@@ -7,3 +7,4 @@ CGCNN_MT/logs
 raw_data
 */feature_folders*
 */slurm_logs*
+*/optuna*.db
