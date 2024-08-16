@@ -1,0 +1,57 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/DUDZOT_clean'
+_cell_length_a  4.50540
+_cell_length_b 10.33540
+_cell_length_c 10.80170
+_cell_angle_alpha 77.93300
+_cell_angle_beta  79.23000
+_cell_angle_gamma 83.14800
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+O       0.0518   0.0494   0.2482     O
+N        0.075   0.5318    0.951     N
+H       0.1246   0.6222   0.1654     H
+Gd     0.17178  0.11326  0.57849    Gd
+O       0.2151    0.748     0.32     O
+C        0.219   0.1369   0.2507     C
+C       0.2475   0.6634   0.0922     C
+O        0.249   0.1775   0.3498     O
+C       0.2491   0.6292   0.9736     C
+H       0.2701   0.1108   0.0029     H
+O       0.2872   0.9101   0.5007     O
+O       0.3676    0.143   0.7583     O
+C       0.3916    0.175   0.0094     C
+C       0.3977   0.2061    0.127     C
+H       0.4246   0.6748   0.7856     H
+C       0.4254   0.6961    0.865     C
+C       0.4267   0.7911   0.2308     C
+C        0.429   0.7586   0.1001     C
+C        0.571   0.2414   0.8999     C
+C       0.5733   0.2089   0.7692     C
+C       0.5746   0.3039    0.135     C
+H       0.5754   0.3252   0.2144     H
+C       0.6023   0.7939    0.873     C
+C       0.6084    0.825   0.9906     C
+O       0.6324    0.857   0.2417     O
+O       0.7128   0.0899   0.4993     O
+H       0.7299   0.8892   0.9971     H
+C       0.7509   0.3708   0.0264     C
+O        0.751   0.8225   0.6502     O
+C       0.7525   0.3366   0.9078     C
+C        0.781   0.8631   0.7493     C
+O       0.7849    0.252     0.68     O
+Gd     0.82822  0.88674  0.42151    Gd
+H       0.8754   0.3778   0.8346     H
+N        0.925   0.4682    0.049     N
+O       0.9482   0.9506   0.7518     O

@@ -1,0 +1,44 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/REGJIW_clean'
+_cell_length_a  5.50600
+_cell_length_b  7.94600
+_cell_length_c  7.94600
+_cell_angle_alpha 108.10000
+_cell_angle_beta  90.22310
+_cell_angle_gamma 90.22310
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Co         0.0  0.12055  0.87945    Co
+Co         0.0  0.87945  0.12055    Co
+O       0.1509   0.1176   0.6432     O
+O       0.1509   0.6432   0.1176     O
+H       0.1642   0.8213   0.8213     H
+O       0.1753   0.8986   0.8986     O
+O       0.3286  0.01855  0.24325     O
+O       0.3286  0.24325  0.01855     O
+C       0.3417   0.0517   0.5671     C
+C       0.3417   0.5671   0.0517     C
+C        0.425   0.0077   0.3843     C
+C        0.425   0.3843   0.0077     C
+Co         0.5      0.0      0.0    Co
+C        0.575   0.6157   0.9923     C
+C        0.575   0.9923   0.6157     C
+C       0.6583   0.4329   0.9483     C
+C       0.6583   0.9483   0.4329     C
+O       0.6714  0.75675  0.98145     O
+O       0.6714  0.98145  0.75675     O
+O       0.8247   0.1014   0.1014     O
+H       0.8358   0.1787   0.1787     H
+O       0.8491   0.3568   0.8824     O
+O       0.8491   0.8824   0.3568     O

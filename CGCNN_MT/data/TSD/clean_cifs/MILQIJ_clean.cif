@@ -1,0 +1,49 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/MILQIJ_clean'
+_cell_length_a  6.61690
+_cell_length_b  9.43000
+_cell_length_c  9.46420
+_cell_angle_alpha 107.57700
+_cell_angle_beta  107.72500
+_cell_angle_gamma 93.20880
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Al         0.0      0.0      0.0    Al
+O       0.0375   0.0885    0.833     O
+C       0.1182   0.9071   0.4475     C
+C       0.1192   0.1533   0.6253     C
+C        0.173   0.1096  0.76874     C
+O       0.1796   0.1704   0.1664     O
+C       0.2514   0.0489   0.5503     C
+O       0.2533   0.9329    0.017     O
+C       0.2794   0.4388   0.4467     C
+C       0.3497   0.5633   0.6087     C
+O       0.3617   0.1044   0.8453     O
+C       0.3638    0.232   0.2307     C
+C       0.4431    0.347   0.3933     C
+O       0.4947   0.1784   0.1736     O
+Al         0.5      0.0      0.0    Al
+O       0.5053   0.8216   0.8264     O
+C       0.5569    0.653   0.6067     C
+C       0.6362    0.768   0.7693     C
+O       0.6383   0.8956   0.1547     O
+C       0.6503   0.4367   0.3913     C
+C       0.7206   0.5612   0.5533     C
+O       0.7467   0.0671    0.983     O
+C       0.7486   0.9511   0.4497     C
+O       0.8204   0.8296   0.8336     O
+C        0.827   0.8904  0.23126     C
+C       0.8808   0.8467   0.3747     C
+C       0.8818   0.0929   0.5525     C
+O       0.9625   0.9115    0.167     O

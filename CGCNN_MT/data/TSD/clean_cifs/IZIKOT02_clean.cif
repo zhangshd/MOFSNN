@@ -1,0 +1,49 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/IZIKOT02_clean'
+_cell_length_a 13.73680
+_cell_length_b  8.87370
+_cell_length_c  7.98390
+_cell_angle_alpha 90.00000
+_cell_angle_beta  120.81500
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+K          0.0      0.0      0.0     K
+Fe         0.0      0.5      0.5    Fe
+C       0.0035   0.3406    0.338     C
+C       0.0035   0.6594    0.338     C
+N       0.0056   0.2409   0.2478     N
+N       0.0056   0.7591   0.2478     N
+C        0.163      0.5   0.6578     C
+N       0.2399      0.0   0.2439     N
+N       0.2601      0.5   0.7561     N
+C        0.337      0.0   0.3422     C
+N       0.4944   0.2591   0.7522     N
+N       0.4944   0.7409   0.7522     N
+C       0.4965   0.1594    0.662     C
+C       0.4965   0.8406    0.662     C
+Fe         0.5      0.0      0.5    Fe
+K          0.5      0.5      0.0     K
+C       0.5035   0.1594    0.338     C
+C       0.5035   0.8406    0.338     C
+N       0.5056   0.2591   0.2478     N
+N       0.5056   0.7409   0.2478     N
+C        0.663      0.0   0.6578     C
+N       0.7399      0.5   0.2439     N
+N       0.7601      0.0   0.7561     N
+C        0.837      0.5   0.3422     C
+N       0.9944   0.2409   0.7522     N
+N       0.9944   0.7591   0.7522     N
+C       0.9965   0.3406    0.662     C
+C       0.9965   0.6594    0.662     C

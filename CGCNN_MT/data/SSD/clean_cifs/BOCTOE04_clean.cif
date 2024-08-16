@@ -1,0 +1,61 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/BOCTOE04_clean'
+_cell_length_a  8.45290
+_cell_length_b  9.35810
+_cell_length_c 12.88400
+_cell_angle_alpha 90.00000
+_cell_angle_beta  105.26500
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+N          0.0   0.4545     0.75     N
+Mn         0.0      0.5      0.0    Mn
+Mn         0.0      0.5      0.5    Mn
+N          0.0   0.5455     0.25     N
+N        0.051   0.4517  0.67521     N
+N        0.051   0.5483  0.17521     N
+N       0.1622   0.3094   0.0406     N
+N       0.1622   0.6906   0.5406     N
+N       0.2186   0.3708   0.4975     N
+N       0.2186   0.6292   0.9975     N
+N         0.25     0.25      0.0     N
+N         0.25     0.25      0.5     N
+N         0.25     0.75      0.0     N
+N         0.25     0.75      0.5     N
+N       0.2814   0.1292   0.5025     N
+N       0.2814   0.8708   0.0025     N
+N       0.3378   0.1906   0.9594     N
+N       0.3378   0.8094   0.4594     N
+N        0.449   0.0483  0.32479     N
+N        0.449   0.9517  0.82479     N
+Mn         0.5      0.0      0.0    Mn
+Mn         0.5      0.0      0.5    Mn
+N          0.5   0.0455     0.25     N
+N          0.5   0.9545     0.75     N
+N        0.551   0.0483  0.17521     N
+N        0.551   0.9517  0.67521     N
+N       0.6622   0.1906   0.5406     N
+N       0.6622   0.8094   0.0406     N
+N       0.7186   0.1292   0.9975     N
+N       0.7186   0.8708   0.4975     N
+N         0.75     0.25      0.0     N
+N         0.75     0.25      0.5     N
+N         0.75     0.75      0.0     N
+N         0.75     0.75      0.5     N
+N       0.7814   0.3708   0.0025     N
+N       0.7814   0.6292   0.5025     N
+N       0.8378   0.3094   0.4594     N
+N       0.8378   0.6906   0.9594     N
+N        0.949   0.4517  0.82479     N
+N        0.949   0.5483  0.32479     N

@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/CAJHUS_clean'
+_cell_length_a  7.32360
+_cell_length_b  7.32360
+_cell_length_c  8.31800
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+H          0.0    0.411      0.0     H
+C          0.0   0.4355      0.5     C
+C          0.0   0.5645      0.0     C
+H          0.0    0.589      0.5     H
+O      0.10827   0.4138  0.39556     O
+O      0.10827  0.69447  0.10444     O
+O      0.30553   0.4138  0.10444     O
+O      0.30553  0.89173  0.39556     O
+Fe     0.33333  0.66667     0.25    Fe
+H        0.411      0.0      0.0     H
+H        0.411    0.411      0.5     H
+O       0.4138  0.10827  0.60444     O
+O       0.4138  0.30553  0.89556     O
+C       0.4355      0.0      0.5     C
+C       0.4355   0.4355      0.0     C
+C       0.5645      0.0      0.0     C
+C       0.5645   0.5645      0.5     C
+O       0.5862  0.69447  0.39556     O
+O       0.5862  0.89173  0.10444     O
+H        0.589      0.0      0.5     H
+H        0.589    0.589      0.0     H
+Fe     0.66667  0.33333     0.75    Fe
+O      0.69447  0.10827  0.89556     O
+O      0.69447   0.5862  0.60444     O
+O      0.89173  0.30553  0.60444     O
+O      0.89173   0.5862  0.89556     O

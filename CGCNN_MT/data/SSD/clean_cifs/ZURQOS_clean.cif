@@ -1,0 +1,51 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/ZURQOS_clean'
+_cell_length_a  6.96000
+_cell_length_b  7.71800
+_cell_length_c  9.69300
+_cell_angle_alpha 90.61000
+_cell_angle_beta  91.72000
+_cell_angle_gamma 90.17000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cd         0.0      0.0      0.0    Cd
+H        0.041  0.08945  0.71974     H
+N       0.1184   0.0042   0.7747     N
+H      0.18828  0.15192   0.5102     H
+N       0.1983   0.2366    0.063     N
+N       0.2369    0.798   0.0513     N
+C       0.3104   0.3397   0.0418     C
+C       0.3229   0.0523   0.7667     C
+C       0.3245   0.0857   0.5065     C
+C       0.3356   0.6827   0.0326     C
+H      0.33699  0.19076  0.79338     H
+H      0.34669  0.11192  0.28713     H
+H      0.40481  0.97528  0.84287     H
+C       0.4112   0.0235   0.6266     C
+C       0.4142   0.0624   0.3804     C
+Ni         0.5      0.5      0.0    Ni
+C       0.5858   0.9376   0.6196     C
+C       0.5888   0.9765   0.3734     C
+H      0.59519  0.02472  0.15713     H
+H      0.65331  0.88808  0.71287     H
+H      0.66301  0.80924  0.20662     H
+C       0.6644   0.3173   0.9674     C
+C       0.6755   0.9143   0.4935     C
+C       0.6771   0.9477   0.2333     C
+C       0.6896   0.6603   0.9582     C
+N       0.7631    0.202   0.9487     N
+N       0.8017   0.7634    0.937     N
+H      0.81172  0.84808   0.4898     H
+N       0.8816   0.9958   0.2253     N
+H        0.959  0.91055  0.28026     H

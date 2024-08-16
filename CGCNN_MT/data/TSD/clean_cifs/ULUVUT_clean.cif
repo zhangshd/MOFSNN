@@ -1,0 +1,55 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/ULUVUT_clean'
+_cell_length_a  8.77960
+_cell_length_b 10.02970
+_cell_length_c 10.15610
+_cell_angle_alpha 119.58700
+_cell_angle_beta  115.60700
+_cell_angle_gamma 90.00450
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+N       0.0292   0.8244   0.8936     N
+N       0.0804   0.2176   0.0178     N
+C       0.0922   0.0755   0.9962     C
+H       0.1246   0.3059    0.122     H
+N       0.1828    0.888   0.0256     N
+N       0.2284   0.0478    0.095     N
+H        0.349   0.8526    0.246     H
+H       0.3753   0.7687   0.3408     H
+N       0.3975   0.8495   0.3274     N
+Zn     0.47961  0.16314  0.27542    Zn
+H       0.5026   0.1839    0.878     H
+C       0.5296   0.9809    0.456     C
+N       0.5325   0.3969   0.3894     N
+H       0.5345   0.4279   0.6592     H
+H       0.5437   0.2756   0.0562     H
+N       0.5438   0.4534   0.2944     N
+N       0.5626   0.1998   0.9822     N
+N        0.564   0.1098   0.4528     N
+N       0.5701   0.5221   0.6726     N
+C       0.5736   0.5249    0.544     C
+N       0.5907   0.6044   0.3872     N
+N       0.5954   0.0713   0.1312     N
+C        0.596   0.0793   0.0038     C
+H        0.603   0.6066    0.754     H
+N       0.6112    0.657   0.5472     N
+N       0.6334   0.9528    0.905     N
+N       0.6356   0.9308   0.1064     N
+N       0.6431   0.0075   0.6106     N
+N       0.6572   0.8624   0.9744     N
+N       0.7035   0.2172   0.6128     N
+Zn     0.70419  0.88772  0.72458    Zn
+N       0.7494    0.159   0.7056     N
+N       0.9642   0.9401   0.8688     N
+H       0.9875   0.2194   0.9438     H

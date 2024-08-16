@@ -1,0 +1,53 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/UFENEZ_clean'
+_cell_length_a  8.19530
+_cell_length_b  7.55770
+_cell_length_c 13.45930
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C        0.015   0.0817   0.7085     C
+C        0.015   0.9183   0.2085     C
+Cu     0.05634  0.09757   0.5653    Cu
+Cu     0.05634  0.90243   0.0653    Cu
+C       0.1419   0.1668    0.016     C
+C       0.1419   0.8332    0.516     C
+N       0.2486   0.2532   0.0381     N
+N       0.2486   0.7468   0.5381     N
+N       0.2514   0.2468   0.5381     N
+N       0.2514   0.7532   0.0381     N
+C       0.3581   0.3332    0.516     C
+C       0.3581   0.6668    0.016     C
+Cu     0.44366  0.40243   0.0653    Cu
+Cu     0.44366  0.59757   0.5653    Cu
+C        0.485   0.4183   0.2085     C
+C        0.485   0.5817   0.7085     C
+C        0.515   0.4183   0.2915     C
+C        0.515   0.5817   0.7915     C
+Cu     0.55634  0.40243   0.4347    Cu
+Cu     0.55634  0.59757   0.9347    Cu
+C       0.6419   0.3332    0.984     C
+C       0.6419   0.6668    0.484     C
+N       0.7486   0.2468   0.9619     N
+N       0.7486   0.7532   0.4619     N
+N       0.7514   0.2532   0.4619     N
+N       0.7514   0.7468   0.9619     N
+C       0.8581   0.1668    0.484     C
+C       0.8581   0.8332    0.984     C
+Cu     0.94366  0.09757   0.9347    Cu
+Cu     0.94366  0.90243   0.4347    Cu
+C        0.985   0.0817   0.7915     C
+C        0.985   0.9183   0.2915     C

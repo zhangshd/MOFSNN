@@ -1,0 +1,57 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/IKETIC_clean'
+_cell_length_a  6.10090
+_cell_length_b  9.97580
+_cell_length_c 13.38250
+_cell_angle_alpha 68.87100
+_cell_angle_beta  81.03300
+_cell_angle_gamma 76.75000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+O       0.0142   0.4303   0.3426     O
+C       0.0493   0.6164   0.5602     C
+N       0.0605   0.1356   0.9458     N
+O       0.0682   0.2904   0.5102     O
+O       0.0844   0.4293   0.1301     O
+C       0.0876   0.4393   0.0345     C
+C       0.1325    0.895   0.0681     C
+Eu     0.16836  0.38563    0.804    Eu
+C       0.1905   0.0294   0.0154     C
+O       0.2144   0.6502   0.1843     O
+O       0.2235   0.3625   0.9867     O
+C       0.2866   0.7678   0.1416     C
+C       0.2903   0.5562    0.527     C
+H        0.294   0.6747   0.3711     H
+H       0.3248   0.0464   0.0288     H
+C       0.3816   0.6025    0.423     C
+N       0.4061    0.453   0.6064     N
+O       0.4785   0.7843   0.1509     O
+O       0.5215   0.2157   0.8491     O
+N       0.5939    0.547   0.3936     N
+C       0.6184   0.3975    0.577     C
+H       0.6752   0.9536   0.9712     H
+H        0.706   0.3253   0.6289     H
+C       0.7097   0.4438    0.473     C
+C       0.7134   0.2322   0.8584     C
+O       0.7765   0.6375   0.0133     O
+O       0.7856   0.3498   0.8157     O
+C       0.8095   0.9706   0.9846     C
+Eu     0.83164  0.61437    0.196    Eu
+C       0.8675    0.105   0.9319     C
+C       0.9124   0.5607   0.9655     C
+O       0.9156   0.5707   0.8699     O
+O       0.9318   0.7096   0.4898     O
+N       0.9395   0.8644   0.0542     N
+C       0.9507   0.3836   0.4398     C
+O       0.9858   0.5697   0.6574     O

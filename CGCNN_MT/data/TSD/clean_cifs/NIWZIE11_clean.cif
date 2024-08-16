@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/NIWZIE11_clean'
+_cell_length_a  7.26050
+_cell_length_b  7.26050
+_cell_length_c  8.21560
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+H          0.0   0.4317      0.5     H
+C          0.0   0.4402      0.0     C
+C          0.0   0.5598      0.5     C
+H          0.0   0.5683      0.0     H
+O      0.10927  0.41936  0.10602     O
+O      0.10927  0.68991  0.39398     O
+O      0.31009  0.41936  0.39398     O
+O      0.31009  0.89073  0.10602     O
+Mg     0.33333  0.66667     0.25    Mg
+O      0.41936  0.10927  0.89398     O
+O      0.41936  0.31009  0.60602     O
+H       0.4317      0.0      0.5     H
+H       0.4317   0.4317      0.0     H
+C       0.4402      0.0      0.0     C
+C       0.4402   0.4402      0.5     C
+C       0.5598      0.0      0.5     C
+C       0.5598   0.5598      0.0     C
+H       0.5683      0.0      0.0     H
+H       0.5683   0.5683      0.5     H
+O      0.58064  0.68991  0.10602     O
+O      0.58064  0.89073  0.39398     O
+Mg     0.66667  0.33333     0.75    Mg
+O      0.68991  0.10927  0.60602     O
+O      0.68991  0.58064  0.89398     O
+O      0.89073  0.31009  0.89398     O
+O      0.89073  0.58064  0.60602     O

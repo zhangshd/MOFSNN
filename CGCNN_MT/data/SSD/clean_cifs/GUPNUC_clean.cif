@@ -1,0 +1,61 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/GUPNUC_clean'
+_cell_length_a  8.60610
+_cell_length_b  9.36560
+_cell_length_c 13.01600
+_cell_angle_alpha 90.00000
+_cell_angle_beta  105.80300
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+N          0.0      0.0      0.0     N
+N          0.0      0.0      0.5     N
+N          0.0      0.5      0.0     N
+N          0.0      0.5      0.5     N
+N       0.0122   0.1247   0.9963     N
+N       0.0122   0.3753   0.4963     N
+N       0.0719   0.0514   0.4439     N
+N       0.0719   0.4486   0.9439     N
+N       0.1668   0.1974   0.8069     N
+N       0.1668   0.3026   0.3069     N
+N       0.2324   0.1947  0.73929     N
+N       0.2324   0.3053  0.23929     N
+Cd     0.24515   0.2484  0.49082    Cd
+Cd     0.24515   0.2516  0.99082    Cd
+N       0.2969   0.1858   0.6715     N
+N       0.2969   0.3142   0.1715     N
+N       0.3946   0.0443   0.0323     N
+N       0.3946   0.4557   0.5323     N
+N       0.4682   0.1203   0.4796     N
+N       0.4682   0.3797   0.9796     N
+N          0.5      0.0      0.0     N
+N          0.5      0.0      0.5     N
+N          0.5      0.5      0.0     N
+N          0.5      0.5      0.5     N
+N       0.5318   0.6203   0.0204     N
+N       0.5318   0.8797   0.5204     N
+N       0.6054   0.5443   0.4677     N
+N       0.6054   0.9557   0.9677     N
+N       0.7031   0.6858   0.8285     N
+N       0.7031   0.8142   0.3285     N
+Cd     0.75485   0.7484  0.00918    Cd
+Cd     0.75485   0.7516  0.50918    Cd
+N       0.7676   0.6947  0.76071     N
+N       0.7676   0.8053  0.26071     N
+N       0.8332   0.6974   0.6931     N
+N       0.8332   0.8026   0.1931     N
+N       0.9281   0.5514   0.0561     N
+N       0.9281   0.9486   0.5561     N
+N       0.9878   0.6247   0.5037     N
+N       0.9878   0.8753   0.0037     N

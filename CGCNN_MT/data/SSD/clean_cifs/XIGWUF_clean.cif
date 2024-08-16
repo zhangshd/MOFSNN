@@ -1,0 +1,53 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/XIGWUF_clean'
+_cell_length_a 13.52850
+_cell_length_b 13.52850
+_cell_length_c 14.27700
+_cell_angle_alpha 61.71970
+_cell_angle_beta  61.71970
+_cell_angle_gamma 60.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Mo         0.0      0.0      0.0    Mo
+C      0.05077  0.89887  0.89239     C
+N      0.07693  0.84573  0.83491     N
+Li     0.09275     0.75     0.75    Li
+C      0.10113  0.84203  0.10761     C
+N      0.15427  0.75757  0.16509     N
+C      0.15797  0.05077  0.89239     C
+N      0.24243  0.07693  0.83491     N
+Li        0.25  0.59275     0.25    Li
+N      0.25757  0.65427  0.66509     N
+C      0.34203  0.60113  0.60761     C
+N      0.34573  0.57693  0.33491     N
+C      0.39887  0.55077  0.39239     C
+Li     0.40725  0.09275     0.75    Li
+N      0.42307  0.25757  0.66509     N
+C      0.44923  0.34203  0.60761     C
+Mo         0.5      0.5      0.5    Mo
+C      0.55077  0.65797  0.39239     C
+N      0.57693  0.74243  0.33491     N
+Li     0.59275  0.90725     0.25    Li
+C      0.60113  0.44923  0.60761     C
+N      0.65427  0.42307  0.66509     N
+C      0.65797  0.39887  0.39239     C
+N      0.74243  0.34573  0.33491     N
+Li        0.75  0.40725     0.75    Li
+N      0.75757  0.92307  0.16509     N
+C      0.84203  0.94923  0.10761     C
+N      0.84573  0.24243  0.83491     N
+C      0.89887  0.15797  0.89239     C
+Li     0.90725     0.25     0.25    Li
+N      0.92307  0.15427  0.16509     N
+C      0.94923  0.10113  0.10761     C

@@ -1,0 +1,55 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/VIRQES_clean'
+_cell_length_a  7.83000
+_cell_length_b  8.04100
+_cell_length_c  9.65200
+_cell_angle_alpha 76.29000
+_cell_angle_beta  78.47000
+_cell_angle_gamma 86.36000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+O       0.0166   0.8015   0.4458     O
+O       0.0283   0.1893   0.2901     O
+O       0.0311   0.1585   0.8382     O
+C       0.0639   0.0735   0.9589     C
+O       0.0744   0.5405    0.635     O
+P       0.0778   0.7329   0.5903     P
+Mn     0.15717  0.96611  0.25182    Mn
+O       0.1862   0.0985   0.0164     O
+Mn     0.19076  0.31033   0.6146    Mn
+O       0.2748   0.7859    0.565     O
+H        0.284    0.874    0.585     H
+O       0.3444   0.0616   0.6493     O
+O       0.3462    0.761    0.217     O
+O       0.4096   0.0531   0.2831     O
+O       0.4157   0.3601   0.7039     O
+C       0.4804    0.762   0.2692     C
+C       0.4817    0.067   0.6951     C
+C       0.5183    0.933   0.3049     C
+C       0.5196    0.238   0.7308     C
+O       0.5843   0.6399   0.2961     O
+O       0.5904   0.9469   0.7169     O
+O       0.6538    0.239    0.783     O
+O       0.6556   0.9384   0.3507     O
+H        0.716    0.126    0.415     H
+O       0.7252   0.2141    0.435     O
+Mn     0.80924  0.68967   0.3854    Mn
+O       0.8138   0.9015   0.9836     O
+Mn     0.84283  0.03389  0.74818    Mn
+P       0.9222   0.2671   0.4097     P
+O       0.9256   0.4595    0.365     O
+C       0.9361   0.9265   0.0411     C
+O       0.9689   0.8415   0.1618     O
+O       0.9717   0.8107   0.7099     O
+O       0.9834   0.1985   0.5542     O

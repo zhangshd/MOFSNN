@@ -1,0 +1,49 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/WS24/clean_cifs/JIZWAS'
+_cell_length_a  6.62370
+_cell_length_b  9.42270
+_cell_length_c  9.70340
+_cell_angle_alpha 108.36200
+_cell_angle_beta  93.68500
+_cell_angle_gamma 107.39500
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Al         0.0      0.0      0.0    Al
+O       0.0316   0.8442   0.0781     O
+C       0.0971   0.6105   0.1251     C
+C       0.1419   0.4565   0.8848     C
+C       0.1739   0.7713    0.103     C
+O       0.1798   0.1645   0.1768     O
+O       0.2336   0.0013   0.9107     O
+C       0.2366   0.5162   0.0454     C
+C       0.2805   0.4373   0.4239     C
+O       0.3527   0.8519   0.0786     O
+C       0.3631   0.6044    0.542     C
+C       0.3709    0.225   0.2441     C
+C       0.4611   0.3957   0.3493     C
+O       0.4981   0.8185   0.8354     O
+Al         0.5      0.0      0.0    Al
+O       0.5019   0.1815   0.1646     O
+C       0.5389   0.6043   0.6507     C
+C       0.6291    0.775   0.7559     C
+C       0.6369   0.3956    0.458     C
+O       0.6473   0.1481   0.9214     O
+C       0.7195   0.5627   0.5761     C
+C       0.7634   0.4838   0.9546     C
+O       0.7664   0.9987   0.0893     O
+O       0.8202   0.8355   0.8232     O
+C       0.8261   0.2287    0.897     C
+C       0.8581   0.5435   0.1152     C
+C       0.9029   0.3895   0.8749     C
+O       0.9684   0.1558   0.9219     O

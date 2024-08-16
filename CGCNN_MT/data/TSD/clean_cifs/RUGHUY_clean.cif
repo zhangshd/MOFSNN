@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/RUGHUY_clean'
+_cell_length_a 11.17200
+_cell_length_b  7.10200
+_cell_length_c  6.53900
+_cell_angle_alpha 90.00000
+_cell_angle_beta  109.47200
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+H          0.0   0.3852      0.5     H
+Tm         0.0  0.45252      0.0    Tm
+C          0.0   0.5162      0.5     C
+O       0.0071   0.5983   0.3346     O
+O       0.1539   0.2936   0.8818     O
+O       0.1704   0.6487   0.1147     O
+H       0.1953   0.7898   0.8929     H
+C       0.2356   0.7472   0.0336     C
+C       0.2644   0.2472   0.9664     C
+H       0.3047   0.2898   0.1071     H
+O       0.3296   0.1487   0.8853     O
+O       0.3461   0.7936   0.1182     O
+O       0.4929   0.0983   0.6654     O
+C          0.5   0.0162      0.5     C
+H          0.5   0.8852      0.5     H
+Tm         0.5  0.95252      0.0    Tm
+O       0.5071   0.0983   0.3346     O
+O       0.6539   0.7936   0.8818     O
+O       0.6704   0.1487   0.1147     O
+H       0.6953   0.2898   0.8929     H
+C       0.7356   0.2472   0.0336     C
+C       0.7644   0.7472   0.9664     C
+H       0.8047   0.7898   0.1071     H
+O       0.8296   0.6487   0.8853     O
+O       0.8461   0.2936   0.1182     O
+O       0.9929   0.5983   0.6654     O

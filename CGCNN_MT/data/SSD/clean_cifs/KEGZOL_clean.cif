@@ -1,0 +1,61 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/KEGZOL_clean'
+_cell_length_a 11.60900
+_cell_length_b 11.60900
+_cell_length_c 11.60900
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cu         0.0      0.0      0.0    Cu
+Cu         0.0      0.5      0.5    Cu
+C       0.0933   0.0933   0.0933     C
+C       0.0933   0.4067   0.4067     C
+C       0.0933   0.5933   0.5933     C
+C       0.0933   0.9067   0.9067     C
+N       0.1471   0.1471   0.1471     N
+N       0.1471   0.3529   0.3529     N
+N       0.1471   0.6471   0.6471     N
+N       0.1471   0.8529   0.8529     N
+Zn        0.25     0.25     0.25    Zn
+Zn        0.25     0.75     0.75    Zn
+N       0.3529   0.1471   0.3529     N
+N       0.3529   0.3529   0.1471     N
+N       0.3529   0.6471   0.8529     N
+N       0.3529   0.8529   0.6471     N
+C       0.4067   0.0933   0.4067     C
+C       0.4067   0.4067   0.0933     C
+C       0.4067   0.5933   0.9067     C
+C       0.4067   0.9067   0.5933     C
+Cu         0.5      0.0      0.5    Cu
+Cu         0.5      0.5      0.0    Cu
+C       0.5933   0.0933   0.5933     C
+C       0.5933   0.4067   0.9067     C
+C       0.5933   0.5933   0.0933     C
+C       0.5933   0.9067   0.4067     C
+N       0.6471   0.1471   0.6471     N
+N       0.6471   0.3529   0.8529     N
+N       0.6471   0.6471   0.1471     N
+N       0.6471   0.8529   0.3529     N
+Zn        0.75     0.25     0.75    Zn
+Zn        0.75     0.75     0.25    Zn
+N       0.8529   0.1471   0.8529     N
+N       0.8529   0.3529   0.6471     N
+N       0.8529   0.6471   0.3529     N
+N       0.8529   0.8529   0.1471     N
+C       0.9067   0.0933   0.9067     C
+C       0.9067   0.4067   0.5933     C
+C       0.9067   0.5933   0.4067     C
+C       0.9067   0.9067   0.0933     C

@@ -1,0 +1,41 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/EBEMEF_clean'
+_cell_length_a  7.46530
+_cell_length_b  7.46530
+_cell_length_c 12.41420
+_cell_angle_alpha 81.72570
+_cell_angle_beta  81.72570
+_cell_angle_gamma 64.27300
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Ni         0.0      0.5      0.0    Ni
+C       0.0404   0.2704  0.09398     C
+N      0.06726  0.12646  0.15003     N
+C       0.0765   0.6077   0.1021     C
+N      0.12315  0.67895  0.16178     N
+Zn     0.12315  0.87685     0.25    Zn
+N      0.12646  0.06726  0.65003     N
+C       0.2704   0.0404  0.59398     C
+N      0.32105  0.87685  0.33822     N
+C       0.3923   0.9235   0.3979     C
+Ni         0.5      0.0      0.5    Ni
+C       0.6077   0.0765   0.6021     C
+N      0.67895  0.12315  0.66178     N
+C       0.7296   0.9596  0.40602     C
+N      0.87354  0.93274  0.34997     N
+Zn     0.87685  0.12315     0.75    Zn
+N      0.87685  0.32105  0.83822     N
+C       0.9235   0.3923   0.8979     C
+N      0.93274  0.87354  0.84997     N
+C       0.9596   0.7296  0.90602     C

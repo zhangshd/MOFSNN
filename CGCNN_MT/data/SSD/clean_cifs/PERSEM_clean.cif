@@ -1,0 +1,49 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/PERSEM_clean'
+_cell_length_a  6.30570
+_cell_length_b  8.35290
+_cell_length_c  9.10640
+_cell_angle_alpha 98.20000
+_cell_angle_beta  91.28000
+_cell_angle_gamma 103.20000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Zn         0.0      0.5      0.5    Zn
+O         0.02   0.2991  0.34065     O
+C       0.0603   0.1368   0.1127     C
+C       0.1117   0.8722   0.9896     C
+C       0.1322   0.2912   0.2296     C
+C       0.1713   0.0092   0.1031     C
+O       0.1928   0.6346  0.07706     O
+C       0.2265    0.731   0.9816     C
+O       0.2926  0.40182  0.20554     O
+C       0.3497   0.0207    0.219     C
+O       0.3518   0.0995   0.3425     O
+O       0.3543   0.7098  0.88134     O
+H        0.407    0.042    0.745     H
+O       0.4951   0.9394   0.1753     O
+U          0.5      0.5      0.0     U
+O       0.5049   0.0606   0.8247     O
+H        0.593    0.958    0.255     H
+O       0.6457   0.2902  0.11866     O
+O       0.6482   0.9005   0.6575     O
+C       0.6503   0.9793    0.781     C
+O       0.7074  0.59818  0.79446     O
+C       0.7735    0.269   0.0184     C
+O       0.8072   0.3654  0.92294     O
+C       0.8287   0.9908   0.8969     C
+C       0.8678   0.7088   0.7704     C
+C       0.8883   0.1278   0.0104     C
+C       0.9397   0.8632   0.8873     C
+O         0.98   0.7009  0.65935     O

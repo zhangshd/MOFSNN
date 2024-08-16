@@ -1,0 +1,53 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/WS24/clean_cifs/SAXLEK'
+_cell_length_a 11.93300
+_cell_length_b 11.93300
+_cell_length_c  8.54860
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Ag         0.0      0.5      0.0    Ag
+N       0.1724      0.5      0.0     N
+C       0.2041      0.5   0.2906     C
+C       0.2041      0.5   0.7094     C
+C       0.2416      0.5   0.1234     C
+C       0.2416      0.5   0.8766     C
+N        0.349      0.5   0.0815     N
+N        0.349      0.5   0.9185     N
+Ag         0.5      0.0      0.5    Ag
+N          0.5   0.1724      0.5     N
+C          0.5   0.2041   0.2094     C
+C          0.5   0.2041   0.7906     C
+C          0.5   0.2416   0.3766     C
+C          0.5   0.2416   0.6234     C
+N          0.5    0.349   0.4185     N
+N          0.5    0.349   0.5815     N
+Ag         0.5      0.5     0.25    Ag
+Ag         0.5      0.5     0.75    Ag
+N          0.5    0.651   0.4185     N
+N          0.5    0.651   0.5815     N
+C          0.5   0.7584   0.3766     C
+C          0.5   0.7584   0.6234     C
+C          0.5   0.7959   0.2094     C
+C          0.5   0.7959   0.7906     C
+N          0.5   0.8276      0.5     N
+N        0.651      0.5   0.0815     N
+N        0.651      0.5   0.9185     N
+C       0.7584      0.5   0.1234     C
+C       0.7584      0.5   0.8766     C
+C       0.7959      0.5   0.2906     C
+C       0.7959      0.5   0.7094     C
+N       0.8276      0.5      0.0     N

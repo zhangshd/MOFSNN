@@ -1,0 +1,51 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/WS24/clean_cifs/GAYFOD'
+_cell_length_a  7.30070
+_cell_length_b  8.83120
+_cell_length_c  8.83120
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C          0.0  0.43928      0.0     C
+C          0.0  0.56072      0.0     C
+N      0.09314   0.2023      0.0     N
+N      0.09314   0.7977      0.0     N
+C      0.15071  0.34876      0.0     C
+C      0.15071  0.65124      0.0     C
+H      0.22554      0.0    0.382     H
+H      0.22554      0.0    0.618     H
+Zn        0.25      0.0      0.0    Zn
+H      0.27446    0.382      0.0     H
+H      0.27446    0.618      0.0     H
+C      0.34929      0.0  0.34876     C
+C      0.34929      0.0  0.65124     C
+N      0.40686      0.0   0.2023     N
+N      0.40686      0.0   0.7977     N
+C          0.5      0.0  0.43928     C
+C          0.5      0.0  0.56072     C
+N      0.59314      0.0   0.2023     N
+N      0.59314      0.0   0.7977     N
+C      0.65071      0.0  0.34876     C
+C      0.65071      0.0  0.65124     C
+H      0.72554    0.382      0.0     H
+H      0.72554    0.618      0.0     H
+Zn        0.75      0.0      0.0    Zn
+H      0.77446      0.0    0.382     H
+H      0.77446      0.0    0.618     H
+C      0.84929  0.34876      0.0     C
+C      0.84929  0.65124      0.0     C
+N      0.90686   0.2023      0.0     N
+N      0.90686   0.7977      0.0     N

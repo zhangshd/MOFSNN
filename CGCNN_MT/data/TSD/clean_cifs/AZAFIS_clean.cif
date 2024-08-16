@@ -1,0 +1,55 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/AZAFIS_clean'
+_cell_length_a  7.78340
+_cell_length_b 10.13010
+_cell_length_c 10.32770
+_cell_angle_alpha 103.87300
+_cell_angle_beta  91.79700
+_cell_angle_gamma 90.93500
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C       0.0029   0.6172   0.9564     C
+Br     0.00374  0.21483  0.09376    Br
+O       0.0107   0.4873   0.3542     O
+C       0.0578   0.5006   0.1299     C
+C       0.0604   0.6192   0.0853     C
+H       0.1008   0.7002    0.142     H
+C       0.1165   0.5108   0.2729     C
+Br     0.17285  0.98647  0.29075    Br
+O       0.2189   0.2843   0.4819     O
+Ca     0.25016  0.53263  0.54032    Ca
+O       0.2692   0.5465   0.3064     O
+C        0.361   0.9988   0.4149     C
+H       0.3681   0.7961   0.3913     H
+C       0.3744   0.2604   0.4672     C
+C       0.4218   0.8779   0.4356     C
+C       0.4371   0.1228   0.4776     C
+O       0.4844    0.347   0.4514     O
+O       0.5156    0.653   0.5486     O
+C       0.5629   0.8772   0.5224     C
+C       0.5782   0.1221   0.5644     C
+C       0.6256   0.7396   0.5328     C
+H       0.6319   0.2039   0.6087     H
+C        0.639   0.0012   0.5851     C
+O       0.7308   0.4535   0.6936     O
+Ca     0.74984  0.46737  0.45968    Ca
+O       0.7811   0.7157   0.5181     O
+Br     0.82715  0.01353  0.70925    Br
+C       0.8835   0.4892   0.7271     C
+H       0.8992   0.2998    0.858     H
+C       0.9396   0.3808   0.9147     C
+C       0.9422   0.4994   0.8701     C
+O       0.9893   0.5127   0.6458     O
+Br     0.99626  0.78517  0.90624    Br
+C       0.9971   0.3828   0.0436     C

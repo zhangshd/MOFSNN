@@ -1,0 +1,57 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/SADMIV_clean'
+_cell_length_a  6.83060
+_cell_length_b  7.64270
+_cell_length_c 10.58440
+_cell_angle_alpha 111.16400
+_cell_angle_beta  102.97500
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Fe         0.0      0.0      0.0    Fe
+O       0.0676   0.1152   0.8726     O
+C       0.0842    0.031    0.637     C
+C       0.1135   0.9401   0.4038     C
+O       0.1405   0.2196   0.1778     O
+H       0.1605   0.3803     0.43     H
+C       0.1745   0.0641   0.7838     C
+H        0.195   0.8971   0.3348     H
+C       0.1977   0.9711   0.5408     C
+O         0.25   0.8865      1.0     O
+C       0.3023   0.4303   0.4592     C
+H        0.305   0.5623   0.6652     H
+C       0.3255   0.2803   0.2162     C
+H       0.3395   0.9503     0.57     H
+O       0.3595   0.0418   0.8222     O
+C       0.3865   0.5363   0.5962     C
+C       0.4158    0.394    0.363     C
+O       0.4324   0.2426   0.1274     O
+Fe         0.5      0.0      0.0    Fe
+O       0.5676   0.7574   0.8726     O
+C       0.5842    0.606    0.637     C
+C       0.6135   0.4637   0.4038     C
+O       0.6405   0.9582   0.1778     O
+H       0.6605   0.0497     0.43     H
+C       0.6745   0.7197   0.7838     C
+H        0.695   0.4377   0.3348     H
+C       0.6977   0.5697   0.5408     C
+O         0.75   0.1135      1.0     O
+C       0.8023   0.0289   0.4592     C
+H        0.805   0.1029   0.6652     H
+C       0.8255   0.9359   0.2162     C
+H       0.8395   0.6197     0.57     H
+O       0.8595   0.7804   0.8222     O
+C       0.8865   0.0599   0.5962     C
+C       0.9158    0.969    0.363     C
+O       0.9324   0.8848   0.1274     O

@@ -1,0 +1,59 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/WS24/clean_cifs/POZKUL'
+_cell_length_a  6.57900
+_cell_length_b 10.66620
+_cell_length_c 10.66620
+_cell_angle_alpha 117.17700
+_cell_angle_beta  107.88400
+_cell_angle_gamma 72.11550
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Au         0.0      0.0      0.0    Au
+Sn         0.0      0.0      0.5    Sn
+H       0.0001   0.7326   0.4232     H
+C       0.0092    0.624   0.8202     C
+C        0.044    0.969   0.1774     C
+N       0.0675   0.9552   0.2806     N
+C       0.1165   0.1918    0.591     C
+N        0.158   0.5664   0.8778     N
+H       0.1715   0.2167   0.6921     H
+H       0.2312    0.179   0.5458     H
+Au        0.25  0.27294  0.27294    Au
+H       0.2688   0.5458    0.179     H
+H       0.3285   0.6921   0.2167     H
+N        0.342   0.8778   0.5664     N
+C       0.3835    0.591   0.1918     C
+N       0.4325   0.2806   0.9552     N
+C        0.456   0.1774    0.969     C
+C       0.4908   0.8202    0.624     C
+H       0.4999   0.4232   0.7326     H
+Au         0.5      0.0      0.0    Au
+Sn         0.5      0.5      0.0    Sn
+H       0.5001   0.5768   0.2674     H
+C       0.5092   0.1798    0.376     C
+C        0.544   0.8226    0.031     C
+N       0.5675   0.7194   0.0448     N
+C       0.6165    0.409   0.8082     C
+N        0.658   0.1222   0.4336     N
+H       0.6715   0.3079   0.7833     H
+H       0.7312   0.4542    0.821     H
+Au        0.75  0.72706  0.72706    Au
+H       0.7688    0.821   0.4542     H
+H       0.8285   0.7833   0.3079     H
+N        0.842   0.4336   0.1222     N
+C       0.8835   0.8082    0.409     C
+N       0.9325   0.0448   0.7194     N
+C        0.956    0.031   0.8226     C
+C       0.9908    0.376   0.1798     C
+H       0.9999   0.2674   0.5768     H

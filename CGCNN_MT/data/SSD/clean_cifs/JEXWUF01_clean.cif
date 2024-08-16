@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/JEXWUF01_clean'
+_cell_length_a  7.30580
+_cell_length_b  7.30580
+_cell_length_c  8.18970
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+H          0.0    0.408      0.5     H
+C          0.0    0.439      0.0     C
+C          0.0    0.561      0.5     C
+H          0.0    0.592      0.0     H
+O      0.10955  0.41693  0.10556     O
+O      0.10955  0.69262  0.39444     O
+O      0.30738  0.41693  0.39444     O
+O      0.30738  0.89045  0.10556     O
+Co     0.33333  0.66667     0.25    Co
+H        0.408      0.0      0.5     H
+H        0.408    0.408      0.0     H
+O      0.41693  0.10955  0.89444     O
+O      0.41693  0.30738  0.60556     O
+C        0.439      0.0      0.0     C
+C        0.439    0.439      0.5     C
+C        0.561      0.0      0.5     C
+C        0.561    0.561      0.0     C
+O      0.58307  0.69262  0.10556     O
+O      0.58307  0.89045  0.39444     O
+H        0.592      0.0      0.0     H
+H        0.592    0.592      0.5     H
+Co     0.66667  0.33333     0.75    Co
+O      0.69262  0.10955  0.60556     O
+O      0.69262  0.58307  0.89444     O
+O      0.89045  0.30738  0.89444     O
+O      0.89045  0.58307  0.60556     O

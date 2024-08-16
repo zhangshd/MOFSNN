@@ -1,0 +1,41 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/LUFQUZ02_clean'
+_cell_length_a  7.24210
+_cell_length_b  7.26660
+_cell_length_c  7.26960
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Fe         0.0      0.0      0.0    Fe
+N          0.0   0.2051   0.2088     N
+N          0.0   0.2051   0.7912     N
+C          0.0   0.3243    0.312     C
+C          0.0   0.3243    0.688     C
+Ni         0.0      0.5      0.5    Ni
+C          0.0   0.6757    0.312     C
+C          0.0   0.6757    0.688     C
+N          0.0   0.7949   0.2088     N
+N          0.0   0.7949   0.7912     N
+N       0.3073      0.0      0.0     N
+H       0.3406      0.0   0.2661     H
+H       0.3406      0.0   0.7339     H
+C       0.4031      0.0   0.1544     C
+C       0.4031      0.0   0.8456     C
+C       0.5969      0.0   0.1544     C
+C       0.5969      0.0   0.8456     C
+H       0.6594      0.0   0.2661     H
+H       0.6594      0.0   0.7339     H
+N       0.6927      0.0      0.0     N

@@ -1,0 +1,43 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/PEWFII_clean'
+_cell_length_a  7.10700
+_cell_length_b  7.22340
+_cell_length_c  9.20500
+_cell_angle_alpha 95.37700
+_cell_angle_beta  91.25600
+_cell_angle_gamma 114.89300
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cu         0.0      0.0      0.5    Cu
+O       0.0102  0.16313  0.68625     O
+C       0.0414   0.4328  0.86239     C
+C       0.0938   0.3551  0.71816     C
+C       0.1322   0.5247  0.12236     C
+C       0.1725   0.4585  0.98397     C
+O       0.2221  0.48518  0.64632     O
+O       0.2397   0.5993  0.37788     O
+C       0.2701   0.5391  0.25138     C
+H       0.2886   0.4314   0.9732     H
+O       0.4157   0.4827  0.23425     O
+U          0.5      0.5      0.5     U
+O       0.5843   0.5173  0.76575     O
+H       0.7114   0.5686   0.0268     H
+C       0.7299   0.4609  0.74862     C
+O       0.7603   0.4007  0.62212     O
+O       0.7779  0.51482  0.35368     O
+C       0.8275   0.5415  0.01603     C
+C       0.8678   0.4753  0.87764     C
+C       0.9062   0.6449  0.28184     C
+C       0.9586   0.5672  0.13761     C
+O       0.9898  0.83687  0.31375     O

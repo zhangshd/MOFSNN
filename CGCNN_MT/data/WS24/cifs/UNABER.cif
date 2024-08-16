@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/Users/gianmarcoterrones/Research/MOFs/MOF_structures/water_stability_work_extra_structs/cleaned_from_CoRE/UNABER_clean'
+_cell_length_a  8.71250
+_cell_length_b 13.57150
+_cell_length_c 13.57150
+_cell_angle_alpha 120.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cu     0.02186   0.5613   0.1226    Cu
+Cu     0.02186   0.5613  0.43871    Cu
+Cu     0.02186  0.87741  0.43871    Cu
+S      0.06318  0.48744  0.24372     S
+S      0.06318  0.75628  0.24372     S
+S      0.06318  0.75628  0.51256     S
+Mo      0.1562 0.66666667 0.33333333    Mo
+N       0.2286   0.5124   0.0248     N
+N       0.2286   0.5124   0.4876     N
+N       0.2286   0.9752   0.4876     N
+C       0.3402    0.028    0.514     C
+C       0.3402    0.486    0.514     C
+C       0.3402    0.486    0.972     C
+Cu     0.52186  0.12259   0.5613    Cu
+Cu     0.52186   0.4387  0.56129    Cu
+Cu     0.52186   0.4387  0.87741    Cu
+S      0.56318  0.24372  0.48744     S
+S      0.56318  0.24372  0.75628     S
+S      0.56318  0.51256  0.75628     S
+Mo      0.6562 0.33333333 0.66666667    Mo
+N       0.7286   0.0248   0.5124     N
+N       0.7286   0.4876   0.5124     N
+N       0.7286   0.4876   0.9752     N
+C       0.8402    0.514    0.028     C
+C       0.8402    0.514    0.486     C
+C       0.8402    0.972    0.486     C

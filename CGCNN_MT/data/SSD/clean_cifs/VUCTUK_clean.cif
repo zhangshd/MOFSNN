@@ -1,0 +1,55 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/VUCTUK_clean'
+_cell_length_a  7.78950
+_cell_length_b  8.07540
+_cell_length_c  9.72860
+_cell_angle_alpha 75.90200
+_cell_angle_beta  79.14200
+_cell_angle_gamma 86.69500
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C        0.018   0.7389   0.7309     C
+C       0.0212   0.4301   0.3055     C
+O       0.0887   0.1403   0.2918     O
+O       0.0888   0.4521   0.7147     O
+O       0.1545   0.7433   0.7783     O
+O       0.1601   0.4357   0.3501     O
+H       0.2208   0.6399    0.391     H
+O       0.2279    0.724   0.4228     O
+O       0.3131   0.4017   0.9844     O
+Mn     0.32238  0.19107  0.37035    Mn
+Mn     0.34203  0.53297  0.74731    Mn
+P      0.42679  0.76977  0.40487     P
+C       0.4338   0.4273    0.042     C
+O       0.4397   0.9602   0.3549     O
+O       0.4647   0.3139   0.7056     O
+O       0.4674   0.3473   0.1635     O
+O       0.4771   0.7041   0.5542     O
+O       0.5229   0.2959   0.4458     O
+O       0.5326   0.6527   0.8365     O
+O       0.5353   0.6861   0.2944     O
+O       0.5603   0.0398   0.6451     O
+C       0.5662   0.5727    0.958     C
+P      0.57321  0.23023  0.59513     P
+Mn     0.65797  0.46703  0.25269    Mn
+Mn     0.67762  0.80893  0.62965    Mn
+O       0.6869   0.5983   0.0156     O
+O       0.7721    0.276   0.5772     O
+H       0.7792   0.3601    0.609     H
+O       0.8399   0.5643   0.6499     O
+O       0.8455   0.2567   0.2217     O
+O       0.9112   0.5479   0.2853     O
+O       0.9113   0.8597   0.7082     O
+C       0.9788   0.5699   0.6945     C
+C        0.982   0.2611   0.2691     C

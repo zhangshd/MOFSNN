@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/Users/gianmarcoterrones/Research/MOFs/MOF_structures/water_stability_work_extra_structs/cleaned_from_CoRE/EDIKEH_clean'
+_cell_length_a  8.22930
+_cell_length_b  9.73860
+_cell_length_c  9.75430
+_cell_angle_alpha 60.74100
+_cell_angle_beta  72.35700
+_cell_angle_gamma 84.66600
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C       0.0071   0.0565   0.5326     C
+O       0.0869    0.972   0.3289     O
+O       0.1183   0.1716   0.4386     O
+O       0.3098   0.0932   0.0119     O
+Y       0.3296   0.1587   0.2132     Y
+O       0.3298   0.4223   0.1811     O
+O       0.3404   0.9217   0.4702     O
+C       0.4271    0.024   0.9608     C
+O       0.4398   0.9918   0.8468     O
+C       0.4419    0.524   0.0635     C
+C        0.443   0.9235   0.5411     C
+O       0.4632    0.812   0.6732     O
+O         0.47   0.6605   0.0369     O
+O         0.53   0.3395   0.9631     O
+O       0.5368    0.188   0.3268     O
+C        0.557   0.0765   0.4589     C
+C       0.5581    0.476   0.9365     C
+O       0.5602   0.0082   0.1532     O
+C       0.5729    0.976   0.0392     C
+O       0.6596   0.0783   0.5298     O
+O       0.6702   0.5777   0.8189     O
+Y       0.6704   0.8413   0.7868     Y
+O       0.6902   0.9068   0.9881     O
+O       0.8817   0.8284   0.5614     O
+O       0.9131    0.028   0.6711     O
+C       0.9929   0.9435   0.4674     C

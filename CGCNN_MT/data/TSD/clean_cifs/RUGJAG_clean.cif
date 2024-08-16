@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/RUGJAG_clean'
+_cell_length_a 11.12700
+_cell_length_b  7.08700
+_cell_length_c  6.51830
+_cell_angle_alpha 90.00000
+_cell_angle_beta  109.33400
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+H          0.0   0.5766      0.5     H
+Yb         0.0    0.643      0.0    Yb
+C          0.0    0.708      0.5     C
+O       0.0072   0.7885    0.334     O
+O       0.1548    0.483     0.88     O
+O       0.1694    0.838    0.114     O
+H       0.1981    0.976    0.892     H
+C       0.2367    0.935    0.034     C
+C       0.2633    0.435    0.966     C
+H       0.3019    0.476    0.108     H
+O       0.3306    0.338    0.886     O
+O       0.3452    0.983     0.12     O
+O       0.4928   0.2885    0.666     O
+H          0.5   0.0766      0.5     H
+Yb         0.5    0.143      0.0    Yb
+C          0.5    0.208      0.5     C
+O       0.5072   0.2885    0.334     O
+O       0.6548    0.983     0.88     O
+O       0.6694    0.338    0.114     O
+H       0.6981    0.476    0.892     H
+C       0.7367    0.435    0.034     C
+C       0.7633    0.935    0.966     C
+H       0.8019    0.976    0.108     H
+O       0.8306    0.838    0.886     O
+O       0.8452    0.483     0.12     O
+O       0.9928   0.7885    0.666     O

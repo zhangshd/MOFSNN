@@ -1,0 +1,51 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/GAYGAQ_clean_h'
+_cell_length_a  7.13280
+_cell_length_b  8.72070
+_cell_length_c  9.69840
+_cell_angle_alpha 116.71800
+_cell_angle_beta  111.57600
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cu         0.0      0.0      0.0    Cu
+C      0.03911  0.58516  0.57822     C
+N      0.06168  0.81272  0.81402     N
+C      0.07012  0.32793  0.33172     C
+H      0.14172  0.00561  0.38397     H
+C       0.2384  0.67207  0.66828     C
+H      0.24225  0.37836  0.38397     H
+N      0.24766   0.9987  0.18598     N
+N      0.25234  0.81272  0.81402     N
+H      0.25775  0.99439  0.61603     H
+C       0.2616  0.00379  0.33172     C
+H      0.35828  0.62164  0.61603     H
+C      0.42988  0.99621  0.66828     C
+N      0.43832   0.9987  0.18598     N
+C      0.46089  0.00694  0.42178     C
+Cu         0.5      0.0      0.0    Cu
+C      0.53911  0.99306  0.57822     C
+N      0.56168   0.0013  0.81402     N
+C      0.57012  0.00379  0.33172     C
+H      0.64172  0.37836  0.38397     H
+C       0.7384  0.99621  0.66828     C
+H      0.74225  0.00561  0.38397     H
+N      0.74766  0.18728  0.18598     N
+N      0.75234   0.0013  0.81402     N
+H      0.75775  0.62164  0.61603     H
+C       0.7616  0.32793  0.33172     C
+H      0.85828  0.99439  0.61603     H
+C      0.92988  0.67207  0.66828     C
+N      0.93832  0.18728  0.18598     N
+C      0.96089  0.41484  0.42178     C

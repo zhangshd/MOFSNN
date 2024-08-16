@@ -1,0 +1,40 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/POZHUI_ion_b'
+_cell_length_a 30.98400
+_cell_length_b 30.98400
+_cell_length_c 30.98400
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+O      0.12374 -0.46185  0.05981     O
+C      0.16164 -0.44927  0.06791     C
+O       0.1682      0.0  0.10976     O
+O      0.16891      0.0  0.23967     O
+O      0.16993  -0.4104  0.05869     O
+C      0.16999 -0.39883  0.16999     C
+Mg      0.1747      0.0   0.1747    Mg
+C      0.17629 -0.32854  0.14532     C
+O      0.18097 -0.06473  0.18097     O
+O      0.18816 -0.25339   0.1308     O
+C      0.19082 -0.29213  0.11803     C
+N      0.19313 -0.37107  0.13906     N
+H      0.19328 -0.41296  0.19328     H
+C      0.19351 -0.47717  0.08643     C
+O      0.20754 -0.29973   0.0814     O
+N      0.23149 -0.46303  0.10417     N
+In        0.25 -0.39494  0.10506    In
+C      0.25304     -0.5  0.11507     C
+H      0.28484     -0.5  0.12936     H

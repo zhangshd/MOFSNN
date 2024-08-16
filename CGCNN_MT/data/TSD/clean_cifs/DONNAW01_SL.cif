@@ -1,0 +1,33 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/TSD/clean_cifs/DONNAW01_SL'
+_cell_length_a 17.43700
+_cell_length_b  6.74750
+_cell_length_c 12.15410
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+O      0.58949   0.0826   0.5886     O
+C      0.61762     0.25   0.6108     C
+C      0.69218     0.25   0.6712     C
+H       0.7021   0.5647   0.6704     H
+C      0.72605   0.4274   0.6995     C
+C      0.79127   0.4288   0.7651     C
+H       0.8119   0.5661   0.7989     H
+C      0.82814     0.25   0.7914     C
+C      0.89907     0.25     0.86     C
+O      0.92632    0.083  0.88584     O
+O       0.9936     0.25   1.0734     O
+Ga         1.0      0.0      1.0    Ga

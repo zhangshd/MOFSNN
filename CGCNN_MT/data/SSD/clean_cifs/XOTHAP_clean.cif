@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MofS-CGCNN/ML/data/SSD/clean_cifs/XOTHAP_clean'
+_cell_length_a  8.62220
+_cell_length_b  9.56830
+_cell_length_c  9.57120
+_cell_angle_alpha 109.38800
+_cell_angle_beta  98.50800
+_cell_angle_gamma 102.36100
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+O       0.0013     0.04   0.8347     O
+O       0.0176    0.608   0.6897     O
+C       0.0286   0.0699   0.9767     C
+C       0.0448   0.5123   0.5805     C
+C       0.0826   0.9836   0.5193     C
+O       0.0836    0.878    0.568     O
+O       0.0976   0.1989   0.0795     O
+O       0.1382    0.428   0.5882     O
+Nd      0.1614  0.22834  0.34985    Nd
+O       0.2039   0.0678   0.4985     O
+O        0.344   0.4651   0.3453     O
+O       0.4315   0.3403    0.544     O
+C       0.4749   0.5356    0.442     C
+C       0.5251   0.4644    0.558     C
+O       0.5685   0.6597    0.456     O
+O        0.656   0.5349   0.6547     O
+O       0.7961   0.9322   0.5015     O
+Nd      0.8386  0.77166  0.65015    Nd
+O       0.8618    0.572   0.4118     O
+O       0.9024   0.8011   0.9205     O
+O       0.9164    0.122    0.432     O
+C       0.9174   0.0164   0.4807     C
+C       0.9552   0.4877   0.4195     C
+C       0.9714   0.9301   0.0233     C
+O       0.9824    0.392   0.3103     O
+O       0.9987     0.96   0.1653     O
