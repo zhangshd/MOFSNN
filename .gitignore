@@ -9,7 +9,7 @@ raw_data
 *perf_logs.txt
 *events.out.tfevents.*
 test.ipynb
-CGCNN_MT/logs/*
+CGCNN_MT/logs/*/*
 !CGCNN_MT/logs/TSD_seed42_cgcnn_raw/version_29/
 !CGCNN_MT/logs/SSD_seed42_cgcnn_raw/version_4/
 !CGCNN_MT/logs/WS24_water_seed42_cgcnn_raw/version_29/
