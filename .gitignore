@@ -36,3 +36,13 @@ CGCNN_MT/data/CoREMOF2019
 !CGCNN_MT/logs/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43/
 !CGCNN_MT/logs/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_3
 !CGCNN_MT/logs/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_1
+
+*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+logs*
+CGCNN_MT/logs
+raw_data
+*/feature_folders*
+*/slurm_logs*
