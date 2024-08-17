@@ -1,3 +1,10 @@
+'''
+Author: zhangshd
+Date: 2024-08-16 11:04:13
+LastEditors: zhangshd
+LastEditTime: 2024-08-17 19:32:49
+'''
+## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
 
 import os
 import sys

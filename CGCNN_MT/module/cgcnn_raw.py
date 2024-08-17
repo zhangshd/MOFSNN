@@ -1,3 +1,11 @@
+'''
+Author: zhangshd
+Date: 2024-08-09 16:49:54
+LastEditors: zhangshd
+LastEditTime: 2024-08-17 19:33:07
+'''
+## This script is adapted from CGCNN(https://github.com/txie-93/cgcnn)
+
 from __future__ import print_function, division
 
 import torch

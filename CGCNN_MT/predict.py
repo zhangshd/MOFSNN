@@ -1,3 +1,9 @@
+'''
+Author: zhangshd
+Date: 2024-08-17 19:01:41
+LastEditors: zhangshd
+LastEditTime: 2024-08-17 19:17:05
+'''
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -202,24 +208,14 @@ def process_clf_outputs(targets, preds, logits, cifids, task, split, **kwargs):
 if __name__ == '__main__':
     
     # parser = ArgumentParser()
-    # parser.add_argument('--model_dir', default="/home/zhangsd/repos/MOF-MTHNN/CGCNN-MT/lightning_logs/version_26_prop_AdsCO2_all_condi", type=str)
+    # parser.add_argument('--model_dir', type=str)
 
     # args = parser.parse_args()
     # main(args.model_dir)
     
     model_dirs = [
 
-        # "./logs/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_142",
-        # "./logs/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_82",
-        # "./logs/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_uni_atom/version_14",
-        # "./logs/TSD2_SSD_WS24_water_WS24_water4_seed42_att_cgcnn/version_44",
-        # "./logs/TSD2_SSD_WS24_water_WS24_water4_seed42_att_cgcnn/version_23"
-        # "./logs/TSD_SSD_WS24_water_WS24_water4_seed42_att_cgcnn/version_60",
-        # "./logs0715/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43",
-        # "./logs0715/TSD_SSD_WS24_water_WS24_water4_seed42_att_cgcnn/version_13",
-        # "./logs0715/TSD_SSD_WS24_water_WS24_water4_seed42_att_cgcnn/version_28",
-        # "./logs0715/TSD_seed42_cgcnn_raw/version_29",
-        "./logs0715/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24"
+        "./logs/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24"
 
         
     ]
@@ -247,13 +243,11 @@ if __name__ == '__main__':
         "./data/TSD",
         "./data/SSD", 
         "./data/WS24",
-        # "./data/TSD2"
     ]
     col2tasks = [
         {"Label": "TSD"},
         {"Label": "SSD"},
         {"water_label": "WS24_water", "water4_label": "WS24_water4", "acid_label": "WS24_acid", "base_label": "WS24_base", "boiling_label": "WS24_boiling"},
-        # {"Label": "TSD2"},
         ]
     for model_dir in model_dirs:
         model_name = "@".join(str(model_dir).split("/")[-2:])

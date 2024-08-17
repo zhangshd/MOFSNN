@@ -1,6 +1,14 @@
+'''
+Author: zhangshd
+Date: 2024-08-09 16:49:54
+LastEditors: zhangshd
+LastEditTime: 2024-08-17 19:43:22
+'''
+
+## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
+
 # This script removes overlapping atoms
 # and floating (unbound) solvent from CIFs.
-# Use molSimplify version 1.7.3
 
 from molSimplify.Informatics.MOF.PBC_functions import solvent_removal, overlap_removal
 from pathlib import Path
@@ -25,27 +33,28 @@ def standardized_cif(cif_file, out_file, primitive=False, spacegroup=False):
     if not spacegroup:
         struct.to(out_file, fmt='cif')
         return out_file
-    # 创建 SpacegroupAnalyzer 对象
+    # Create SpacegroupAnalyzer object
     spacegroup_analyzer = SpacegroupAnalyzer(struct)
     if primitive:
         standardized_structure = spacegroup_analyzer.get_primitive_standard_structure()
         standardized_structure = standardized_structure.get_primitive_structure()
     else:
-        # 获取空间群符号
+        # Get space group symbol
         space_group_symbol = spacegroup_analyzer.get_space_group_symbol()
         # print("Space Group Symbol:", space_group_symbol)
-        # 获取空间群编号
+        # Get space group number
         space_group_number = spacegroup_analyzer.get_space_group_number()
         # print("Space Group Number:", space_group_number)
-        # 获取空间群操作
+        # Get space group operations
         space_group_operations = spacegroup_analyzer.get_space_group_operations()
         # print("Space Group Operations:", space_group_operations)
-        # 获取标准化的晶体结构（按照国际晶体学联合会标准）
+        # Get standardized crystal structure (according to International Union of Crystallography standard)
         standardized_structure = spacegroup_analyzer.get_refined_structure()
         # print("Standardized Structure:", standardized_structure)
     standardized_structure.to(out_file, fmt='cif')
-    print("standardized struacture saved to: ", out_file)
+    print("standardized structure saved to: ", out_file)
     return out_file
+
 
 def main(cif_dir, output_dir, log_file=None, santize=True, n_cpus=1, **kwargs):
     

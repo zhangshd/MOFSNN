@@ -1,3 +1,11 @@
+'''
+Author: zhangshd
+Date: 2024-08-16 11:04:32
+LastEditors: zhangshd
+LastEditTime: 2024-08-17 19:33:30
+'''
+## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
+
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

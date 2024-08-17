@@ -1,3 +1,11 @@
+'''
+Author: zhangshd
+Date: 2024-08-09 16:49:54
+LastEditors: zhangshd
+LastEditTime: 2024-08-17 19:35:59
+'''
+## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
+
 import os
 import math
 import logging
@@ -301,26 +309,3 @@ if __name__ == "__main__":
     #                     print(f"Failed to generate graph data for {cif_file}")
     #                     continue
     #                 shutil.copy(cach_dir/g_file_name, split_dir/g_file_name)
-    # for dataset in ["KVRH", "GVRH"]:
-    #     dataset_dir = root_dir/dataset
-    #     split_dir = dataset_dir/"total"
-    #     file_list = list(split_dir.glob("*.cif"))
-    #     file_list.sort()
-    #     with mp.Pool(processes=32) as pool:
-    #         flags = pool.map(partial(make_prepared_data, root_dataset_total=cach_dir, radius=8, max_num_nbr=10), file_list)
-    #     for flag, cif_file in tqdm(zip(flags, file_list)):
-    #         g_file_name = cif_file.stem + ".graphdata"
-    #         if (cach_dir/g_file_name).exists():
-    #             shutil.copy(cach_dir/g_file_name, split_dir/g_file_name)
-    #             continue
-    #         elif not flag:
-    #             print(f"Failed to generate graph data for {cif_file}")
-    #             continue
-    #         else:
-    #             flag = make_prepared_data(cif_file, cach_dir, radius=8, max_num_nbr=10)
-    #             if not flag:
-    #                 print(f"Failed to generate graph data for {cif_file}")
-    #                 continue
-    #             shutil.copy(cach_dir/g_file_name, split_dir/g_file_name)
-
-

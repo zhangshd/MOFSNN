@@ -1,3 +1,12 @@
+'''
+Author: zhangshd
+Date: 2024-08-09 16:49:54
+LastEditors: zhangshd
+LastEditTime: 2024-08-17 19:33:52
+'''
+
+## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer)
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pytorch_lightning as pl
@@ -157,7 +166,7 @@ def plot_confusion_matrix(cm, title=None, outfile=None, ax=None, cbar=True):
     ax.set_aspect('equal')
     if cbar:
         plt.colorbar(im, fraction=0.046, pad=0.04)
-    ## 在混淆矩阵中显示预测正确的数量
+    
     for i in range(num_classes):
         for j in range(num_classes):
             ax.text(j, i, cm[i, j], ha='center', va='center', color='black')

@@ -7,6 +7,9 @@ import pandas as pd
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive
 import multiprocessing as mp
 
+## This script is adapted from the original example_feature_generation.py script provided by Terrones et al. in their published work:
+## Terrones G G, Huang S P, Rivera M P, et al. Journal of the American Chemical Society, 2024, 146(29): 20333–20348.
+
 # Use molSimplify version 1.7.3 and pymatgen=2020.10.20
 # Use Zeo++-0.3
 # This script generates RAC and Zeo++ features for the specified CIFs.

@@ -1,6 +1,11 @@
+'''
+Author: zhangshd
+Date: 2024-08-17 19:43:39
+LastEditors: zhangshd
+LastEditTime: 2024-08-17 19:43:40
+'''
 # This script removes overlapping atoms
 # and floating (unbound) solvent from CIFs.
-# Use molSimplify version 1.7.3
 
 from molSimplify.Informatics.MOF.PBC_functions import solvent_removal, overlap_removal
 from pathlib import Path

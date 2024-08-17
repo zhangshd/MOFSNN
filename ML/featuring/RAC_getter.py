@@ -2,6 +2,8 @@ import sys
 from molSimplify.Informatics.MOF.MOF_descriptors import get_MOF_descriptors
 
 # This is called by example_feature_generation.py.
+## This script is adapted from the original scripts provided by Terrones et al. in their published work:
+## Terrones G G, Huang S P, Rivera M P, et al. Journal of the American Chemical Society, 2024, 146(29): 20333–20348.
 
 def main():
 

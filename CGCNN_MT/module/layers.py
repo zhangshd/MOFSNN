@@ -1,3 +1,9 @@
+'''
+Author: zhangshd
+Date: 2024-08-09 16:49:54
+LastEditors: zhangshd
+LastEditTime: 2024-08-17 19:18:15
+'''
 import torch
 import torch.nn as nn
 from torch.nn import init
