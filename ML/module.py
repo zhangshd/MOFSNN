@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-15 15:51:31
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:19:42
+LastEditTime: 2024-08-17 20:02:53
 '''
 import os
 import time
@@ -74,11 +74,9 @@ def plot_scatter(targets, predictions, title: str=None, metrics: dict=None, outf
     ax.set_xlabel(f"Groud Truth")
     ax.set_ylabel(f"Predictions")
 
-    # 设置x轴和y轴的范围，确保它们一致
     ax.set_xlim(min_value - offset, max_value + offset)
     ax.set_ylim(min_value - offset, max_value + offset)
 
-    # 画对角线，从(0, 0)到图的右上角
     ax.plot([min_value, max_value], [min_value, max_value], 'r--')  # 'r--'表示红色虚线
 
     if metrics:
@@ -109,7 +107,7 @@ def plot_confusion_matrix(targets, predictions, title=None, outfile=None):
     ax.set_title(title+f'(ACC={acc:.2f}%)')
     ax.set_aspect('equal')
     plt.colorbar(im, fraction=0.046, pad=0.04)
-    ## 在混淆矩阵中显示预测正确的数量
+    
     for i in range(num_classes):
         for j in range(num_classes):
             ax.text(j, i, cm[i, j], ha='center', va='center', color='black')
