@@ -8,6 +8,7 @@ raw_data
 */optuna*.db
 *perf_logs.txt
 *events.out.tfevents.*
+logs
 test.ipynb
 CGCNN_MT/logs/*/*
 !CGCNN_MT/logs/TSD_seed42_cgcnn_raw/version_29/
