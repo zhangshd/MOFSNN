@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:35:59
+LastEditTime: 2024-08-19 16:18:21
 '''
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
 
@@ -153,7 +153,7 @@ def make_prepared_data(
     # Grid data and Graph data already exists
     if p_graphdata.exists():
         logger.info(f"{cif_id} graph data already exists")
-        return True
+        return p_graphdata
 
     # valid cif check
     # try:
@@ -198,6 +198,7 @@ def make_prepared_data(
     data = [cif_id, atom_num, nbr_idx, nbr_dist, uni_idx, uni_count, cellpars]
     with open(str(p_graphdata), "wb") as f:
         pickle.dump(data, f)
+    return p_graphdata
 
 def prepare_data(root_cifs, root_dataset, **kwargs):
     """

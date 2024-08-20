@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:33:52
+LastEditTime: 2024-08-20 16:36:41
 '''
 
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer)
@@ -271,6 +271,19 @@ def dist_penalty(d):
     """
     return np.exp(-d ** 2)
 
+def weighted_average(values, weights):
+    """
+    Calculate the weighted average of a set of values.
+
+    Parameters:
+    values (np.ndarray): Values to average.
+    weights (np.ndarray): Corresponding weights.
+
+    Returns:
+    float: Weighted average.
+    """
+    return np.sum(values * weights) / np.sum(weights)
+
 def calculate_lsd(latent_vectors_train, latent_vectors_test, k=1):
     """
     Calculate the Latent Space Distance (LSD) for regression tasks.
@@ -302,6 +315,43 @@ def calculate_lsd(latent_vectors_train, latent_vectors_test, k=1):
     
     return norm_avg_knn_dist, avg_distances, avg_traintrain
 
+def calculate_lsv(latent_vectors_train, labels_train, latent_vectors_test, k=5):
+    """
+    Calculate Latent Space Variance (LSV) for regression tasks by considering the labels of the nearest neighbors.
+
+    Parameters:
+    latent_vectors_train (np.ndarray): Latent vectors of the training data.
+    labels_train (np.ndarray): Labels of the training data.
+    latent_vectors_test (np.ndarray): Latent vectors of the test data.
+    k (int): Number of nearest neighbors to consider.
+
+    Returns:
+    np.ndarray: Variance values for each test point.
+    """
+    # Calculate distances between test points and training points
+    dists = pairwise_distances(latent_vectors_test, latent_vectors_train, metric='euclidean')
+    nearest_neighbors = np.argsort(dists, axis=1)[:, :k]
+    nearest_dists = np.take_along_axis(dists, nearest_neighbors, axis=1)
+    
+    variances = []
+    
+    for i, neighbors in enumerate(nearest_neighbors):
+        # Get the labels of the nearest neighbors
+        neighbor_labels = labels_train[neighbors]
+        
+        # Calculate weights based on distances
+        weights = dist_penalty(nearest_dists[i])
+        
+        # Calculate weighted average of the neighbor labels
+        weighted_avg = weighted_average(neighbor_labels, weights)
+        
+        # Calculate variance of neighbor labels as a measure of uncertainty
+        variance = np.average((neighbor_labels - weighted_avg) ** 2, weights=weights)
+        
+        variances.append(variance)
+    
+    return np.array(variances)
+
 def calculate_entropy(dists, neighbor_targets, num_classes):
     """
     Calculate the entropy for each test point based on its nearest neighbors.
@@ -323,9 +373,9 @@ def calculate_entropy(dists, neighbor_targets, num_classes):
             d = dists[i][j]
             if d <= 10:
                 if d != 0:
-                    probabilities[target] += dist_penalty(d)
+                    probabilities[target] += dist_penalty(d) 
                 else:
-                    probabilities[target] += 100
+                    probabilities[target] += 100 
         
         # Normalize the probabilities
         total = np.sum(probabilities)

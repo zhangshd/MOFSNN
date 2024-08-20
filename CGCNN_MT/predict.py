@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-17 19:01:41
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:17:05
+LastEditTime: 2024-08-19 16:04:30
 '''
 import os
 import sys
@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 from CGCNN_MT.utils import load_model_from_dir, MODEL_NAME_TO_DATASET_CLS
 from torch.utils.data import DataLoader
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 matplotlib.use('Agg')
 
 UNITS = {
