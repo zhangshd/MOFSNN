@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2024-08-20 16:36:41
+LastEditTime: 2024-09-13 17:24:43
 '''
 
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer)
@@ -420,3 +420,70 @@ def calculate_lse(latent_vectors_train, labels_train, latent_vectors_test, k=5):
     nearest_labels = labels_train[nearest_neighbors]
     # print(nearest_labels.shape)
     return calculate_entropy(nearest_dists, nearest_labels, num_classes)
+
+def calculate_lsv_from_tree(tree_dic, latent_vectors_test, k=5):
+    """
+    Calculate Latent Space Variance (LSV) for regression tasks by considering the labels of the nearest neighbors.
+
+    Parameters:
+    tree_dic: dictory object which contains ball tree of training set features, traning set labels, and average distance of k nearest neighbors for training set.
+    latent_vectors_test (np.ndarray): Latent vectors of the test data.
+    k (int): Number of nearest neighbors to consider.
+
+    Returns:
+    np.ndarray: Variance values for each test point.
+    """
+    # Calculate distances between test points and training points
+
+    balltree = tree_dic["tree"]
+    labels_train= tree_dic["labels_train"]
+    avg_traintrain = tree_dic["avg_dist_traintrian"]
+    nearest_dists, nearest_neighbors = balltree.query(latent_vectors_test, k=k, dualtree=True)
+    # nearest_dists /= avg_traintrain
+
+    variances = []
+    for i, neighbors in enumerate(nearest_neighbors):
+        # Get the labels of the nearest neighbors
+        neighbor_labels = labels_train[neighbors]
+        
+        # Calculate weights based on distances
+        weights = dist_penalty(nearest_dists[i])
+        
+        # Calculate weighted average of the neighbor labels
+        weighted_avg = weighted_average(neighbor_labels, weights)
+        
+        # Calculate variance of neighbor labels as a measure of uncertainty
+        variance = np.average((neighbor_labels - weighted_avg) ** 2, weights=weights)
+        
+        variances.append(variance)
+    variances = np.array(variances)
+    if "scaler" in tree_dic:
+        variances = tree_dic["scaler"].transform(variances.reshape(-1, 1)).reshape(-1)
+    return variances
+
+def calculate_lse_from_tree(tree_dic, latent_vectors_test, k=5):
+    """
+    Calculate the Latent Space Entropy (LSE) for classification tasks.
+
+    Parameters:
+    tree_dic: dictory object which contains ball tree of training set features, traning set labels, and average distance of k nearest neighbors for training set.
+    latent_vectors_test (np.ndarray): Latent vectors of the test data.
+    k (int): Number of nearest neighbors to consider.
+
+    Returns:
+    np.ndarray: Entropy values for each test point.
+    """
+    
+    balltree = tree_dic["tree"]
+    labels_train= tree_dic["labels_train"]
+    avg_traintrain = tree_dic["avg_dist_traintrian"]
+    nearest_dists, nearest_neighbors = balltree.query(latent_vectors_test, k=k, dualtree=True)
+
+    nearest_dists /= avg_traintrain
+    nearest_labels = labels_train[nearest_neighbors]
+    num_classes = len(np.unique(labels_train))
+    # print(nearest_labels.shape)
+    entropies = calculate_entropy(nearest_dists, nearest_labels, num_classes)
+    if "scaler" in tree_dic:
+        entropies = tree_dic["scaler"].transform(np.array(entropies).reshape(-1, 1)).reshape(-1)
+    return entropies

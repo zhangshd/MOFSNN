@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-17 19:01:41
 LastEditors: zhangshd
-LastEditTime: 2024-08-19 16:04:30
+LastEditTime: 2024-09-13 16:40:32
 '''
 import os
 import sys
@@ -226,7 +226,7 @@ if __name__ == '__main__':
         "./data/WS24v2_external_test", 
     ]
     col2tasks = [
-        {"ts_label": "TSD", "ss_label": "SSD", "ts2_label": "TSD2"},
+        {"ts_label": "TSD", "ss_label": "SSD"},
         {"water_label": "WS24_water", "water4_label": "WS24_water4", "acid_label": "WS24_acid", "base_label": "WS24_base", "boiling_label": "WS24_boiling"}
         ]
     split = "external_test"

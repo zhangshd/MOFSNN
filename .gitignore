@@ -13,6 +13,7 @@ test.ipynb
 CGCNN_MT/logs/*/*
 inference/*
 */inference/*
+CGCNN_MT/data/CoREMOF2019
 !CGCNN_MT/logs/TSD_seed42_cgcnn_raw/version_29/
 !CGCNN_MT/logs/SSD_seed42_cgcnn_raw/version_4/
 !CGCNN_MT/logs/WS24_water_seed42_cgcnn_raw/version_29/

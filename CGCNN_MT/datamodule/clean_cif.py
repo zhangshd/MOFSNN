@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2024-08-27 17:23:25
+LastEditTime: 2024-09-13 17:01:29
 '''
 
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
@@ -108,23 +108,12 @@ def main(cif_dir, output_dir, log_file=None, sanitize=True, n_cpus=None, **kwarg
         n_cpus = min(int(mp.cpu_count()*0.8), len(os.listdir(cif_dir)))
 
     # Create a Lock for logging to avoid conflicts
-    log_lock = mp.Lock()
+    cif_paths = list(cif_dir.glob('*.cif'))
+    print("Number of CIFs to clean:", len(cif_paths))
     
+    # Create a Pool
     with mp.Pool(processes=n_cpus) as pool:
-        results = []
-        for cif_path in cif_dir.glob('*.cif'):
-            output_path = str(output_dir / cif_path.name)
-            cif_path = str(cif_path)
-            result = pool.apply_async(
-                clean_cif, 
-                args=(cif_path, output_path, log_file, sanitize), 
-                kwds={'log_lock': log_lock, **kwargs}
-            )
-            results.append(result)
-        
-        # Ensure all processes complete
-        for result in results:
-            result.wait()
+        pool.starmap(clean_cif, [(str(cif_path), str(output_dir / cif_path.name), log_file, sanitize) for cif_path in cif_paths])
 
     # process_dir = cif_dir
     # if sanitize:

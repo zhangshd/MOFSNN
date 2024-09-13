@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2024-08-19 16:18:21
+LastEditTime: 2024-09-13 22:13:20
 '''
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
 
@@ -243,20 +243,24 @@ def prepare_data(root_cifs, root_dataset, **kwargs):
     ):
         make_prepared_data(cif, root_dataset_total, logger, **kwargs)
 
-def main(cif_dir, radius=8, max_num_nbr=10, n_cpus=32):
+def main(cif_dir, out_dir=None, radius=8, max_num_nbr=10, n_cpus=32):
     cif_dir = Path(cif_dir)
+    if out_dir is None:
+        out_dir = cif_dir
+    else:
+        out_dir = Path(out_dir)
     dataset = cif_dir.parent.name
-    logger = get_logger(filename=str(cif_dir.parent/f"prepare_data_{dataset}.log"))
+    logger = get_logger(filename=str(out_dir.parent/f"prepare_data_{dataset}.log"))
     if n_cpus > 1:
         with mp.Pool(processes=n_cpus) as pool:
-            pool.map(partial(make_prepared_data, root_dataset_total=cif_dir, 
+            pool.map(partial(make_prepared_data, root_dataset_total=out_dir, 
                             radius=radius, max_num_nbr=max_num_nbr, logger=logger), cif_dir.glob("*.cif"))
     for cif_file in tqdm(list(cif_dir.glob("*.cif"))):
         g_file_name = cif_file.stem + ".graphdata"
-        if (cif_dir/g_file_name).exists():
+        if (out_dir/g_file_name).exists():
             continue
         else:
-            flag = make_prepared_data(cif_file, cif_dir, radius=radius, max_num_nbr=max_num_nbr, logger=logger)
+            flag = make_prepared_data(cif_file, out_dir, radius=radius, max_num_nbr=max_num_nbr, logger=logger)
             if not flag:
                 print(f"Failed to generate graph data for {cif_file}")
                 continue
@@ -266,6 +270,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--cif_dir", type=str, required=True)
+    parser.add_argument("--out_dir", type=str, default=None)
     parser.add_argument("--radius", type=int, default=8)
     parser.add_argument("--max_num_nbr", type=int, default=10)
     parser.add_argument("--n_cpus", type=int, default=32)
