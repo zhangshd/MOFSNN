@@ -1,10 +1,33 @@
-*/__pycache__/
-*.vscode
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# special files
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.clinerules
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# VS Code
+.vscode/
 *.cli*
+*.cur*
 *.pyc
 *.pyo
 *.pyd
-raw_data
+
+# Data files
 */feature_folders*
 */slurm_logs*
 */optuna*.db
@@ -12,8 +35,7 @@ raw_data
 *events.out.tfevents.*
 logs
 test.ipynb
-CGCNN_MT/logs/*/*
-inference/*
+src/cgcnn/logs/*/*
 */inference/*
 CGCNN_MT/data/CoREMOF2019
 !CGCNN_MT/logs/TSD_seed42_cgcnn_raw/version_29/
@@ -46,3 +68,26 @@ CGCNN_MT/logs
 raw_data
 */feature_folders*
 */slurm_logs*
+inference/*
+*/raw_data
+data/cgcnn_data/CoREMOF2019
+!results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29/
+!results/cgcnn_models/SSD_seed42_cgcnn_raw/version_4/
+!results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_29/
+!results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_3/
+!results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_47/
+!results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_0/
+!results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_7/
+!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24/
+!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43/
+!results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29/
+!results/cgcnn_models/SSD_seed42_cgcnn_raw/version_4/
+!results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_29/
+!results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_3/
+!results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_47/
+!results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_0/
+!results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_7/
+!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24/
+!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43/
+!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_3
+!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_1
