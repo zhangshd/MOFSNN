@@ -1,0 +1,41 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/ja4012707_si_004_clean'
+_cell_length_a  8.21690
+_cell_length_b  8.21690
+_cell_length_c 13.17050
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C         0.08     0.54    0.515     C
+C         0.08     0.54    0.985     C
+Zn    0.33333333 0.66666667  0.58303    Zn
+C     0.33333333 0.66666667    0.705     C
+C     0.33333333 0.66666667    0.795     C
+Zn    0.33333333 0.66666667  0.91697    Zn
+C         0.46     0.54    0.515     C
+C         0.46     0.54    0.985     C
+C         0.46     0.92    0.515     C
+C         0.46     0.92    0.985     C
+C         0.54     0.08    0.015     C
+C         0.54     0.08    0.485     C
+C         0.54     0.46    0.015     C
+C         0.54     0.46    0.485     C
+Zn    0.66666667 0.33333333  0.08303    Zn
+C     0.66666667 0.33333333    0.205     C
+C     0.66666667 0.33333333    0.295     C
+Zn    0.66666667 0.33333333  0.41697    Zn
+C         0.92     0.46    0.015     C
+C         0.92     0.46    0.485     C

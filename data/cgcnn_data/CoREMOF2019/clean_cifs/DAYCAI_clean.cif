@@ -1,0 +1,48 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/DAYCAI_clean'
+_cell_length_a 10.23450
+_cell_length_b 10.23450
+_cell_length_c  7.07990
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Na         0.0      0.0      0.0    Na
+Na         0.0      0.0      0.5    Na
+O       0.0309   0.1827     0.75     O
+O       0.0309   0.8482     0.75     O
+C        0.127   0.3175     0.75     C
+C        0.127   0.8095     0.75     C
+O       0.1518   0.1827     0.75     O
+O       0.1518   0.9691     0.75     O
+O        0.179   0.0895     0.25     O
+N      0.22125   0.4425     0.75     N
+N      0.22125  0.77875     0.75     N
+C       0.3163  0.15815     0.25     C
+Zn    0.33333333 0.66666667     0.75    Zn
+N       0.4425  0.22125     0.25     N
+N       0.5575  0.77875     0.75     N
+Zn    0.66666667 0.33333333     0.25    Zn
+C       0.6825   0.8095     0.75     C
+N      0.77875  0.22125     0.25     N
+N      0.77875   0.5575     0.25     N
+C       0.8095    0.127     0.25     C
+C       0.8095   0.6825     0.25     C
+O       0.8173   0.8482     0.75     O
+O       0.8173   0.9691     0.75     O
+O       0.8482   0.0309     0.25     O
+O       0.8482   0.8173     0.25     O
+O       0.9691   0.1518     0.25     O
+O       0.9691   0.8173     0.25     O

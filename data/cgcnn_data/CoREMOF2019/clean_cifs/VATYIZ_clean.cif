@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/VATYIZ_clean'
+_cell_length_a  8.67300
+_cell_length_b  9.41100
+_cell_length_c 10.04800
+_cell_angle_alpha 63.70800
+_cell_angle_beta  76.11300
+_cell_angle_gamma 75.45000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C        0.016   0.5891     0.95     C
+O       0.0808   0.3024   0.0217     O
+O       0.1382   0.6028   0.8501     O
+O       0.3262   0.0794   0.9176     O
+Nd      0.3298  0.36454  0.84235    Nd
+O        0.338   0.5929   0.5921     O
+O       0.3404   0.3927   0.0745     O
+C       0.4299   0.9737   0.9861     C
+O       0.4355   0.8228   0.0371     O
+C       0.4445   0.5817   0.4852     C
+C       0.4448   0.4613   0.0762     C
+O       0.4703   0.4756   0.1877     O
+O       0.4719   0.6906   0.3564     O
+O       0.5281   0.3094   0.6436     O
+O       0.5297   0.5244   0.8123     O
+C       0.5552   0.5387   0.9238     C
+C       0.5555   0.4183   0.5148     C
+O       0.5645   0.1772   0.9629     O
+C       0.5701   0.0263   0.0139     C
+O       0.6596   0.6073   0.9255     O
+O        0.662   0.4071   0.4079     O
+Nd      0.6702  0.63546  0.15765    Nd
+O       0.6738   0.9206   0.0824     O
+O       0.8618   0.3972   0.1499     O
+O       0.9192   0.6976   0.9783     O
+C        0.984   0.4109     0.05     C

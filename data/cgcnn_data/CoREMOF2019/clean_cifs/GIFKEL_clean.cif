@@ -1,0 +1,55 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/GIFKEL_clean'
+_cell_length_a  9.54000
+_cell_length_b  7.61100
+_cell_length_c  7.12000
+_cell_angle_alpha 90.00000
+_cell_angle_beta  100.95000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cd         0.0      0.0      0.0    Cd
+Ni         0.0      0.5      0.5    Ni
+C       0.0405   0.3273    0.334     C
+C       0.0405   0.6727    0.334     C
+N       0.0622   0.2209   0.2302     N
+N       0.0622   0.7791   0.2302     N
+H          0.2    0.101    0.677     H
+H          0.2    0.899    0.677     H
+N       0.2297      0.0   0.9402     N
+C       0.2522      0.0   0.7419     C
+H        0.287     0.08    0.022     H
+H        0.287     0.92    0.022     H
+H        0.363    0.106    0.431     H
+H        0.363    0.894    0.431     H
+C       0.4066      0.0    0.721     C
+C       0.4227      0.0   0.5112     C
+H        0.474    0.106    0.808     H
+H        0.474    0.894    0.808     H
+H        0.526    0.106    0.192     H
+H        0.526    0.894    0.192     H
+C       0.5773      0.0   0.4888     C
+C       0.5934      0.0    0.279     C
+H        0.637    0.106    0.569     H
+H        0.637    0.894    0.569     H
+H        0.713     0.08    0.978     H
+H        0.713     0.92    0.978     H
+C       0.7478      0.0   0.2581     C
+N       0.7703      0.0   0.0598     N
+H          0.8    0.101    0.323     H
+H          0.8    0.899    0.323     H
+N       0.9378   0.2209   0.7698     N
+N       0.9378   0.7791   0.7698     N
+C       0.9595   0.3273    0.666     C
+C       0.9595   0.6727    0.666     C

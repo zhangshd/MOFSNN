@@ -1,0 +1,34 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/FIGXAU_clean'
+_cell_length_a  6.54700
+_cell_length_b  6.63230
+_cell_length_c  6.63230
+_cell_angle_alpha 115.20500
+_cell_angle_beta  106.37100
+_cell_angle_gamma 73.62930
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Er         0.0      0.0      0.0    Er
+C       0.0334   0.4686   0.9374     C
+O       0.1151   0.6311   0.9753     O
+H        0.116    0.843    0.461     H
+O       0.1208   0.3133   0.0045     O
+O       0.3349   0.8461   0.8607     O
+H          0.5     0.07     0.07     H
+C          0.5   0.9344   0.9344     C
+O       0.6651   0.8607   0.8461     O
+O       0.8792   0.0045   0.3133     O
+H        0.884    0.461    0.843     H
+O       0.8849   0.9753   0.6311     O
+C       0.9666   0.9374   0.4686     C

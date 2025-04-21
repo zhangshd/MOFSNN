@@ -1,0 +1,59 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/AZAWAZ_clean'
+_cell_length_a  5.58500
+_cell_length_b 11.35900
+_cell_length_c 14.62400
+_cell_angle_alpha 98.03000
+_cell_angle_beta  99.00000
+_cell_angle_gamma 103.86000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+O         0.01    0.897     0.72     O
+C        0.046    0.975    0.042     C
+O        0.067    0.339    0.346     O
+C        0.087    0.701    0.729     C
+O        0.093    0.129   0.9522     O
+Na       0.118   0.7478   0.1343    Na
+C        0.139    0.838    0.767     C
+O          0.2    0.643   0.7772     O
+O        0.233    0.035   0.0949     O
+U        0.261  0.20118  0.42509     U
+O        0.263    0.365    0.971     O
+O        0.287    0.542   0.9194     O
+O        0.291    0.881    0.841     O
+O        0.311    0.994   0.3907     O
+O        0.364    0.793   0.0052     O
+C        0.377    0.473    0.969     C
+C        0.442    0.957    0.454     C
+U       0.4596  0.24486  0.07682     U
+O        0.489    0.854   0.4432     O
+O        0.511    0.146   0.5568     O
+U       0.5404  0.75514  0.92318     U
+C        0.558    0.043    0.546     C
+C        0.623    0.527    0.031     C
+O        0.636    0.207   0.9948     O
+O        0.689    0.006   0.6093     O
+O        0.709    0.119    0.159     O
+O        0.713    0.458   0.0806     O
+O        0.737    0.635    0.029     O
+U        0.739  0.79882  0.57491     U
+O        0.767    0.965   0.9051     O
+O          0.8    0.357   0.2228     O
+C        0.861    0.162    0.233     C
+Na       0.882   0.2522   0.8657    Na
+O        0.907    0.871   0.0478     O
+C        0.913    0.299    0.271     C
+O        0.933    0.661    0.654     O
+C        0.954    0.025    0.958     C
+O         0.99    0.103     0.28     O

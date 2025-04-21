@@ -1,0 +1,43 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/BOHGOU_clean'
+_cell_length_a  7.73100
+_cell_length_b  7.84550
+_cell_length_c  7.84550
+_cell_angle_alpha 116.47300
+_cell_angle_beta  103.02500
+_cell_angle_gamma 103.02500
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+O        0.009   0.4109   0.0597     O
+H        0.025    0.613    0.523     H
+C       0.0276   0.4958   0.3992     C
+C       0.0803   0.5399   0.2463     C
+O       0.0914   0.0451   0.2919     O
+O       0.2008   0.7192   0.3224     O
+Mn        0.25  0.85669  0.14331    Mn
+O       0.3681   0.0447   0.0289     O
+H        0.447    0.501    0.313     H
+C       0.4812   0.2268   0.1186     C
+C        0.483    0.388   0.3158     C
+O        0.509   0.0597   0.4109     O
+H        0.525    0.523    0.613     H
+C       0.5276   0.3992   0.4958     C
+C       0.5803   0.2463   0.5399     C
+O       0.5914   0.2919   0.0451     O
+O       0.7008   0.3224   0.7192     O
+Mn        0.75  0.14331  0.85669    Mn
+O       0.8681   0.0289   0.0447     O
+H        0.947    0.313    0.501     H
+C       0.9812   0.1186   0.2268     C
+C        0.983   0.3158    0.388     C

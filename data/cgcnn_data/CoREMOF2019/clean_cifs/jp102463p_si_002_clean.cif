@@ -1,0 +1,57 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/jp102463p_si_002_clean'
+_cell_length_a  6.84700
+_cell_length_b 11.19120
+_cell_length_c 11.19120
+_cell_angle_alpha 71.93010
+_cell_angle_beta  72.18710
+_cell_angle_gamma 72.18710
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cr         0.0      0.0      0.5    Cr
+O        0.011    0.992    0.678     O
+C        0.069    0.995    0.867     C
+H        0.134    0.613    0.499     H
+C        0.135    0.999    0.067     C
+C        0.142    0.989    0.727     C
+O        0.181    0.822    0.508     O
+C        0.201    0.001    0.933     C
+H        0.246    0.387    0.501     H
+O         0.25     0.05     0.45     O
+H        0.254    0.999    0.113     H
+C        0.299    0.567    0.499     C
+O        0.319    0.992    0.678     O
+C        0.358    0.773    0.511     C
+C        0.365    0.433    0.501     C
+H        0.366    0.001    0.887     H
+C        0.431    0.633    0.505     C
+O        0.489    0.822    0.508     O
+Cr         0.5      0.0      0.5    Cr
+O        0.511    0.178    0.492     O
+C        0.569    0.367    0.495     C
+H        0.634    0.999    0.113     H
+C        0.635    0.567    0.499     C
+C        0.642    0.227    0.489     C
+O        0.681    0.008    0.322     O
+C        0.701    0.433    0.501     C
+H        0.746    0.001    0.887     H
+O         0.75     0.95     0.55     O
+H        0.754    0.613    0.499     H
+C        0.799    0.999    0.067     C
+O        0.819    0.178    0.492     O
+C        0.858    0.011    0.273     C
+C        0.865    0.001    0.933     C
+H        0.866    0.387    0.501     H
+C        0.931    0.005    0.133     C
+O        0.989    0.008    0.322     O

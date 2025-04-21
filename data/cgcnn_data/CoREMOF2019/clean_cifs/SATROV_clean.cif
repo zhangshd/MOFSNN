@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/SATROV_clean'
+_cell_length_a  8.53300
+_cell_length_b  9.37000
+_cell_length_c 10.00300
+_cell_angle_alpha 63.28300
+_cell_angle_beta  75.90500
+_cell_angle_gamma 74.27600
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C       0.0153   0.5869   0.9516     C
+O       0.0832   0.3023    0.017     O
+O       0.1371   0.6052   0.8502     O
+O       0.3204   0.0866    0.919     O
+Gd      0.3325  0.36823   0.8405    Gd
+O       0.3419   0.3916   0.0745     O
+O       0.3427   0.6001   0.5918     O
+C       0.4287   0.9734   0.9881     C
+O       0.4314   0.8245   0.0394     O
+C       0.4437    0.461   0.0759     C
+C       0.4452    0.585   0.4843     C
+O       0.4669   0.4767   0.1867     O
+O       0.4701    0.693   0.3535     O
+O       0.5299    0.307   0.6465     O
+O       0.5331   0.5233   0.8133     O
+C       0.5548    0.415   0.5157     C
+C       0.5563    0.539   0.9241     C
+O       0.5686   0.1755   0.9606     O
+C       0.5713   0.0266   0.0119     C
+O       0.6573   0.3999   0.4082     O
+O       0.6581   0.6084   0.9255     O
+Gd      0.6675  0.63177   0.1595    Gd
+O       0.6796   0.9134    0.081     O
+O       0.8629   0.3948   0.1498     O
+O       0.9168   0.6977    0.983     O
+C       0.9847   0.4131   0.0484     C

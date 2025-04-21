@@ -1,0 +1,43 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/AHOKIR01_clean'
+_cell_length_a  4.39990
+_cell_length_b  6.67080
+_cell_length_c 10.55870
+_cell_angle_alpha 108.41500
+_cell_angle_beta  91.18690
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+P       0.0194  0.82578  0.65156     P
+C        0.076   0.9667   0.9334     C
+C        0.136   0.0913   0.1826     C
+H        0.197    0.039    0.936     H
+H        0.197    0.897    0.936     H
+O       0.2079   0.0089    0.637     O
+O       0.2079   0.6281    0.637     O
+H         0.23    0.187    0.184     H
+H         0.23    0.997    0.184     H
+O        0.255   0.2245    0.449     O
+Cu         0.5      0.0      0.5    Cu
+Cu         0.5      0.5      0.5    Cu
+O        0.745   0.7755    0.551     O
+H         0.77    0.003    0.816     H
+H         0.77    0.813    0.816     H
+O       0.7921   0.3719    0.363     O
+O       0.7921   0.9911    0.363     O
+H        0.803    0.103    0.064     H
+H        0.803    0.961    0.064     H
+C        0.864   0.9087   0.8174     C
+C        0.924   0.0333   0.0666     C
+P       0.9806  0.17422  0.34844     P

@@ -1,0 +1,51 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/KECRAL_clean'
+_cell_length_a  8.69500
+_cell_length_b  8.54800
+_cell_length_c 21.09200
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cd         0.0      0.0      0.0    Cd
+Cd         0.0      0.5      0.5    Cd
+C       0.1729      0.0   0.0742     C
+C       0.1729      0.5   0.5742     C
+N       0.1895      0.0   0.9252     N
+N       0.1895      0.5   0.4252     N
+N       0.2745      0.0   0.1082     N
+N       0.2745      0.5   0.6082     N
+C       0.2942      0.0   0.8926     C
+C       0.2942      0.5   0.3926     C
+Cd         0.5      0.0   0.1675    Cd
+Cd         0.5      0.0   0.8352    Cd
+N          0.5   0.1962   0.2382     N
+C          0.5    0.206   0.7751     C
+C          0.5    0.294   0.2751     C
+N          0.5   0.3038   0.7382     N
+Cd         0.5      0.5   0.3352    Cd
+Cd         0.5      0.5   0.6675    Cd
+N          0.5   0.6962   0.7382     N
+C          0.5    0.706   0.2751     C
+C          0.5    0.794   0.7751     C
+N          0.5   0.8038   0.2382     N
+C       0.7058      0.0   0.8926     C
+C       0.7058      0.5   0.3926     C
+N       0.7255      0.0   0.1082     N
+N       0.7255      0.5   0.6082     N
+N       0.8105      0.0   0.9252     N
+N       0.8105      0.5   0.4252     N
+C       0.8271      0.0   0.0742     C
+C       0.8271      0.5   0.5742     C

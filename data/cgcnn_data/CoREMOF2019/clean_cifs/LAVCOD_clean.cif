@@ -1,0 +1,49 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/LAVCOD_clean'
+_cell_length_a  9.01930
+_cell_length_b  7.34210
+_cell_length_c  9.39010
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Ga         0.0      0.0      0.0    Ga
+F          0.0     0.25   0.9255     F
+Ga         0.0      0.5      0.0    Ga
+F          0.0     0.75   0.0745     F
+F       0.1489   0.0496   0.1346     F
+F       0.1489   0.4504   0.1346     F
+F       0.1489   0.5496   0.8654     F
+F       0.1489   0.9504   0.8654     F
+Co        0.25     0.25     0.25    Co
+Co        0.25     0.75     0.75    Co
+F       0.3511   0.0496   0.3654     F
+F       0.3511   0.4504   0.3654     F
+F       0.3511   0.5496   0.6346     F
+F       0.3511   0.9504   0.6346     F
+Ga         0.5      0.0      0.5    Ga
+F          0.5     0.25   0.5745     F
+Ga         0.5      0.5      0.5    Ga
+F          0.5     0.75   0.4255     F
+F       0.6489   0.0496   0.3654     F
+F       0.6489   0.4504   0.3654     F
+F       0.6489   0.5496   0.6346     F
+F       0.6489   0.9504   0.6346     F
+Co        0.75     0.25     0.25    Co
+Co        0.75     0.75     0.75    Co
+F       0.8511   0.0496   0.1346     F
+F       0.8511   0.4504   0.1346     F
+F       0.8511   0.5496   0.8654     F
+F       0.8511   0.9504   0.8654     F

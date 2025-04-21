@@ -1,0 +1,49 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/OTIBUQ_clean'
+_cell_length_a 31.97800
+_cell_length_b  6.58120
+_cell_length_c 16.86200
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+H       0.1938      0.5      0.0     H
+O       0.2205   0.1588   0.0818     O
+O       0.2205   0.1588   0.9182     O
+O       0.2205   0.8412   0.0818     O
+O       0.2205   0.8412   0.9182     O
+O       0.2251      0.5      0.0     O
+Al        0.25     0.25      0.0    Al
+Al        0.25     0.75      0.0    Al
+O       0.2749      0.0      0.0     O
+O       0.2795   0.3412   0.0818     O
+O       0.2795   0.3412   0.9182     O
+O       0.2795   0.6588   0.0818     O
+O       0.2795   0.6588   0.9182     O
+H       0.3062      0.0      0.0     H
+H       0.6938      0.0      0.0     H
+O       0.7205   0.3412   0.0818     O
+O       0.7205   0.3412   0.9182     O
+O       0.7205   0.6588   0.0818     O
+O       0.7205   0.6588   0.9182     O
+O       0.7251      0.0      0.0     O
+Al        0.75     0.25      0.0    Al
+Al        0.75     0.75      0.0    Al
+O       0.7749      0.5      0.0     O
+O       0.7795   0.1588   0.0818     O
+O       0.7795   0.1588   0.9182     O
+O       0.7795   0.8412   0.0818     O
+O       0.7795   0.8412   0.9182     O
+H       0.8062      0.5      0.0     H

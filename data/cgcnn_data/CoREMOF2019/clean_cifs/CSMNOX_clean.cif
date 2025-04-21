@@ -1,0 +1,45 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/CSMNOX_clean'
+_cell_length_a  7.28900
+_cell_length_b 10.52500
+_cell_length_c  5.98700
+_cell_angle_alpha 92.16000
+_cell_angle_beta  102.74000
+_cell_angle_gamma 92.84000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Mn      0.0104   0.7682   0.0738    Mn
+O        0.036    0.758    0.447     O
+C        0.076    0.178    0.469     C
+O        0.091    0.174    0.267     O
+C        0.108    0.505    0.016     C
+O        0.186    0.402    0.004     O
+O         0.19    0.614    0.046     O
+O        0.198     0.11    0.846     O
+C        0.205    0.096    0.643     C
+O        0.247    0.909    0.124     O
+O        0.305     0.02    0.561     O
+Cs      0.4636   0.7632   0.7489    Cs
+Cs      0.5364   0.2368   0.2511    Cs
+O        0.695     0.98    0.439     O
+O        0.753    0.091    0.876     O
+C        0.795    0.904    0.357     C
+O        0.802     0.89    0.154     O
+O         0.81    0.386    0.954     O
+O        0.814    0.598    0.996     O
+C        0.892    0.495    0.984     C
+O        0.909    0.826    0.733     O
+C        0.924    0.822    0.531     C
+O        0.964    0.242    0.553     O
+Mn      0.9896   0.2318   0.9262    Mn

@@ -1,0 +1,43 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/cg200332y_si_002_clean'
+_cell_length_a  8.47700
+_cell_length_b  8.79500
+_cell_length_c  8.92900
+_cell_angle_alpha 92.24800
+_cell_angle_beta  95.82500
+_cell_angle_gamma 98.07600
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+P      0.00554  0.26841  0.98099     P
+Ga     0.01132  0.48296  0.25211    Ga
+O      0.05005  0.69537  0.86313     O
+O      0.06307  0.90044  0.06405     O
+O       0.0827  0.63926  0.13644     O
+O      0.16074  0.47087  0.65759     O
+O       0.1773  0.71519  0.52304     O
+O      0.18252   0.3027  0.98361     O
+O      0.18906  0.46294  0.38092     O
+P      0.23569  0.56332   0.5309     P
+O      0.41811   0.5765  0.56685     O
+O      0.58189   0.4235  0.43315     O
+P      0.76431  0.43668   0.4691     P
+O      0.81094  0.53706  0.61908     O
+O      0.81748   0.6973  0.01639     O
+O       0.8227  0.28481  0.47696     O
+O      0.83926  0.52913  0.34241     O
+O       0.9173  0.36074  0.86356     O
+O      0.93693  0.09956  0.93595     O
+O      0.94995  0.30463  0.13687     O
+Ga     0.98868  0.51704  0.74789    Ga
+P      0.99446  0.73159  0.01901     P

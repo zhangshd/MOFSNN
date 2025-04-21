@@ -1,0 +1,51 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/LORNEL_clean'
+_cell_length_a  8.95300
+_cell_length_b  8.95300
+_cell_length_c 21.92900
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cd         0.0      0.0  0.37498    Cd
+C          0.0      0.0   0.4761     C
+N          0.0      0.0   0.5239     N
+Cd         0.0      0.0  0.62502    Cd
+C      0.06573  0.53287  0.00777     C
+C       0.1338   0.2676   0.3411     C
+C       0.1338   0.8662   0.3411     C
+C      0.19953  0.39907  0.32557     C
+C      0.19953  0.80047  0.32557     C
+C       0.2676   0.1338   0.6589     C
+Cd    0.33333333 0.66666667  0.04165    Cd
+C     0.33333333 0.66666667  0.14277     C
+N     0.33333333 0.66666667  0.19057     N
+Cd    0.33333333 0.66666667  0.29169    Cd
+C      0.39907  0.19953  0.67443     C
+C      0.46713  0.53287  0.00777     C
+C      0.46713  0.93427  0.00777     C
+C      0.53287  0.06573  0.99223     C
+C      0.53287  0.46713  0.99223     C
+C      0.60093  0.80047  0.32557     C
+Cd    0.66666667 0.33333333  0.70831    Cd
+C     0.66666667 0.33333333  0.80943     C
+N     0.66666667 0.33333333  0.85723     N
+Cd    0.66666667 0.33333333  0.95835    Cd
+C       0.7324   0.8662   0.3411     C
+C      0.80047  0.19953  0.67443     C
+C      0.80047  0.60093  0.67443     C
+C       0.8662   0.1338   0.6589     C
+C       0.8662   0.7324   0.6589     C
+C      0.93427  0.46713  0.99223     C

@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/UNABER_clean'
+_cell_length_a 13.57150
+_cell_length_b 13.57150
+_cell_length_c  8.71250
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+N       0.0248   0.5124   0.7714     N
+C        0.028    0.514   0.1598     C
+Cu     0.12259   0.5613  0.97814    Cu
+S      0.24372  0.48744  0.93682     S
+S      0.24372  0.75628  0.93682     S
+Mo    0.33333333 0.66666667   0.8438    Mo
+Cu      0.4387   0.5613  0.97814    Cu
+Cu      0.4387  0.87741  0.97814    Cu
+C        0.486    0.514   0.1598     C
+C        0.486    0.972   0.1598     C
+S      0.48744  0.24372  0.43682     S
+N       0.4876   0.5124   0.7714     N
+N       0.4876   0.9752   0.7714     N
+N       0.5124   0.0248   0.2714     N
+N       0.5124   0.4876   0.2714     N
+S      0.51256  0.75628  0.93682     S
+C        0.514    0.028   0.6598     C
+C        0.514    0.486   0.6598     C
+Cu      0.5613  0.12259  0.47814    Cu
+Cu      0.5613  0.43871  0.47814    Cu
+Mo    0.66666667 0.33333333   0.3438    Mo
+S      0.75628  0.24372  0.43682     S
+S      0.75628  0.51256  0.43682     S
+Cu     0.87741  0.43871  0.47814    Cu
+C        0.972    0.486   0.6598     C
+N       0.9752   0.4876   0.2714     N

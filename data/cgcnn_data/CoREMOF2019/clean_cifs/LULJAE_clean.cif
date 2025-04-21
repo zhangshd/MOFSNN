@@ -1,0 +1,51 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/LULJAE_clean'
+_cell_length_a  7.03680
+_cell_length_b  8.21600
+_cell_length_c 10.48970
+_cell_angle_alpha 108.85900
+_cell_angle_beta  109.59800
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Co         0.0      0.0      0.5    Co
+C      0.00502  0.55717  0.07024     C
+O      0.02012   0.7834  0.33782     O
+C      0.04743  0.06022  0.19326     C
+H       0.0563    0.013   0.8066     H
+C      0.06522  0.05717  0.07024     C
+H          0.1    0.369    0.926     H
+C      0.14583  0.56022  0.19326     C
+C      0.15133  0.67996  0.33566     C
+O      0.15872  0.17275  0.44778     O
+H        0.174    0.131    0.074     H
+C      0.18433  0.17996  0.33566     C
+H       0.2497    0.487   0.1934     H
+O      0.28906  0.67275  0.44778     O
+O       0.3177   0.2834  0.33782     O
+Co         0.5      0.5      0.5    Co
+O       0.6823   0.7166  0.66218     O
+O      0.71094  0.32725  0.55222     O
+H       0.7503    0.513   0.8066     H
+C      0.81567  0.82004  0.66434     C
+H        0.826    0.869    0.926     H
+O      0.84128  0.82725  0.55222     O
+C      0.84867  0.32004  0.66434     C
+C      0.85417  0.43978  0.80674     C
+H          0.9    0.631    0.074     H
+C      0.93478  0.94283  0.92976     C
+H       0.9437    0.987   0.1934     H
+C      0.95257  0.93978  0.80674     C
+O      0.97988   0.2166  0.66218     O
+C      0.99498  0.44283  0.92976     C

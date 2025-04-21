@@ -1,0 +1,55 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/GUKNIK_clean'
+_cell_length_a  7.30870
+_cell_length_b 14.56400
+_cell_length_c  6.80790
+_cell_angle_alpha 91.60100
+_cell_angle_beta  93.71700
+_cell_angle_gamma 78.15400
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C        0.017   0.8727   0.9417     C
+C         0.02   0.0704    0.725     C
+C        0.021   0.2022    0.924     C
+C        0.022   0.9589   0.0729     C
+O       0.0647   0.5389   0.1463     O
+C        0.131   0.6939    0.335     C
+N        0.151   0.7737    0.212     N
+C        0.154    0.857    0.343     C
+P       0.2064    0.571   0.2959     P
+O        0.214   0.5216   0.4912     O
+Ce      0.2422   0.5004   0.8247    Ce
+O        0.339   0.3534     0.01     O
+O        0.345    0.668    0.834     O
+O       0.3972   0.5547     0.21     O
+O        0.435   0.2722    0.334     O
+O        0.476   0.7889    0.966     O
+S        0.483   0.2968    0.144     S
+S        0.517   0.7032    0.856     S
+O        0.524   0.2111    0.034     O
+O        0.565   0.7278    0.666     O
+O       0.6028   0.4453     0.79     O
+O        0.655    0.332    0.166     O
+O        0.661   0.6466     0.99     O
+Ce      0.7578   0.4996   0.1753    Ce
+O        0.786   0.4784   0.5088     O
+P       0.7936    0.429   0.7041     P
+C        0.846    0.143    0.657     C
+N        0.849   0.2263    0.788     N
+C        0.869   0.3061    0.665     C
+O       0.9353   0.4611   0.8537     O
+C        0.978   0.0411   0.9271     C
+C        0.979   0.7978    0.076     C
+C         0.98   0.9296    0.275     C
+C        0.983   0.1273   0.0583     C

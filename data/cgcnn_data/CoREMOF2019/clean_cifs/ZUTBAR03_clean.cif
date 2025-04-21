@@ -1,0 +1,37 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/ZUTBAR03_clean'
+_cell_length_a  6.45050
+_cell_length_b  6.45050
+_cell_length_c  6.45050
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Mn         0.0      0.0      0.0    Mn
+N          0.0      0.0      0.5     N
+N          0.0   0.0706   0.3353     N
+N          0.0   0.0706   0.6647     N
+N          0.0   0.3353   0.0706     N
+N          0.0   0.3353   0.9294     N
+N          0.0      0.5      0.0     N
+N          0.0   0.6647   0.0706     N
+N          0.0   0.6647   0.9294     N
+N          0.0   0.9294   0.3353     N
+N          0.0   0.9294   0.6647     N
+N       0.3353      0.0   0.0706     N
+N       0.3353      0.0   0.9294     N
+N          0.5      0.0      0.0     N
+N       0.6647      0.0   0.0706     N
+N       0.6647      0.0   0.9294     N

@@ -1,0 +1,18 @@
+Number of CIFs to clean: 12020
+**************************************************
+/home/zhangsd/repos/MOFSNN/raw_data/CoREMOF2019/CUTFON_charged.cif
+('cell vectors: ', 'alpha, beta, gamma = 90.0, 90.0, 90.0')
+**************************************************
+/home/zhangsd/repos/MOFSNN/raw_data/CoREMOF2019/LAWFUN_clean.cif
+('cell vectors: ', 'alpha, beta, gamma = 90.0, 112.447, 90.0')
+**************************************************
+/home/zhangsd/repos/MOFSNN/raw_data/CoREMOF2019/FOHCIP_clean.cif
+('cell vectors: ', 'alpha, beta, gamma = 90.0, 90.0, 90.0')
+**************************************************
+/home/zhangsd/repos/MOFSNN/raw_data/CoREMOF2019/AHOKIR_clean.cif
+('cell vectors: ', 'alpha, beta, gamma = 90.0, 91.379, 90.0')
+**************************************************
+/home/zhangsd/repos/MOFSNN/raw_data/CoREMOF2019/ORAJAT_clean.cif
+('cell vectors: ', 'alpha, beta, gamma = 90.0, 90.0, 90.0')
+**************************************************
+/home/zhangsd/repos/MOFSNN/raw_data/CoREMOF2019/WUQRAC_clean_h.cif

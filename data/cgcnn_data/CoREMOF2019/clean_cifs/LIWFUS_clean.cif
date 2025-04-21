@@ -1,0 +1,55 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/LIWFUS_clean'
+_cell_length_a  7.45480
+_cell_length_b  8.08250
+_cell_length_c 10.16600
+_cell_angle_alpha 75.24400
+_cell_angle_beta  68.88300
+_cell_angle_gamma 80.64800
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+H       0.0501   0.9693   0.3592     H
+C       0.0784   0.9505   0.4481     C
+P       0.0973    0.723   0.5215     P
+O       0.0993   0.3448    0.434     O
+O       0.1593   0.6903   0.6553     O
+H       0.2017   0.9956   0.4247     H
+V        0.244   0.5164   0.2622     V
+O       0.2566   0.6414   0.4054     O
+O       0.2887   0.3488    0.131     O
+V       0.3074   0.7614   0.7472     V
+H       0.3086   0.0606   0.0034     H
+O       0.3563   0.7594   0.9194     O
+H       0.3672   0.9929   0.1424     H
+C       0.4121   0.0523    0.042     C
+P       0.4677   0.2648   0.0312     P
+O       0.4783   0.6392   0.1261     O
+O       0.4866   0.3416   0.3285     O
+O       0.5134   0.6584   0.6715     O
+O       0.5217   0.3608   0.8739     O
+P       0.5323   0.7352   0.9688     P
+C       0.5879   0.9477    0.958     C
+H       0.6328   0.0071   0.8576     H
+O       0.6437   0.2406   0.0806     O
+H       0.6914   0.9394   0.9966     H
+V       0.6926   0.2386   0.2528     V
+O       0.7113   0.6512    0.869     O
+O       0.7434   0.3586   0.5946     O
+V        0.756   0.4836   0.7378     V
+H       0.7983   0.0044   0.5753     H
+O       0.8407   0.3097   0.3447     O
+O       0.9007   0.6552    0.566     O
+P       0.9027    0.277   0.4785     P
+C       0.9216   0.0495   0.5519     C
+H       0.9499   0.0307   0.6408     H

@@ -1,0 +1,55 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/UBUROY_clean'
+_cell_length_a  9.47900
+_cell_length_b  9.47900
+_cell_length_c 16.38690
+_cell_angle_alpha 88.64220
+_cell_angle_beta  88.64220
+_cell_angle_gamma 83.20920
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Zn         0.0      0.0      0.0    Zn
+Zn         0.0      0.0      0.5    Zn
+N       0.0266   0.2022   0.5145     N
+C       0.0421   0.3173   0.5111     C
+Cu     0.13631  0.49227  0.50206    Cu
+N       0.2022   0.0266   0.0145     N
+N       0.2294   0.5424   0.6022     N
+N        0.244   0.5156   0.3988     N
+C       0.2825   0.5705   0.6603     C
+C        0.306   0.5366   0.3399     C
+C       0.3173   0.0421   0.0111     C
+Cu     0.36396  0.63604     0.75    Cu
+Cu     0.39785  0.60215     0.25    Cu
+C       0.4295   0.7175   0.8397     C
+N       0.4576   0.7706   0.8978     N
+C       0.4634    0.694   0.1601     C
+N       0.4844    0.756   0.1012     N
+Cu     0.49227  0.13631  0.00206    Cu
+Cu     0.50773  0.86369  0.99794    Cu
+N       0.5156    0.244   0.8988     N
+C       0.5366    0.306   0.8399     C
+N       0.5424   0.2294   0.1022     N
+C       0.5705   0.2825   0.1603     C
+Cu     0.60215  0.39785     0.75    Cu
+Cu     0.63604  0.36396     0.25    Cu
+C       0.6827   0.9579   0.9889     C
+C        0.694   0.4634   0.6601     C
+C       0.7175   0.4295   0.3397     C
+N        0.756   0.4844   0.6012     N
+N       0.7706   0.4576   0.3978     N
+N       0.7978   0.9734   0.9855     N
+Cu     0.86369  0.50773  0.49794    Cu
+C       0.9579   0.6827   0.4889     C
+N       0.9734   0.7978   0.4855     N

@@ -1,0 +1,55 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/YIWPEZ_SL_part'
+_cell_length_a  8.77500
+_cell_length_b  8.77500
+_cell_length_c 20.54600
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cd         0.0      0.0      0.0    Cd
+Cd         0.0      0.0      0.5    Cd
+N       0.1226   0.2452   0.0651     N
+N       0.1226   0.2452   0.4349     N
+N       0.1226   0.8774   0.0651     N
+N       0.1226   0.8774   0.4349     N
+C        0.195     0.39   0.0814     C
+C        0.195     0.39   0.4186     C
+C        0.195    0.805   0.0814     C
+C        0.195    0.805   0.4186     C
+N       0.2452   0.1226   0.5651     N
+N       0.2452   0.1226   0.9349     N
+Cd    0.33333333 0.66666667   0.1136    Cd
+N     0.33333333 0.66666667    0.225     N
+C     0.33333333 0.66666667    0.275     C
+Cd    0.33333333 0.66666667   0.3864    Cd
+C         0.39    0.195   0.5814     C
+C         0.39    0.195   0.9186     C
+C         0.61    0.805   0.0814     C
+C         0.61    0.805   0.4186     C
+Cd    0.66666667 0.33333333   0.6136    Cd
+N     0.66666667 0.33333333    0.725     N
+C     0.66666667 0.33333333    0.775     C
+Cd    0.66666667 0.33333333   0.8864    Cd
+N       0.7548   0.8774   0.0651     N
+N       0.7548   0.8774   0.4349     N
+C        0.805    0.195   0.5814     C
+C        0.805    0.195   0.9186     C
+C        0.805     0.61   0.5814     C
+C        0.805     0.61   0.9186     C
+N       0.8774   0.1226   0.5651     N
+N       0.8774   0.1226   0.9349     N
+N       0.8774   0.7548   0.5651     N
+N       0.8774   0.7548   0.9349     N

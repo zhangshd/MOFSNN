@@ -1,0 +1,61 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/YEFPII_clean'
+_cell_length_a 11.77100
+_cell_length_b 11.77100
+_cell_length_c 11.77100
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cu         0.0      0.0      0.0    Cu
+Cu         0.0      0.5      0.5    Cu
+C       0.0429    0.071    0.071     C
+C       0.0429    0.429    0.429     C
+C       0.0429    0.571    0.571     C
+C       0.0429    0.929    0.929     C
+N         0.15     0.15     0.15     N
+N         0.15     0.35     0.35     N
+N         0.15     0.65     0.65     N
+N         0.15     0.85     0.85     N
+Zn        0.25     0.25     0.25    Zn
+Zn        0.25     0.75     0.75    Zn
+N         0.35     0.15     0.35     N
+N         0.35     0.35     0.15     N
+N         0.35     0.65     0.85     N
+N         0.35     0.85     0.65     N
+C        0.406    0.094    0.406     C
+C        0.406    0.406    0.094     C
+C        0.406    0.594    0.906     C
+C        0.406    0.906    0.594     C
+Cu         0.5      0.0      0.5    Cu
+Cu         0.5      0.5      0.0    Cu
+C       0.5429    0.071    0.571     C
+C       0.5429    0.429    0.929     C
+C       0.5429    0.571    0.071     C
+C       0.5429    0.929    0.429     C
+N         0.65     0.15     0.65     N
+N         0.65     0.35     0.85     N
+N         0.65     0.65     0.15     N
+N         0.65     0.85     0.35     N
+Zn        0.75     0.25     0.75    Zn
+Zn        0.75     0.75     0.25    Zn
+N         0.85     0.15     0.85     N
+N         0.85     0.35     0.65     N
+N         0.85     0.65     0.35     N
+N         0.85     0.85     0.15     N
+C        0.906    0.094    0.906     C
+C        0.906    0.406    0.594     C
+C        0.906    0.594    0.406     C
+C        0.906    0.906    0.094     C

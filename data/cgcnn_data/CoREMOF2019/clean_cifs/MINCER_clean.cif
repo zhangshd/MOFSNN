@@ -1,0 +1,59 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/MINCER_clean'
+_cell_length_a  8.58860
+_cell_length_b  9.40860
+_cell_length_c  9.42820
+_cell_angle_alpha 119.93100
+_cell_angle_beta  116.51400
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+N       0.0197   0.9626   0.4364     N
+N       0.0704   0.2312   0.3478     N
+H        0.075    0.759    0.976     H
+N       0.0898   0.3511   0.5116     N
+O       0.0945   0.8611   0.0564     O
+H        0.152   0.8713   0.1606     H
+C       0.1864   0.9236   0.5004     C
+N       0.2113   0.2732   0.3354     N
+N       0.2432   0.4751   0.6108     N
+Ba        0.25   0.0808      0.0    Ba
+N       0.2568   0.8643   0.3892     N
+N       0.2887   0.9378   0.6646     N
+C       0.3136   0.4232   0.4996     C
+H        0.348   0.7107   0.8394     H
+O       0.4055   0.8047   0.9436     O
+N       0.4102   0.8395   0.4884     N
+H        0.425    0.783    0.024     H
+N       0.4296   0.8834   0.6522     N
+N       0.4803   0.5262   0.5636     N
+N       0.5197   0.4738   0.4364     N
+N       0.5704   0.1166   0.3478     N
+H        0.575    0.217    0.976     H
+N       0.5898   0.1605   0.5116     N
+O       0.5945   0.1953   0.0564     O
+H        0.652   0.2893   0.1606     H
+C       0.6864   0.5768   0.5004     C
+N       0.7113   0.0622   0.3354     N
+N       0.7432   0.1357   0.6108     N
+Ba        0.75   0.9192      0.0    Ba
+N       0.7568   0.5249   0.3892     N
+N       0.7887   0.7268   0.6646     N
+C       0.8136   0.0764   0.4996     C
+H        0.848   0.1287   0.8394     H
+O       0.9055   0.1389   0.9436     O
+N       0.9102   0.6489   0.4884     N
+H        0.925    0.241    0.024     H
+N       0.9296   0.7688   0.6522     N
+N       0.9803   0.0374   0.5636     N

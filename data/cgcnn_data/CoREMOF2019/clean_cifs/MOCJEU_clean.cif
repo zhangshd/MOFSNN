@@ -1,0 +1,39 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/MOCJEU_clean'
+_cell_length_a  6.44000
+_cell_length_b  6.83260
+_cell_length_c  7.67470
+_cell_angle_alpha 111.65400
+_cell_angle_beta  95.75700
+_cell_angle_gamma 91.09600
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+O       0.0509   0.7525   0.3465     O
+C       0.0562   0.9028   0.5007     C
+Er     0.12335  0.21922   0.9316    Er
+O       0.1464   0.9155   0.6537     O
+O       0.1815   0.5699   0.9765     O
+O       0.1979   0.9417   0.0357     O
+P       0.3302   0.7476   0.9792     P
+H       0.3622   0.7204   0.7978     H
+O       0.4663   0.2208   0.8945     O
+O       0.5337   0.7792   0.1055     O
+H       0.6378   0.2796   0.2022     H
+P       0.6698   0.2524   0.0208     P
+O       0.8021   0.0583   0.9643     O
+O       0.8185   0.4301   0.0235     O
+O       0.8536   0.0845   0.3463     O
+Er     0.87665  0.78078   0.0684    Er
+C       0.9438   0.0972   0.4993     C
+O       0.9491   0.2475   0.6535     O

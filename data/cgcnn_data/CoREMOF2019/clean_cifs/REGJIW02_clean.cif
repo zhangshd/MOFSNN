@@ -1,0 +1,44 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/REGJIW02_clean'
+_cell_length_a  5.49400
+_cell_length_b  7.93160
+_cell_length_c  7.93160
+_cell_angle_alpha 108.47300
+_cell_angle_beta  90.40030
+_cell_angle_gamma 90.40030
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Co         0.0  0.11989  0.88011    Co
+Co         0.0  0.88011  0.11989    Co
+H        0.144    0.808    0.808     H
+O       0.1499  0.11814  0.64386     O
+O       0.1499  0.64386  0.11814     O
+O       0.1744    0.897    0.897     O
+O        0.329  0.02001  0.24299     O
+O        0.329  0.24299  0.02001     O
+C       0.3416   0.0522   0.5674     C
+C       0.3416   0.5674   0.0522     C
+C       0.4246   0.0085   0.3839     C
+C       0.4246   0.3839   0.0085     C
+Co         0.5      0.0      0.0    Co
+C       0.5754   0.6161   0.9915     C
+C       0.5754   0.9915   0.6161     C
+C       0.6584   0.4326   0.9478     C
+C       0.6584   0.9478   0.4326     C
+O        0.671  0.75701  0.97999     O
+O        0.671  0.97999  0.75701     O
+O       0.8256    0.103    0.103     O
+O       0.8501  0.35614  0.88186     O
+O       0.8501  0.88186  0.35614     O
+H        0.856    0.192    0.192     H

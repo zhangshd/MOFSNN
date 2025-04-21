@@ -1,0 +1,43 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/IGAHED_clean'
+_cell_length_a  6.95750
+_cell_length_b  7.43830
+_cell_length_c  8.25780
+_cell_angle_alpha 90.36650
+_cell_angle_beta  109.80300
+_cell_angle_gamma 93.23980
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Co         0.0      0.0      0.0    Co
+O      0.16518  0.23344  0.11291     O
+O      0.25763  0.86865  0.03902     O
+C      0.34895  0.24118  0.21653     C
+C      0.41483  0.10799  0.35901     C
+H      0.41906  0.29548  0.54038     H
+C      0.41952  0.84379  0.15953     C
+O      0.44084  0.26165  0.85102     O
+C      0.44993  0.17539  0.52409     C
+C      0.45988   0.9337  0.33472     C
+O      0.48222  0.36185  0.21458     O
+Co     0.49749   0.5005   0.0004    Co
+O      0.50863  0.64285  0.78782     O
+C      0.53228   0.0691  0.66758     C
+C      0.54174  0.82571  0.47511     C
+O      0.55281  0.74135  0.14938     O
+H      0.57101  0.70531  0.45781     H
+C      0.57194  0.15771  0.83946     C
+C      0.57952  0.89091  0.64229     C
+C      0.64479  0.75922  0.78577     C
+O      0.73193  0.12825  0.96428     O
+O      0.82647  0.76866  0.89049     O

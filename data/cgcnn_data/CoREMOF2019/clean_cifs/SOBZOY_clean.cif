@@ -1,0 +1,41 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/SOBZOY_clean'
+_cell_length_a 11.34800
+_cell_length_b  7.65200
+_cell_length_c  7.04200
+_cell_angle_alpha 90.00000
+_cell_angle_beta  106.07000
+_cell_angle_gamma 90.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cd         0.0      0.0      0.0    Cd
+Ni         0.0      0.5      0.5    Ni
+C       0.0387   0.3285   0.6943     C
+C       0.0387   0.6715   0.6943     C
+N       0.0583   0.2216   0.8117     N
+N       0.0583   0.7784   0.8117     N
+N       0.1959      0.0   0.2106     N
+C       0.2112      0.0   0.4273     C
+C        0.343      0.0   0.5484     C
+C       0.3588      0.0   0.7687     C
+C       0.4935      0.0   0.8873     C
+C       0.5065      0.0   0.1127     C
+C       0.6412      0.0   0.2313     C
+C        0.657      0.0   0.4516     C
+C       0.7888      0.0   0.5727     C
+N       0.8041      0.0   0.7894     N
+N       0.9417   0.2216   0.1883     N
+N       0.9417   0.7784   0.1883     N
+C       0.9613   0.3285   0.3057     C
+C       0.9613   0.6715   0.3057     C

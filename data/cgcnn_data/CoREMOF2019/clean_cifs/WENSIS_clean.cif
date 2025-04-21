@@ -1,0 +1,49 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/WENSIS_clean'
+_cell_length_a  8.92000
+_cell_length_b  9.17670
+_cell_length_c  9.17670
+_cell_angle_alpha 76.33710
+_cell_angle_beta  60.92110
+_cell_angle_gamma 60.92120
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Zr         0.0      0.0      0.0    Zr
+O       0.0112   0.2963   0.2883     O
+O       0.0581   0.1892   0.8182     O
+O       0.0655   0.8108   0.1818     O
+O       0.0992    0.114   0.1044     O
+O       0.1237   0.8182   0.8108     O
+K         0.25      0.5      0.5     K
+C       0.3042   0.7382   0.7286     C
+O       0.3176    0.886   0.8956     O
+O       0.3915   0.6373   0.6155     O
+C       0.4196    0.778   0.7818     C
+K          0.5      0.0      0.0     K
+O       0.5958   0.7037   0.7117     O
+O       0.6443   0.3627   0.3845     O
+O       0.6925   0.7117   0.2963     O
+O       0.7005   0.2883   0.7037     O
+Ca        0.75      0.5      0.5    Ca
+O       0.7527   0.1818   0.1892     O
+C        0.771   0.2618   0.2714     C
+O       0.7868   0.8956    0.114     O
+O       0.7964   0.1044    0.886     O
+C       0.7986   0.7818    0.222     C
+C       0.8024   0.2182    0.778     C
+C       0.9576   0.2714   0.7382     C
+C       0.9672   0.7286   0.2618     C
+O       0.9712   0.3845   0.6373     O
+C       0.9794    0.222   0.2182     C
+O        0.993   0.6155   0.3627     O

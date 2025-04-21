@@ -1,0 +1,47 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/CAJHUS03_clean'
+_cell_length_a  7.33370
+_cell_length_b  7.33370
+_cell_length_c  8.31900
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+C          0.0   0.4342      0.0     C
+H          0.0   0.4389      0.5     H
+H          0.0   0.5611      0.0     H
+C          0.0   0.5658      0.5     C
+O       0.1075   0.4133   0.8956     O
+O       0.1075   0.6942   0.6044     O
+O       0.3058   0.4133   0.6044     O
+O       0.3058   0.8925   0.8956     O
+Fe    0.33333333 0.66666667     0.75    Fe
+O       0.4133   0.1075   0.1044     O
+O       0.4133   0.3058   0.3956     O
+C       0.4342      0.0      0.0     C
+C       0.4342   0.4342      0.5     C
+H       0.4389      0.0      0.5     H
+H       0.4389   0.4389      0.0     H
+H       0.5611      0.0      0.0     H
+H       0.5611   0.5611      0.5     H
+C       0.5658      0.0      0.5     C
+C       0.5658   0.5658      0.0     C
+O       0.5867   0.6942   0.8956     O
+O       0.5867   0.8925   0.6044     O
+Fe    0.66666667 0.33333333     0.25    Fe
+O       0.6942   0.1075   0.3956     O
+O       0.6942   0.5867   0.1044     O
+O       0.8925   0.3058   0.1044     O
+O       0.8925   0.5867   0.3956     O

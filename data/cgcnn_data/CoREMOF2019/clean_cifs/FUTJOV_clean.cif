@@ -1,0 +1,43 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/FUTJOV_clean'
+_cell_length_a  6.72000
+_cell_length_b  9.49400
+_cell_length_c 10.68200
+_cell_angle_alpha 111.97900
+_cell_angle_beta  96.87900
+_cell_angle_gamma 106.67800
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+Cu      0.0105  0.14908  0.76927    Cu
+C       0.0559   0.2325   0.9686     C
+C       0.0919   0.2891   0.0878     C
+C       0.1189   0.5948   0.2972     C
+C       0.1442   0.7226   0.3098     C
+Cu     0.16819  0.39624   0.2921    Cu
+C       0.2235   0.0886   0.6722     C
+C       0.2477   0.2178   0.3092     C
+C       0.2755   0.1163   0.3314     C
+C       0.3521   0.0568     0.62     C
+Cu     0.35954  0.96358  0.39001    Cu
+Cu     0.64046  0.03642  0.60999    Cu
+N       0.6479   0.9432     0.38     N
+N       0.7245   0.8837   0.6686     N
+C       0.7523   0.7822   0.6908     C
+C       0.7765   0.9114   0.3278     C
+Cu     0.83181  0.60376   0.7079    Cu
+N       0.8558   0.2774   0.6902     N
+C       0.8811   0.4052   0.7028     C
+C       0.9081   0.7109   0.9122     C
+C       0.9441   0.7675   0.0314     C
+Cu      0.9895  0.85092  0.23073    Cu

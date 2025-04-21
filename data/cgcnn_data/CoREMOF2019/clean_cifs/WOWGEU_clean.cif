@@ -1,0 +1,57 @@
+data_I
+_chemical_name_common  '/home/zhangsd/repos/MOFSNN/CGCNN_MT/data/CoREMOF2019/clean_cifs/WOWGEU_clean'
+_cell_length_a  4.97800
+_cell_length_b  8.18900
+_cell_length_c 12.00000
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 91.97000
+_space_group_name_H-M_alt      'P 1'
+
+
+loop_
+_space_group_symop_operation_xyz
+  'x, y, z' 
+
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_type_symbol
+P       0.0052   0.2322  0.01474     P
+P       0.0052   0.2322  0.48526     P
+H       0.0357    0.443   0.6117     H
+H       0.0357    0.443   0.8883     H
+O       0.0358    0.233   0.1416     O
+O       0.0358    0.233   0.3584     O
+C       0.0787    0.436   0.5307     C
+C       0.0787    0.436   0.9693     C
+O        0.203   0.1192   0.5433     O
+O        0.203   0.1192   0.9567     O
+Al      0.2416   0.1449     0.25    Al
+H       0.2747    0.461   0.5187     H
+H       0.2747    0.461   0.9813     H
+O       0.2836   0.8072   0.0191     O
+O       0.2836   0.8072   0.4809     O
+F        0.453   0.0477   0.1469     F
+F        0.453   0.0477   0.3531     F
+Al         0.5      0.0      0.0    Al
+Al         0.5      0.0      0.5    Al
+F        0.547   0.9523   0.6469     F
+F        0.547   0.9523   0.8531     F
+O       0.7164   0.1928   0.5191     O
+O       0.7164   0.1928   0.9809     O
+H       0.7253    0.539   0.0187     H
+H       0.7253    0.539   0.4813     H
+Al      0.7584   0.8551     0.75    Al
+O        0.797   0.8808   0.0433     O
+O        0.797   0.8808   0.4567     O
+C       0.9213    0.564   0.0307     C
+C       0.9213    0.564   0.4693     C
+O       0.9642    0.767   0.6416     O
+O       0.9642    0.767   0.8584     O
+H       0.9643    0.557   0.1117     H
+H       0.9643    0.557   0.3883     H
+P       0.9948   0.7678  0.51474     P
+P       0.9948   0.7678  0.98526     P
