@@ -1,0 +1,15 @@
+{
+    "include": [
+        "*.py",
+        "*.ipynb"
+    ],
+    "exclude": [
+        "**/raw_data/**",
+        "**/data/**",
+        "**/__pycache__/**",
+        "**/inference/**",
+        "**/feature_folders/**",
+        "**/results/**",
+    ]
+    
+}

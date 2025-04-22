@@ -7,13 +7,10 @@ LastEditTime: 2024-08-17 19:17:13
 
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 import torch
 from argparse import ArgumentParser
-from CGCNN_MT.module.module import MInterface
-from CGCNN_MT.datamodule.data_interface import DInterface
-from CGCNN_MT.utils import load_model_path_by_args
-from CGCNN_MT.module.att_cgcnn import CrystalGraphConvNet
 import pytorch_lightning as pl
 from pytorch_lightning import Trainer
 import pytorch_lightning.callbacks as plc
@@ -29,6 +26,11 @@ from main import main
 import optuna
 from config import *
 from types import SimpleNamespace
+
+from cgcnn.module.module import MInterface
+from cgcnn.datamodule.data_interface import DInterface
+from cgcnn.utils import load_model_path_by_args
+from cgcnn.module.att_cgcnn import CrystalGraphConvNet
 
 
 if __name__ == '__main__':

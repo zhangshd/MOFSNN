@@ -10,7 +10,7 @@ import sys
 # 确定项目根目录路径
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 import torch
 import pytorch_lightning as pl
 from argparse import ArgumentParser
@@ -18,10 +18,6 @@ from pytorch_lightning import Trainer
 import pytorch_lightning.callbacks as plc
 from pytorch_lightning.loggers import TensorBoardLogger
 
-from module.module import MInterface
-from datamodule.data_interface import DInterface
-from utils import load_model_path_by_args, load_callbacks
-from utils import MODEL_NAME_TO_DATASET_CLS, MODEL_NAME_TO_MODULE_CLS
 from pytorch_lightning.accelerators import find_usable_cuda_devices
 from pytorch_lightning.profilers import AdvancedProfiler
 from pytorch_lightning.utilities.model_summary import ModelSummary
@@ -32,6 +28,12 @@ from pathlib import Path
 import optuna
 from config import *
 from types import SimpleNamespace
+
+from cgcnn.module.module import MInterface
+from cgcnn.datamodule.data_interface import DInterface
+from cgcnn.utils import load_model_path_by_args, load_callbacks
+from cgcnn.utils import MODEL_NAME_TO_DATASET_CLS, MODEL_NAME_TO_MODULE_CLS
+
 # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 

@@ -7,21 +7,23 @@ LastEditTime: 2024-08-27 14:54:32
 
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 from pathlib import Path
-from CGCNN_MT.module.att_cgcnn import CrystalGraphConvNet as AttCGCNN
-from CGCNN_MT.module.att_fcnn import AttFCNN
-from CGCNN_MT.module.cgcnn import CrystalGraphConvNet as CGCNN
-from CGCNN_MT.module.cgcnn_raw import CrystalGraphConvNet as CGCNNRaw
-from CGCNN_MT.module.cgcnn_uni_atom import CrystalGraphConvNet as CGCNNUniAtom
-from CGCNN_MT.module.fcnn import FCNN
-from CGCNN_MT.datamodule.dataset import LoadGraphData, LoadGraphDataWithAtomicNumber, LoadExtraFeatureData
 import pytorch_lightning.callbacks as plc
 import yaml
 import torch
 from pytorch_lightning import Trainer
 from pytorch_lightning.accelerators import find_usable_cuda_devices
-from CGCNN_MT.module.module import MInterface
+
+from cgcnn.module.att_cgcnn import CrystalGraphConvNet as AttCGCNN
+from cgcnn.module.att_fcnn import AttFCNN
+from cgcnn.module.cgcnn import CrystalGraphConvNet as CGCNN
+from cgcnn.module.cgcnn_raw import CrystalGraphConvNet as CGCNNRaw
+from cgcnn.module.cgcnn_uni_atom import CrystalGraphConvNet as CGCNNUniAtom
+from cgcnn.module.fcnn import FCNN
+from cgcnn.datamodule.dataset import LoadGraphData, LoadGraphDataWithAtomicNumber, LoadExtraFeatureData
+from cgcnn.module.module import MInterface
 
 
 MODEL_NAME_TO_DATASET_CLS = {

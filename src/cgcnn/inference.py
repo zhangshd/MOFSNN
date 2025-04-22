@@ -6,19 +6,11 @@ LastEditTime: 2024-09-13 23:55:46
 '''
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 from argparse import ArgumentParser
-from CGCNN_MT.module.module import MInterface
-from CGCNN_MT.module.cgcnn import CrystalGraphConvNet
-from CGCNN_MT.datamodule.data_interface import DInterface
 from pymatgen.io.cif import CifParser
 from ase.io import read
-from CGCNN_MT.datamodule.prepare_data import _make_supercell, get_crystal_graph
-from CGCNN_MT.datamodule.dataset import AtomCustomJSONInitializer, GaussianDistance
-from CGCNN_MT.utils import load_model_from_dir, MODEL_NAME_TO_DATASET_CLS
-from CGCNN_MT.datamodule.prepare_data import make_prepared_data
-from CGCNN_MT.datamodule.clean_cif import clean_cif
-from CGCNN_MT.module.module_utils import calculate_lse_from_tree, calculate_lsv_from_tree
 from pytorch_lightning.accelerators import find_usable_cuda_devices
 import yaml
 import torch
@@ -36,6 +28,17 @@ import functools
 import inspect
 from tqdm import tqdm
 import shutil
+
+from cgcnn.module.module import MInterface
+from cgcnn.module.cgcnn import CrystalGraphConvNet
+from cgcnn.datamodule.data_interface import DInterface
+from cgcnn.datamodule.prepare_data import _make_supercell, get_crystal_graph
+from cgcnn.datamodule.dataset import AtomCustomJSONInitializer, GaussianDistance
+from cgcnn.utils import load_model_from_dir, MODEL_NAME_TO_DATASET_CLS
+from cgcnn.datamodule.prepare_data import make_prepared_data
+from cgcnn.datamodule.clean_cif import clean_cif
+from cgcnn.module.module_utils import calculate_lse_from_tree, calculate_lsv_from_tree
+
 matplotlib.use('Agg')
 
 

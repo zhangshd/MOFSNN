@@ -6,10 +6,9 @@ LastEditTime: 2024-08-17 19:19:31
 '''
 import os
 import sys
-# 确定项目根目录路径
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 import hyperopt
 import pandas as pd
 import numpy as np

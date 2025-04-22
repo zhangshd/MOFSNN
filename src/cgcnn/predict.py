@@ -6,9 +6,10 @@ LastEditTime: 2024-09-13 16:40:32
 '''
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 from argparse import ArgumentParser
-from CGCNN_MT.datamodule.dataset import *
+
 import yaml
 import torch
 import numpy as np
@@ -18,11 +19,12 @@ import pandas as pd
 import matplotlib
 from sklearn.metrics import r2_score, confusion_matrix, mean_absolute_error
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, matthews_corrcoef, roc_auc_score, roc_curve
-from CGCNN_MT.module.module_utils import plot_roc_curve, plot_scatter, plot_confusion_matrix
-import matplotlib.pyplot as plt
-from CGCNN_MT.utils import load_model_from_dir, MODEL_NAME_TO_DATASET_CLS
 from torch.utils.data import DataLoader
-import os
+import matplotlib.pyplot as plt
+
+from cgcnn.module.module_utils import plot_roc_curve, plot_scatter, plot_confusion_matrix
+from cgcnn.datamodule.dataset import *
+from cgcnn.utils import load_model_from_dir, MODEL_NAME_TO_DATASET_CLS
 # os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 matplotlib.use('Agg')
 
