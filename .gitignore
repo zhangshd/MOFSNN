@@ -21,6 +21,7 @@ build/
 
 # VS Code
 .vscode/
+.git*
 *.cli*
 *.cur*
 *.pyc
