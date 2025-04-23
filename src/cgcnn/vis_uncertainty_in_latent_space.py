@@ -1,0 +1,909 @@
+'''
+Author: zhangshd
+Date: 2025-04-22
+Description: This script visualizes the uncertainty in latent space using dimensionality reduction for the MOFSNN model.
+It predicts all samples in the training, validation, and test sets, saves the latent vectors,
+calculates uncertainty, and creates visualizations with uncertainty/target labels as color labels.
+Multiple dimensionality reduction methods are supported: t-SNE, UMAP, and PCA.
+'''
+
+import os
+import sys
+# Get the directory of the script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Get the root directory of the project (two levels up from the script directory)
+ROOT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+# Add the src directory to the Python path
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+from argparse import ArgumentParser
+import torch
+from pathlib import Path
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
+try:
+    import umap
+    import warnings
+    # Filter UMAP specific warnings about n_jobs and random_state
+    warnings.filterwarnings("ignore", message="n_jobs value 1 overridden to 1 by setting random_state")
+    UMAP_AVAILABLE = True
+except ImportError:
+    UMAP_AVAILABLE = False
+    print("Warning: UMAP not available. Install with 'pip install umap-learn' to use UMAP dimensionality reduction.")
+from matplotlib.colors import Normalize
+from tqdm import tqdm
+import pickle
+
+from cgcnn.utils import load_model_from_dir
+from cgcnn.module.module_utils import calculate_lse_from_tree, calculate_lsv_from_tree
+
+# Class label mapping dictionary for classification tasks
+# Maps numerical class labels to meaningful text labels for better visualization
+TARGETS_MAP = {
+    "TSD": None,  # TSD is a regression task
+    "SSD": {0: "unstable", 1: "stable"},
+    "WS24_water": {0: "unstable", 1: "stable"},
+    "WS24_water4": {0: "unstable", 1: "low kinetic stability", 2: "high kinetic stability", 3: "thermodynamic stable"},
+    "WS24_acid": {0: "unstable", 1: "stable"},
+    "WS24_base": {0: "unstable", 1: "stable"},
+    "WS24_boiling": {0: "unstable", 1: "stable"},
+}
+
+# Dimension reduction method display names
+DIM_REDUCTION_METHODS = {
+    "tsne": "t-SNE",
+    "umap": "UMAP",
+    "pca": "PCA"
+}
+
+def get_dataloader_from_datamodule(model, data_module, split='train'):
+    """
+    Get dataloader from a specific split of the data module.
+    This function ensures the data module is properly set up before requesting a dataloader.
+    
+    Args:
+        model: The loaded model
+        data_module: The data module instance
+        split: Which split to get ('train', 'val', or 'test')
+        
+    Returns:
+        The appropriate dataloader for the requested split
+    """
+    # First complete proper setup of the data module for the specific stage
+    print(f"Setting up data module for '{split}' split...")
+    data_module.setup(stage=split)
+    
+    # Check if the required dataset attribute exists
+    dataset_attr = f"{split}set"
+    if not hasattr(data_module, dataset_attr) or getattr(data_module, dataset_attr) is None:
+        print(f"Warning: {dataset_attr} not properly initialized in data module. Trying to force setup...")
+        # Try to force a more complete setup
+        setup_stage = 'fit' if split in ['train', 'val'] else 'test'
+        data_module.setup(stage=setup_stage)
+        if not hasattr(data_module, dataset_attr) or getattr(data_module, dataset_attr) is None:
+            raise AttributeError(f"Data module does not have '{dataset_attr}' attribute even after forced setup.")
+    
+    dataloader_method = f"{split}_dataloader"
+    return getattr(data_module, dataloader_method)()
+
+def predict_and_collect_features(model, dataloader, device):
+    """
+    Run model prediction on dataloader and collect latent features, predictions, and targets.
+    """
+    model.eval()
+    all_features = {}
+    all_preds = {}
+    all_targets = {}
+    all_cif_ids = {}
+    
+    for task_id, task in enumerate(model.hparams.tasks):
+        all_features[task] = []
+        all_preds[task] = []
+        all_targets[task] = []
+        all_cif_ids[task] = []
+    
+    with torch.no_grad():
+        for batch in tqdm(dataloader, desc="Processing batch"):
+            # Move batch to device
+            for k, v in batch.items():
+                if isinstance(v, torch.Tensor):
+                    batch[k] = v.to(device)
+            
+            # Forward pass
+            outputs, last_layer_feas = model.model(**batch)
+            
+            for task_id, task in enumerate(model.hparams.tasks):
+                # Get task mask
+                task_mask = (batch['task_id'] == task_id)
+                if not torch.any(task_mask):
+                    continue
+                
+                # Get task-specific data
+                task_targets = batch['targets'][task_mask].cpu().numpy()
+                task_cif_ids = np.array(batch['cif_id'])[task_mask.cpu().numpy()]
+                
+                # Get predictions
+                if model.hparams.task_types[task_id] == 'regression':
+                    task_preds = model.denormalize(outputs[task_id][task_mask], task_id).cpu().numpy()
+                else:
+                    task_preds = torch.argmax(outputs[task_id][task_mask], dim=1).cpu().numpy()
+                
+                # Get latent features
+                task_features = last_layer_feas[task_id][task_mask].cpu().numpy()
+                
+                # Append to lists
+                all_features[task].append(task_features)
+                all_preds[task].append(task_preds)
+                all_targets[task].append(task_targets)
+                all_cif_ids[task].extend(task_cif_ids)
+    
+    # Concatenate all batches
+    for task in model.hparams.tasks:
+        if len(all_features[task]) > 0:
+            all_features[task] = np.concatenate(all_features[task], axis=0)
+            all_preds[task] = np.concatenate(all_preds[task], axis=0)
+            all_targets[task] = np.concatenate(all_targets[task], axis=0)
+    
+    return all_features, all_preds, all_targets, all_cif_ids
+
+def calculate_uncertainty(latent_vectors, uncertainty_trees, task, task_type):
+    """
+    Calculate uncertainty for each sample based on its latent vector.
+    """
+    if task not in uncertainty_trees:
+        print(f"Warning: Task {task} not found in uncertainty trees. Skipping uncertainty calculation.")
+        return None
+    
+    if "classification" in task_type:
+        return calculate_lse_from_tree(uncertainty_trees[task], latent_vectors, 
+                                       k=uncertainty_trees[task]["k"])
+    else:
+        return calculate_lsv_from_tree(uncertainty_trees[task], latent_vectors, 
+                                       k=uncertainty_trees[task]["k"])
+
+def apply_dimensionality_reduction(features, method="tsne", random_state=42):
+    """
+    Apply dimensionality reduction to feature vectors.
+    
+    Args:
+        features: Feature vectors to reduce (numpy array)
+        method: Dimensionality reduction method ('tsne', 'umap', or 'pca')
+        random_state: Random state for reproducibility
+        
+    Returns:
+        2D reduced vectors as a numpy array
+    """
+    n_samples = features.shape[0]
+    
+    if method.lower() == "tsne":
+        # Adjust perplexity to avoid issues with small datasets
+        perplexity = min(30, n_samples - 1)
+        reducer = TSNE(n_components=2, random_state=random_state, perplexity=perplexity)
+        reduced_vectors = reducer.fit_transform(features)
+        
+    elif method.lower() == "umap" and UMAP_AVAILABLE:
+        # UMAP typically needs more samples than t-SNE to be effective
+        n_neighbors = min(15, n_samples - 1)
+        reducer = umap.UMAP(n_components=2, random_state=random_state, n_neighbors=n_neighbors)
+        reduced_vectors = reducer.fit_transform(features)
+        
+    elif method.lower() == "pca":
+        reducer = PCA(n_components=2, random_state=random_state)
+        reduced_vectors = reducer.fit_transform(features)
+        
+    else:
+        if method.lower() == "umap" and not UMAP_AVAILABLE:
+            print("Warning: UMAP not available. Falling back to t-SNE.")
+        else:
+            print(f"Warning: Unknown method '{method}'. Falling back to t-SNE.")
+        
+        # Fallback to t-SNE
+        perplexity = min(30, n_samples - 1)
+        reducer = TSNE(n_components=2, random_state=random_state, perplexity=perplexity)
+        reduced_vectors = reducer.fit_transform(features)
+    
+    return reduced_vectors
+
+def identify_error_samples(predictions, targets, task_type):
+    """
+    Identify samples with prediction errors based on task type.
+    
+    Args:
+        predictions: Model predictions
+        targets: Ground truth targets
+        task_type: Type of task ('regression' or 'classification_*')
+        
+    Returns:
+        Boolean mask where True indicates error samples
+    """
+    # Ensure predictions and targets have the same shape
+    predictions = np.array(predictions).flatten()
+    targets = np.array(targets).flatten()
+    
+    if 'regression' in task_type:
+        # For regression tasks, find samples with >20% relative error
+        # Avoid division by zero by adding a small epsilon
+        epsilon = 1e-10
+        relative_error = np.abs(predictions - targets) / (np.abs(targets) + epsilon)
+        error_mask = relative_error > 0.3  # >30% error
+    else:
+        # For classification tasks, find samples with mismatched predictions
+        error_mask = predictions != targets
+    
+    return error_mask
+
+def create_scatter_plot(ax, reduced_vectors, color_values, colormap, norm=None, alpha=0.7, s=20, is_discrete=False):
+    """
+    Create a scatter plot with given data and color settings.
+    
+    Args:
+        ax: Matplotlib axis to plot on
+        reduced_vectors: 2D array of points to plot
+        color_values: Values used for coloring points
+        colormap: Colormap to use
+        norm: Normalization for colormap
+        alpha: Transparency of points
+        s: Size of points
+        is_discrete: Whether the coloring is discrete or continuous
+        
+    Returns:
+        scatter plot object
+    """
+    if is_discrete:
+        # For discrete coloring, create a separate scatter for each class
+        unique_values = np.unique(color_values)
+        scatter = None
+        for idx, val in enumerate(unique_values):
+            mask = (color_values == val)
+            scatter = ax.scatter(
+                reduced_vectors[mask, 0], reduced_vectors[mask, 1],
+                color=colormap(idx % colormap.N),
+                alpha=alpha, s=s
+            )
+    else:
+        # For continuous coloring, create a single scatter with colormap
+        scatter = ax.scatter(
+            reduced_vectors[:, 0], reduced_vectors[:, 1],
+            c=color_values, cmap=colormap, norm=norm,
+            alpha=alpha, s=s
+        )
+    
+    return scatter
+
+def plot_error_samples(ax, reduced_vectors, error_mask, label=None):
+    """
+    Plot error samples on the given axis.
+    
+    Args:
+        ax: Matplotlib axis to plot on
+        reduced_vectors: 2D array of all points
+        error_mask: Boolean mask indicating error samples
+        label: Label for the error samples in the legend
+        
+    Returns:
+        The scatter plot object or None if no error samples
+    """
+    if np.any(error_mask):
+        error_points = reduced_vectors[error_mask]
+        scatter = ax.scatter(
+            error_points[:, 0], error_points[:, 1],
+            color='black', alpha=0.5, s=30, marker='x',
+            label=label
+        )
+        return scatter
+    return None
+
+def setup_class_legend(ax, targets, task, cmap):
+    """
+    Set up legend for classification tasks.
+    
+    Args:
+        ax: Matplotlib axis
+        targets: Target values 
+        task: Task name for TARGETS_MAP lookup
+        cmap: Colormap used
+    """
+    unique_targets = np.unique(targets)
+    handles = []
+    labels = []
+    
+    for class_idx, class_val in enumerate(unique_targets):
+        # Use TARGETS_MAP for class labels if available
+        if task in TARGETS_MAP and TARGETS_MAP[task] is not None and int(class_val) in TARGETS_MAP[task]:
+            class_label = TARGETS_MAP[task][int(class_val)]
+        else:
+            class_label = f'Class {int(class_val)}'
+        
+        # Create a proxy artist for the legend
+        handle = plt.Line2D([0], [0], marker='o', color='w', 
+                            markerfacecolor=cmap(class_idx % cmap.N), 
+                            markersize=8)
+        handles.append(handle)
+        labels.append(class_label)
+    
+    ax.legend(handles, labels, loc='best', fontsize=8)
+
+def create_visualization_figure(task, features, preds, targets, uncertainties, task_type, 
+                               dim_reduction_methods, output_dir, figsize=(20, 12)):
+    """
+    Create visualization figure for a task with multiple dimensionality reduction methods
+    and both target and uncertainty coloring.
+    
+    Args:
+        task: Task name
+        features: Feature vectors
+        preds: Model predictions
+        targets: Ground truth targets
+        uncertainties: Uncertainty values
+        task_type: Type of task ('regression' or 'classification_*')
+        dim_reduction_methods: List of dimensionality reduction methods to use
+        output_dir: Directory to save figure
+        figsize: Size of figure
+        
+    Returns:
+        Path to saved figure
+    """
+    # Ensure targets and predictions are flattened arrays
+    targets = np.array(targets).flatten()
+    preds = np.array(preds).flatten()
+    uncertainties = np.array(uncertainties).flatten()
+    
+    # Identify error samples
+    error_mask = identify_error_samples(preds, targets, task_type)
+    print(f"Task {task}: {np.sum(error_mask)} error samples out of {len(error_mask)} ({np.sum(error_mask)/len(error_mask)*100:.1f}%)")
+    
+    # Cache for dimensionality reduction results
+    reduced_vectors_cache = {}
+    
+    # Create figure with 2 rows (target and uncertainty) and len(dim_reduction_methods) columns
+    fig, axs = plt.subplots(2, len(dim_reduction_methods), figsize=figsize)
+    if len(dim_reduction_methods) == 1:
+        axs = axs.reshape(-1, 1)  # Ensure 2D shape
+    
+    is_classification = 'classification' in task_type
+    
+    # Process each dimensionality reduction method
+    for col_idx, method in enumerate(dim_reduction_methods):
+        # Skip unavailable methods
+        if (method == "umap" and not UMAP_AVAILABLE):
+            print(f"Warning: UMAP not available. Skipping {method} visualization for task {task}.")
+            continue
+        
+        # Apply dimensionality reduction
+        if method not in reduced_vectors_cache:
+            reduced_vectors_cache[method] = apply_dimensionality_reduction(
+                features, method=method)
+        
+        reduced_vectors = reduced_vectors_cache[method]
+        method_display_name = DIM_REDUCTION_METHODS.get(method.lower(), method)
+        
+        # --- First row: target visualization ---
+        ax_target = axs[0, col_idx]
+        
+        if is_classification:
+            # For classification tasks, create separate scatter plots for each class
+            unique_targets = np.unique(targets)
+            class_scatters = []
+            
+            # Create colormap
+            cmap_name = 'tab10' if len(unique_targets) <= 10 else 'tab20'
+            cmap_target = plt.colormaps[cmap_name]
+            
+            # Plot each class separately with explicit labels
+            for idx, val in enumerate(unique_targets):
+                mask = (targets == val)
+                if task in TARGETS_MAP and TARGETS_MAP[task] is not None and int(val) in TARGETS_MAP[task]:
+                    class_label = TARGETS_MAP[task][int(val)]
+                else:
+                    class_label = f'Class {int(val)}'
+                
+                scatter = ax_target.scatter(
+                    reduced_vectors[mask, 0], reduced_vectors[mask, 1],
+                    color=cmap_target(idx % cmap_target.N),
+                    alpha=0.7, s=20, label=class_label
+                )
+                class_scatters.append(scatter)
+        else:
+            # Create continuous colormap for regression
+            norm_target = Normalize(vmin=np.min(targets), vmax=np.max(targets))
+            cmap_target = plt.colormaps['plasma']
+            
+            scatter_target = create_scatter_plot(ax_target, reduced_vectors, targets, 
+                                               cmap_target, norm=norm_target)
+            
+            # Add colorbar
+            cbar_target = plt.colorbar(scatter_target, ax=ax_target, fraction=0.046, pad=0.04)
+            cbar_target.set_label('Target Value')
+        
+        # --- Second row: uncertainty visualization ---
+        ax_uncertainty = axs[1, col_idx]
+        
+        # Create uncertainty visualization
+        norm_uncertainty = Normalize(vmin=np.min(uncertainties), vmax=np.max(uncertainties))
+        cmap_uncertainty = plt.colormaps['viridis_r']  # Reverse viridis for low=blue
+        
+        scatter_uncertainty = create_scatter_plot(
+            ax_uncertainty, reduced_vectors, uncertainties, 
+            cmap_uncertainty, norm=norm_uncertainty
+        )
+        
+        # Add colorbar
+        cbar_uncertainty = plt.colorbar(scatter_uncertainty, ax=ax_uncertainty, fraction=0.046, pad=0.04)
+        cbar_uncertainty.set_label('Uncertainty')
+        
+        # Add error markers to both plots
+        error_label = f'Error samples ({np.sum(error_mask)})'
+        error_scatter_target = plot_error_samples(ax_target, reduced_vectors, error_mask, error_label)
+        error_scatter_uncertainty = plot_error_samples(ax_uncertainty, reduced_vectors, error_mask, error_label)
+        
+        # Create legends
+        if is_classification:
+            # For target plot with classification: combine class and error labels
+            if error_scatter_target:
+                # Get handles and labels before adding error samples
+                handles, labels = ax_target.get_legend_handles_labels()
+                
+                # Add error samples to legend
+                ax_target.legend(loc='best', fontsize=8)
+            else:
+                ax_target.legend(loc='best', fontsize=8)
+            
+            # For uncertainty plot: add just error samples
+            if error_scatter_uncertainty:
+                ax_uncertainty.legend(loc='best', fontsize=8)
+        else:
+            # For regression tasks: add error samples legend to both plots
+            if error_scatter_target:
+                ax_target.legend(loc='best', fontsize=8)
+            
+            if error_scatter_uncertainty:
+                ax_uncertainty.legend(loc='best', fontsize=8)
+        
+        # Set labels
+        ax_target.set_title(f"{method_display_name} - Target Values")
+        ax_uncertainty.set_title(f"{method_display_name} - Uncertainty")
+        
+        ax_target.set_xlabel(f"{method_display_name} 1")
+        ax_target.set_ylabel(f"{method_display_name} 2")
+        ax_uncertainty.set_xlabel(f"{method_display_name} 1")
+        ax_uncertainty.set_ylabel(f"{method_display_name} 2")
+    
+    # Add super title
+    plt.suptitle(f"Latent Space Visualization for {task} Task", fontsize=16, y=0.98)
+    
+    # Adjust layout
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    
+    # Save figure
+    output_path = output_dir / f"{task}_combined_visualization.png"
+    fig.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close(fig)
+    
+    print(f"Saved visualization for task {task} to {output_path}")
+    return output_path
+
+def create_combined_visualization(results, tasks, model_hparams, output_dir, dim_reduction_method="tsne", figsize=(20, 15)):
+    """
+    Create combined visualization for all tasks with a specific dimensionality reduction method.
+    Two figures are created: one colored by uncertainty and one by target values.
+    
+    Args:
+        results: Dictionary of results
+        tasks: List of task names
+        model_hparams: Model hyperparameters
+        output_dir: Output directory
+        dim_reduction_method: Dimensionality reduction method
+        figsize: Figure size
+        
+    Returns:
+        Tuple of paths to saved figures (uncertainty_fig_path, target_fig_path)
+    """
+    # Create subplots
+    n_tasks = len(tasks)
+    n_cols = min(3, n_tasks)
+    n_rows = (n_tasks + n_cols - 1) // n_cols
+    
+    # Create figures
+    fig_uncertainty, axes_uncertainty = plt.subplots(n_rows, n_cols, figsize=figsize)
+    fig_target, axes_target = plt.subplots(n_rows, n_cols, figsize=figsize)
+    
+    # Handle different subplot configurations
+    if n_rows > 1 and n_cols > 1:
+        axes_uncertainty = axes_uncertainty.flatten()
+        axes_target = axes_target.flatten()
+    elif n_rows > 1:
+        axes_uncertainty = axes_uncertainty.reshape(-1)
+        axes_target = axes_target.reshape(-1)
+    elif n_cols > 1:
+        pass  # Already 2D
+    else:
+        axes_uncertainty = np.array([axes_uncertainty])
+        axes_target = np.array([axes_target])
+    
+    method_display_name = DIM_REDUCTION_METHODS.get(dim_reduction_method.lower(), dim_reduction_method)
+    
+    # Process each task
+    for i, task in enumerate(tasks):
+        if i >= len(axes_uncertainty):
+            print(f"Warning: Not enough subplots for task {task}. Skipping.")
+            continue
+            
+        task_id = model_hparams.tasks.index(task)
+        task_type = model_hparams.task_types[task_id]
+        
+        # Check if data exists
+        if task not in results:
+            print(f"Warning: No data for task {task}. Skipping.")
+            continue
+            
+        ax_uncertainty = axes_uncertainty[i]
+        ax_target = axes_target[i]
+        
+        # Combine data from all splits
+        all_features = []
+        all_preds = []
+        all_targets = []
+        all_uncertainties = []
+        
+        for split in ['train', 'val', 'test']:
+            if split in results[task]:
+                all_features.append(results[task][split]['features'])
+                all_preds.append(results[task][split]['preds'])
+                all_targets.append(results[task][split]['targets'])
+                all_uncertainties.append(results[task][split]['uncertainties'])
+        
+        if not all_features:
+            print(f"No data for task {task}. Skipping.")
+            continue
+        
+        # Concatenate data
+        features = np.concatenate(all_features, axis=0)
+        preds = np.concatenate(all_preds, axis=0)
+        targets = np.concatenate(all_targets, axis=0).flatten()
+        uncertainties = np.concatenate(all_uncertainties, axis=0).flatten()
+        
+        # Apply dimensionality reduction
+        reduced_vectors = apply_dimensionality_reduction(features, method=dim_reduction_method)
+        
+        # Identify error samples
+        error_mask = identify_error_samples(preds, targets, task_type)
+        error_label = f'Error samples ({np.sum(error_mask)})'
+        
+        # ----- Uncertainty plot -----
+        norm_uncertainty = Normalize(vmin=np.min(uncertainties), vmax=np.max(uncertainties))
+        cmap_uncertainty = plt.colormaps['viridis_r']
+        
+        scatter_uncertainty = create_scatter_plot(
+            ax_uncertainty, reduced_vectors, uncertainties, 
+            cmap_uncertainty, norm=norm_uncertainty
+        )
+        
+        # Add error samples to uncertainty plot with label
+        error_scatter_uncertainty = plot_error_samples(ax_uncertainty, reduced_vectors, error_mask, error_label)
+        
+        # Add colorbar for uncertainty
+        fig_uncertainty.colorbar(scatter_uncertainty, ax=ax_uncertainty, 
+                                label='Uncertainty', fraction=0.046, pad=0.04)
+        
+        # Add legend for error samples on uncertainty plot
+        if error_scatter_uncertainty:
+            ax_uncertainty.legend(loc='best', fontsize=8)
+        
+        # ----- Target plot -----
+        is_classification = 'classification' in task_type
+        
+        if is_classification:
+            # Classification tasks - create separate scatter for each class
+            unique_targets = np.unique(targets)
+            cmap_name = 'tab10' if len(unique_targets) <= 10 else 'tab20'
+            cmap_target = plt.colormaps[cmap_name]
+            
+            # Plot each class with its own label
+            for idx, val in enumerate(unique_targets):
+                mask = (targets == val)
+                if task in TARGETS_MAP and TARGETS_MAP[task] is not None and int(val) in TARGETS_MAP[task]:
+                    class_label = TARGETS_MAP[task][int(val)]
+                else:
+                    class_label = f'Class {int(val)}'
+                
+                scatter = ax_target.scatter(
+                    reduced_vectors[mask, 0], reduced_vectors[mask, 1],
+                    color=cmap_target(idx % cmap_target.N),
+                    alpha=0.7, s=20, label=class_label
+                )
+        else:
+            # Regression tasks - continuous colormap
+            norm_target = Normalize(vmin=np.min(targets), vmax=np.max(targets))
+            cmap_target = plt.colormaps['plasma']
+            
+            scatter_target = create_scatter_plot(
+                ax_target, reduced_vectors, targets, 
+                cmap_target, norm=norm_target
+            )
+            
+            # Add colorbar for target values
+            fig_target.colorbar(scatter_target, ax=ax_target, 
+                              label='Target Value', fraction=0.046, pad=0.04)
+        
+        # Add error samples to target plot with label
+        error_scatter_target = plot_error_samples(ax_target, reduced_vectors, error_mask, error_label)
+        
+        # Add legend for target plot
+        if is_classification or error_scatter_target:
+            ax_target.legend(loc='best', fontsize=8)
+        
+        # Set titles and labels
+        ax_uncertainty.set_title(f"{task}")
+        ax_target.set_title(f"{task}")
+        
+        ax_uncertainty.set_xlabel(f"{method_display_name} 1")
+        ax_uncertainty.set_ylabel(f"{method_display_name} 2")
+        ax_target.set_xlabel(f"{method_display_name} 1")
+        ax_target.set_ylabel(f"{method_display_name} 2")
+    
+    # Hide unused subplots
+    for i in range(len(tasks), len(axes_uncertainty)):
+        axes_uncertainty[i].axis('off')
+    for i in range(len(tasks), len(axes_target)):
+        axes_target[i].axis('off')
+    
+    # Add super titles
+    fig_uncertainty.suptitle(f"Latent Space Visualization using {method_display_name}\nColored by Uncertainty", 
+                           fontsize=16, y=0.98)
+    fig_target.suptitle(f"Latent Space Visualization using {method_display_name}\nColored by Target Values", 
+                      fontsize=16, y=0.98)
+    
+    # Adjust layout
+    fig_uncertainty.tight_layout(rect=[0, 0, 1, 0.97])
+    fig_target.tight_layout(rect=[0, 0, 1, 0.97])
+    
+    # Save figures
+    uncertainty_path = output_dir / f"all_tasks_{dim_reduction_method.lower()}_uncertainty_visualization.png"
+    target_path = output_dir / f"all_tasks_{dim_reduction_method.lower()}_target_visualization.png"
+    
+    fig_uncertainty.savefig(uncertainty_path, dpi=300, bbox_inches='tight')
+    fig_target.savefig(target_path, dpi=300, bbox_inches='tight')
+    
+    plt.close(fig_uncertainty)
+    plt.close(fig_target)
+    
+    print(f"Saved combined visualizations to:\n- {uncertainty_path}\n- {target_path}")
+    return uncertainty_path, target_path
+
+def collect_and_process_data(model, data_module, device, uncertainty_trees, output_dir):
+    """
+    Collect and process data from all data splits.
+    
+    Args:
+        model: Trained model
+        data_module: Data module
+        device: Computation device
+        uncertainty_trees: Dictionary of uncertainty trees
+        output_dir: Output directory
+        
+    Returns:
+        Dictionary of results by task and split
+    """
+    results = {task: {} for task in model.hparams.tasks}
+    splits = ['train', 'val', 'test']
+    
+    for split in splits:
+        print(f"Processing {split} set")
+        try:
+            dataloader = get_dataloader_from_datamodule(model, data_module, split)
+            
+            if not dataloader:
+                print(f"No data in {split} set. Skipping.")
+                continue
+            
+            # Predict and collect features
+            features, preds, targets, cif_ids = predict_and_collect_features(model, dataloader, device)
+            
+            # Process each task
+            for task_id, task in enumerate(model.hparams.tasks):
+                if task not in features or len(features[task]) == 0:
+                    print(f"No data for task {task} in {split} set. Skipping.")
+                    continue
+                
+                print(f"Processing task: {task}")
+                
+                # Calculate uncertainty
+                task_type = model.hparams.task_types[task_id]
+                uncertainties = calculate_uncertainty(features[task], uncertainty_trees, task, task_type)
+                
+                if uncertainties is None:
+                    print(f"Could not calculate uncertainty for task {task}. Skipping.")
+                    continue
+                
+                # Store results
+                results[task][split] = {
+                    'features': features[task],
+                    'preds': preds[task],
+                    'targets': targets[task],
+                    'uncertainties': uncertainties,
+                    'cif_ids': cif_ids[task]
+                }
+                
+                # Save results to CSV
+                df = pd.DataFrame({
+                    'cif_id': cif_ids[task],
+                    'prediction': preds[task].squeeze(),
+                    'target': targets[task].squeeze(),
+                    'uncertainty': uncertainties.squeeze()
+                })
+                
+                df.to_csv(output_dir / f"{task}_{split}_results.csv", index=False)
+        except Exception as e:
+            print(f"Error processing {split} set: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            continue
+    
+    return results
+
+def create_data_module(model):
+    """
+    Create a data module from model hyperparameters.
+    
+    Args:
+        model: Trained model with hyperparameters
+        
+    Returns:
+        Configured data module
+    """
+    from cgcnn.datamodule.data_interface import DInterface
+    
+    # Extract parameters from model hparams
+    hparams = model.hparams
+    hparams_dict = dict(hparams)
+    
+    # Update data directory to standard location
+    data_dir = os.path.join(ROOT_DIR, "data/cgcnn_data")
+    print(f"Using data directory: {data_dir}")
+    hparams_dict['data_dir'] = data_dir
+    
+    # Try to create data module with full parameters
+    try:
+        data_module = DInterface(**hparams_dict)
+    except Exception as e:
+        print(f"Error creating data module with full parameters: {str(e)}")
+        # Fall back to minimal parameters
+        min_params = {
+            'data_dir': data_dir,
+            'tasks': hparams.tasks,
+            'task_types': hparams.task_types,
+            'batch_size': getattr(hparams, 'batch_size', 32),
+            'num_workers': getattr(hparams, 'num_workers', 2),
+            'dl_sampler': getattr(hparams, 'dl_sampler', 'random')
+        }
+        print("Using minimal parameters instead")
+        data_module = DInterface(**min_params)
+    
+    # Log key parameters
+    print(f"Data module parameters:")
+    print(f"  - tasks: {data_module.tasks}")
+    print(f"  - task_types: {data_module.task_types}")
+    print(f"  - batch_size: {data_module.batch_size}")
+    print(f"  - data_dir: {data_module.root_dir}")
+    
+    return data_module
+
+def run_analysis(model_dir, uncertainty_trees_file, output_dir, dim_reduction_methods=["tsne"], use_data_module=None):
+    """
+    Run the full analysis pipeline.
+    
+    Args:
+        model_dir: Path to the directory containing the model checkpoint
+        uncertainty_trees_file: Path to the file containing uncertainty trees
+        output_dir: Directory where output files will be saved
+        dim_reduction_methods: List of dimensionality reduction methods to use
+        use_data_module: Optional pre-configured data module to use
+        
+    Returns:
+        Dictionary containing the results of the analysis
+    """
+    output_dir = Path(output_dir)
+    output_dir.mkdir(exist_ok=True, parents=True)
+    
+    # Load model
+    print(f"Loading model from {model_dir}")
+    model, trainer = load_model_from_dir(model_dir)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = model.to(device)
+    
+    # Load uncertainty trees
+    print(f"Loading uncertainty trees from {uncertainty_trees_file}")
+    with open(uncertainty_trees_file, 'rb') as f:
+        uncertainty_trees = pickle.load(f)
+    
+    # Get data module
+    data_module = use_data_module if use_data_module else create_data_module(model)
+    
+    # Collect and process data
+    results = collect_and_process_data(model, data_module, device, uncertainty_trees, output_dir)
+    
+    # Create task-specific visualizations
+    print("\nCreating visualizations by task...")
+    for task in model.hparams.tasks:
+        if task not in results or not results[task]:
+            print(f"No data for task {task}. Skipping visualization.")
+            continue
+        
+        # Combine data from all splits
+        all_features = []
+        all_preds = []
+        all_targets = []
+        all_uncertainties = []
+        
+        for split in ['train', 'val', 'test']:
+            if split in results[task]:
+                all_features.append(results[task][split]['features'])
+                all_preds.append(results[task][split]['preds'])
+                all_targets.append(results[task][split]['targets'])
+                all_uncertainties.append(results[task][split]['uncertainties'])
+        
+        if not all_features:
+            continue
+            
+        # Get task info
+        task_id = model.hparams.tasks.index(task)
+        task_type = model.hparams.task_types[task_id]
+        
+        # Concatenate data
+        features = np.concatenate(all_features, axis=0)
+        preds = np.concatenate(all_preds, axis=0)
+        targets = np.concatenate(all_targets, axis=0)
+        uncertainties = np.concatenate(all_uncertainties, axis=0)
+        
+        # Create visualization
+        create_visualization_figure(
+            task, features, preds, targets, uncertainties, 
+            task_type, dim_reduction_methods, output_dir
+        )
+    
+    # Create combined visualizations
+    print("\nCreating combined visualizations for each dimensionality reduction method...")
+    for method in dim_reduction_methods:
+        print(f"Creating combined visualizations for {method}...")
+        create_combined_visualization(
+            results, model.hparams.tasks, model.hparams, 
+            output_dir, dim_reduction_method=method
+        )
+    
+    print("Analysis complete!")
+    return results
+
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("--model_dir", type=str, 
+                        default=os.path.join(ROOT_DIR, "results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43"),
+                        help="Path to the model directory")
+    parser.add_argument("--uncertainty_trees_file", type=str, 
+                        default=os.path.join(ROOT_DIR, "results/evaluation/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn@version_43/uncertainty_trees.pkl"),
+                        help="Path to the uncertainty trees file")
+    parser.add_argument("--output_dir", type=str, 
+                        default=os.path.join(ROOT_DIR, "results/uncertainty_visualization"),
+                        help="Directory where visualization outputs will be saved")
+    parser.add_argument("--dim_reduction", type=str, nargs='+',
+                        default=["tsne", "pca", "umap"],
+                        choices=["tsne", "pca", "umap"],
+                        help="Dimensionality reduction method(s) to use. Can specify multiple methods.")
+    
+    args = parser.parse_args()
+    
+    # Process paths
+    model_dir = Path(args.model_dir)
+    uncertainty_trees_file = Path(args.uncertainty_trees_file)
+    output_dir = Path(args.output_dir)
+    
+    print("Starting uncertainty visualization in latent space...")
+    print(f"Project root directory: {ROOT_DIR}")
+    print(f"Model directory: {model_dir}")
+    print(f"Uncertainty trees file: {uncertainty_trees_file}")
+    print(f"Output directory: {output_dir}")
+    print(f"Dimensionality reduction methods: {args.dim_reduction}")
+    
+    run_analysis(model_dir, uncertainty_trees_file, output_dir, dim_reduction_methods=args.dim_reduction)

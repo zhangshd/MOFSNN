@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-19 15:59:37
 LastEditors: zhangshd
-LastEditTime: 2024-09-13 23:55:46
+LastEditTime: 2025-04-22 17:46:18
 '''
 import os
 import sys
@@ -265,10 +265,11 @@ if __name__ == "__main__":
     saved_dir = Path(args.saved_dir)
     clean = args.clean
     saved_dir.mkdir(exist_ok=True, parents=True)
-
     
-    model_dir = Path(__file__).parent/"logs/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43"
-    uncertainty_trees_file = Path(__file__).parent/"evaluation/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn@version_43/uncertainty_trees.pkl"
+    ROOT_DIR = Path(SCRIPT_DIR).parent.parent
+    
+    model_dir = ROOT_DIR/"results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43"
+    uncertainty_trees_file = ROOT_DIR/"results/evaluation/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn@version_43/uncertainty_trees.pkl"
     model_name = os.path.basename(model_dir)
 
     cif_list = sorted(cif_dir.glob("*.cif"))

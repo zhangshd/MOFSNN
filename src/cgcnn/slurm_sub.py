@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:16:52
+LastEditTime: 2025-04-22 17:55:39
 '''
 import subprocess
 from pathlib import Path
@@ -41,7 +41,7 @@ def run_slurm_job(work_dir, executor="sbatch", script_name="run"):
 
 if __name__ == '__main__':
     work_dir = Path("./")
-
+    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     task_configs = [
         # "tsd_ssd",
         "tsd_ssd_ws24",
@@ -102,9 +102,9 @@ if __name__ == '__main__':
                 'reconstruct': False,
                 'log_dir': "logs0723",
                 'optuna_name': "optuna_20240723",
-                # 'load_dir': './logs/TSD_SSD_WS24_water_WS24_water4_seed42_att_cgcnn/version_20/checkpoints/best-epoch=194-val_Metric=0.643.ckpt',
-                # 'load_dir': './logs/TSD_SSD_seed42_att_cgcnn/version_34/checkpoints/best-epoch=136-val_Metric=0.598.ckpt'
-                # 'load_dir': "./logs/WS24_water4_seed42_cgcnn_uni_atom/version_1/checkpoints/best-epoch=50-val_Metric=0.574.ckpt"
+                # 'load_dir': os.path.join(ROOT_DIR, 'results/cgcnn_models', 'TSD_SSD_WS24_water_WS24_water4_seed42_att_cgcnn/version_20/checkpoints/best-epoch=194-val_Metric=0.643.ckpt'),
+                # 'load_dir': os.path.join(ROOT_DIR, 'results/cgcnn_models', 'TSD_SSD_seed42_att_cgcnn/version_34/checkpoints/best-epoch=136-val_Metric=0.598.ckpt')
+                # 'load_dir': os.path.join(ROOT_DIR, 'results/cgcnn_models', "WS24_water4_seed42_cgcnn_uni_atom/version_1/checkpoints/best-epoch=50-val_Metric=0.574.ckpt")
                 }
     
     for task_config in task_configs:

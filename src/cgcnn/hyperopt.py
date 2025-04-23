@@ -2,12 +2,13 @@
 Author: zhangshd
 Date: 2024-08-16 11:00:42
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:17:13
+LastEditTime: 2025-04-22 17:52:56
 '''
 
 import os
 import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 import torch
 from argparse import ArgumentParser
@@ -76,8 +77,8 @@ if __name__ == '__main__':
     # parser.add_argument('--load_v_num', default=None, type=int)
 
     # # Training Info
-    # parser.add_argument('--data_dir', default='/home/zhangsd/repos/MofS-CGCNN/data/processed', type=str)
-    parser.add_argument('--log_dir', default='logs', type=str)
+    # parser.add_argument('--data_dir', default=os.path.join(ROOT_DIR, 'data/cgcnn_data'), type=str)
+    parser.add_argument('--log_dir', default=os.path.join(ROOT_DIR, 'results/cgcnn_models'), type=str)  
     parser.add_argument('--patience', type=int)
     # parser.add_argument('--min_delta', default=0.01, type=float)
     # parser.add_argument('--monitor', default='val_loss', type=str)
@@ -178,7 +179,7 @@ if __name__ == '__main__':
         return best_metric
 
     def bayesian_optimization(study_name, optuna_name):
-        storage_name = f"sqlite:///{optuna_name}.db"
+        storage_name = f"sqlite:///{os.path.join(ROOT_DIR, 'results/cgcnn_models', optuna_name)}.db"
         pruner = optuna.pruners.MedianPruner(n_warmup_steps=3) if args.pruning else optuna.pruners.NopPruner()
         study = optuna.create_study(direction='maximize', study_name=study_name, 
                                     pruner=pruner, storage=storage_name, load_if_exists=True)

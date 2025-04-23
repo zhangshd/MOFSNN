@@ -2,12 +2,11 @@
 Author: zhangshd
 Date: 2024-08-16 10:58:34
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:17:09
+LastEditTime: 2025-04-22 16:12:30
 '''
 
 import os
 import sys
-# 确定项目根目录路径
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
@@ -192,7 +191,7 @@ if __name__ == '__main__':
 
     # # Training Info
     # parser.add_argument('--data_dir', default='/home/zhangsd/repos/MofS-CGCNN/data/processed', type=str)
-    parser.add_argument('--log_dir', default='results/cgcnn_models', type=str)
+    parser.add_argument('--log_dir', default=os.path.join(ROOT_DIR, 'results/cgcnn_models'), type=str)
     parser.add_argument('--patience', type=int)
     # parser.add_argument('--min_delta', default=0.01, type=float)
     # parser.add_argument('--monitor', default='val_loss', type=str)

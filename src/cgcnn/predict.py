@@ -214,18 +214,20 @@ if __name__ == '__main__':
 
     # args = parser.parse_args()
     # main(args.model_dir)
+
+    ROOT_DIR = Path(SCRIPT_DIR).parent.parent
     
     model_dirs = [
 
-        "./logs/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24"
+        ROOT_DIR/"results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24"
 
         
     ]
     res = {}
-    result_dir = Path("./evaluation")
+    result_dir = ROOT_DIR/"results/evaluation"
     data_dirs = [
-        "./data/TS_external_test",
-        "./data/WS24v2_external_test", 
+        ROOT_DIR/"data/cgcnn_data/TS_external_test",
+        ROOT_DIR/"data/cgcnn_data/WS24v2_external_test", 
     ]
     col2tasks = [
         {"ts_label": "TSD", "ss_label": "SSD"},
@@ -242,9 +244,9 @@ if __name__ == '__main__':
     # pd.DataFrame(res).T.to_csv(result_dir/"all_metrics.csv")
 
     data_dirs = [
-        "./data/TSD",
-        "./data/SSD", 
-        "./data/WS24",
+        ROOT_DIR/"data/cgcnn_data/TSD",
+        ROOT_DIR/"data/cgcnn_data/SSD",
+        ROOT_DIR/"data/cgcnn_data/WS24",
     ]
     col2tasks = [
         {"Label": "TSD"},
