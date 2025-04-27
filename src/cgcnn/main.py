@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 10:58:34
 LastEditors: zhangshd
-LastEditTime: 2025-04-26 11:08:01
+LastEditTime: 2025-04-27 20:55:19
 '''
 
 import os
@@ -235,6 +235,9 @@ if __name__ == '__main__':
     parser.add_argument('--use_extra_fea', action='store_true')
     parser.add_argument('--dl_sampler', type=str, choices=['random', 'same_ratio_prior', 'same_task_prior'])
     parser.add_argument('--augment', action='store_true')
+    parser.add_argument('--aug_noise_std', type=float, default=0.01)
+    parser.add_argument('--balance_classes', action='store_true')
+    parser.add_argument('--down_sampling', action='store_true')
     # parser.add_argument('--tasks', nargs='+', default=['TSD', 'SSD'], type=str)
     # parser.add_argument('--task_types', nargs='+', default=['regression', 'classification'], type=str)
 

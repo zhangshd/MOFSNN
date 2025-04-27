@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2025-04-26 10:54:50
+LastEditTime: 2025-04-27 20:32:08
 '''
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer)
 
@@ -312,6 +312,9 @@ def tsd_ssd_ws24():
     loss_aggregation = 'fixed_weight_sum'  # Loss aggregation type: sum, trainable_weight_sum, sample_weight_sum, fixed_weight_sum
     # task_weights = [0.3, 0.25, 0.15, 0.15, 0.05, 0.05, 0.05]
     task_weights = None
+    aug_noise_std = 0.01
+    balance_classes = True
+
 
 @ex.named_config
 def tsd2_ssd_ws24():

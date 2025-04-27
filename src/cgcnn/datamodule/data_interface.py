@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 11:08:17
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:18:49
+LastEditTime: 2025-04-27 20:07:25
 '''
 import os
 import sys
@@ -10,6 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from datamodule.dataset import LoadGraphData, LoadExtraFeatureData, LoadGraphDataWithAtomicNumber
+from datamodule.augmented_dataset import AugmentedGraphData
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -42,9 +43,18 @@ class DInterface(pl.LightningDataModule):
         if isinstance(dataset_cls, str):
             self.dataset_cls = eval(dataset_cls)
         self.collate_fn = self.dataset_cls.collate
+        
+        # Data augmentation parameters
+        self.augment = kwargs.get('augment', False)
+        self.aug_factor = kwargs.get('aug_factor', None)  # Changed to None as default
+        self.aug_noise_std = kwargs.get('aug_noise_std', 0.01)
+        self.balance_classes = kwargs.get('balance_classes', True)  # New parameter
 
         print("final_train:", self.final_train)
         print("dl_sampler: ", self.dl_sampler)
+        if self.augment:
+            aug_method = "balanced" if self.balance_classes else f"factor={self.aug_factor}"
+            print(f"Data augmentation: enabled ({aug_method}, noise_std={self.aug_noise_std})")
 
     def setup(self, stage=None):
         # This method is called on every GPU
@@ -54,11 +64,29 @@ class DInterface(pl.LightningDataModule):
             if not hasattr(self, 'trainset'):
                 self.trainsets = []
                 self.trainset_sizes = []
-                for i, task in enumerate(self.tasks):
+                for i, (task, task_type) in enumerate(zip(self.tasks, self.task_types)):
                     dataset_dir = self.root_dir / task
                     trainset = self.dataset_cls(data_dir=dataset_dir, split='train',
                                                 task_id=i, **self.kwargs)
                     self.trainset_sizes.append(len(trainset))
+                    
+                    # Add augmentation for classification tasks if enabled
+                    if self.augment and 'classification' in task_type:
+                        # Create augmented dataset for minority classes
+                        augmented_trainset = AugmentedGraphData(
+                            trainset, 
+                            aug_factor=self.aug_factor, 
+                            noise_std=self.aug_noise_std,
+                            balance_classes=self.balance_classes
+                        )
+                        
+                        # If there are augmented samples, add them to the combined dataset
+                        if len(augmented_trainset) > 0:
+                            print(f"Created {len(augmented_trainset)} augmented samples for {task}")
+                            # Create a combined dataset with original and augmented samples
+                            combined_trainset = ConcatDataset([trainset, augmented_trainset])
+                            trainset = combined_trainset
+                    
                     if self.final_train:
                         trainset.append(
                             self.dataset_cls(data_dir=dataset_dir, split='val',
@@ -66,8 +94,10 @@ class DInterface(pl.LightningDataModule):
                         
                     self.trainsets.append(trainset)
                     print(f"Number of {task} training data:", len(trainset))
+                    print("-" * 50 + "\n")
                 self.trainset = ConcatDataset(self.trainsets)
                 print("Number of total training data:", len(self.trainset))
+                print("=" * 50 + "\n")
                 self.task_weights = [len(d) / len(self.trainset) for d in self.trainsets]
             self.train_normalizer()
             if not hasattr(self, 'valset'):

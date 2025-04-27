@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:36:30
+LastEditTime: 2025-04-27 21:28:49
 '''
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
 
@@ -26,7 +26,7 @@ class LoadGraphData(Dataset):
     """
     def __init__(self, data_dir, split, radius=8, dmin=0, step=0.2, 
                  prop_cols=None, use_cell_params=False, use_extra_fea=False,
-                 task_id=0, augment=False, **kwargs
+                 task_id=0, **kwargs
                  ):
         
         data_dir = Path(data_dir)
@@ -34,14 +34,12 @@ class LoadGraphData(Dataset):
         self.radius = radius
         self.dmin = dmin
         self.step = step
-        self.augment = augment
         self.use_cell_params = use_cell_params
         self.use_extra_fea = use_extra_fea
         self.task_id = task_id
         self.max_sample_size = kwargs.get("max_sample_size", None)
         self.csv_file_name = kwargs.get("csv_file_name", "RAC_and_zeo_features_with_id_prop.csv")
-        self.aug_csv_file_name = kwargs.get("aug_csv_file_name", "RAC_and_zeo_features_with_id_prop_aug.csv")
-        self.down_sampling = kwargs.get("down_sampling", True)
+        self.down_sampling = kwargs.get("down_sampling", False)
 
         # print("use_cell_params:", self.use_cell_params)
         # print("use_extra_fea:", self.use_extra_fea)
@@ -57,9 +55,9 @@ class LoadGraphData(Dataset):
         self.data_dir = data_dir
 
         self.prop_cols = prop_cols if prop_cols is not None else ["Label"]
+        print("\n" + "#"*20)
         print("prop_cols:", self.prop_cols)
-        self.id_prop_df = sample_data(data_dir/self.csv_file_name, split, self.prop_cols, augment, 
-                                      id_prop_file_aug=data_dir/self.aug_csv_file_name,
+        self.id_prop_df = sample_data(data_dir/self.csv_file_name, split, self.prop_cols,
                                       random_state=42, max_sample_size=self.max_sample_size,
                                       down_sampling=self.down_sampling)
         
@@ -171,20 +169,18 @@ class LoadGraphDataWithAtomicNumber(Dataset):
     """
     def __init__(self, data_dir, split, radius=8, dmin=0, step=0.2, 
                  prop_cols=None, use_cell_params=False, use_extra_fea=False,
-                 task_id=0, augment=False, **kwargs
+                 task_id=0, **kwargs
                  ):
         data_dir = Path(data_dir)
         self.split = split
         self.radius = radius
         self.dmin = dmin
         self.step = step
-        self.augment = augment
         self.use_cell_params = use_cell_params
         self.use_extra_fea = use_extra_fea
         self.task_id = task_id
         self.max_sample_size = kwargs.get("max_sample_size", None)
         self.csv_file_name = kwargs.get("csv_file_name", "RAC_and_zeo_features_with_id_prop.csv")
-        self.aug_csv_file_name = kwargs.get("aug_csv_file_name", "RAC_and_zeo_features_with_id_prop_aug.csv")
         self.down_sampling = kwargs.get("down_sampling", True)
 
         if  "WS24" in data_dir.name and "test" not in data_dir.name:
@@ -198,8 +194,7 @@ class LoadGraphDataWithAtomicNumber(Dataset):
         self.data_dir = data_dir
         self.prop_cols = prop_cols if prop_cols is not None else ["Label"]
         print("prop_cols:", self.prop_cols)
-        self.id_prop_df = sample_data(data_dir/self.csv_file_name, split, self.prop_cols, augment, 
-                                      id_prop_file_aug=data_dir/self.aug_csv_file_name,
+        self.id_prop_df = sample_data(data_dir/self.csv_file_name, split, self.prop_cols,
                                       random_state=42, max_sample_size=self.max_sample_size,
                                       down_sampling=self.down_sampling)
         
@@ -296,8 +291,8 @@ class LoadGraphDataWithAtomicNumber(Dataset):
         dict_batch["nbr_fea"] = torch.cat(batch_nbr_fea, dim=0)
         dict_batch["nbr_fea_idx"] = torch.cat(batch_nbr_fea_idx, dim=0)
         dict_batch["extra_fea"] = torch.stack(batch_extra_fea, dim=0)
-        dict_batch["crystal_atom_idx"] = crystal_atom_idx
         dict_batch["targets"] = torch.stack(batch_targets, dim=0)
+        dict_batch["crystal_atom_idx"] = crystal_atom_idx
         dict_batch["task_id"] = torch.IntTensor(dict_batch["task_id"])
         return dict_batch
 
@@ -308,16 +303,13 @@ class LoadExtraFeatureData(Dataset):
     def __init__(self, data_dir, split, 
                  prop_cols=None,
                  task_id=0,
-                 augment=False, 
                  **kwargs
                  ):
         data_dir = Path(data_dir)
         self.split = split
-        self.augment = augment
         self.task_id = task_id
         self.max_sample_size = kwargs.get("max_sample_size", None)
         self.csv_file_name = kwargs.get("csv_file_name", "RAC_and_zeo_features_with_id_prop.csv")
-        self.aug_csv_file_name = kwargs.get("aug_csv_file_name", "RAC_and_zeo_features_with_id_prop_aug.csv")
         self.down_sampling = kwargs.get("down_sampling", True)
 
         if  "WS24" in data_dir.name and "test" not in data_dir.name:
@@ -330,8 +322,7 @@ class LoadExtraFeatureData(Dataset):
         self.data_dir = data_dir
         self.prop_cols = prop_cols if prop_cols is not None else ["Label"]
         print("prop_cols:", self.prop_cols)
-        self.id_prop_df = sample_data(data_dir/self.csv_file_name, split, self.prop_cols, augment, 
-                                      id_prop_file_aug=data_dir/self.aug_csv_file_name,
+        self.id_prop_df = sample_data(data_dir/self.csv_file_name, split, self.prop_cols,
                                       random_state=42, max_sample_size=self.max_sample_size,
                                       down_sampling=self.down_sampling
                                       )
@@ -391,19 +382,17 @@ class LoadExtraFeatureData(Dataset):
         return dict_batch
     
     
-def sample_data(id_prop_file, split, prop_cols, augment=False, id_prop_file_aug=None, 
+def sample_data(id_prop_file, split, prop_cols, 
                 random_state=42, max_sample_size: dict=None, down_sampling=True):
     
     """
-    Sample augmented data from dataset
+    Sample data from dataset, possibly balancing classes for classification tasks
     """
     if max_sample_size is None:
         max_sample_size = {
                 "train": 2004,
                 "val": 501,
             }
-    # if augment and split in ["train", "val"]:
-    #     print(f"Sampling {split} data with max_sample_size={max_sample_size[split]}, augment={augment}")
     
     assert os.path.exists(id_prop_file), f'{str(id_prop_file)} not exists'
     id_prop_df = pd.read_csv(id_prop_file, index_col=0)
@@ -414,16 +403,16 @@ def sample_data(id_prop_file, split, prop_cols, augment=False, id_prop_file_aug=
     if isinstance(prop_cols, str):
         prop_cols = [prop_cols]
     
-    if not augment or id_prop_file_aug is None or not os.path.exists(id_prop_file_aug):
-        if len(id_prop_df[prop_cols[0]].unique()) > 5:  ## detect if the task is classification
+    # For classification tasks, perform class balancing if needed
+    if len(id_prop_df[prop_cols[0]].unique()) <= 5:  # detect if the task is classification
+        if not prop_cols or prop_cols[0] not in ["acid_label", "base_label", "boiling_label"]:
             return id_prop_df
-        elif not prop_cols or prop_cols[0] not in ["acid_label", "base_label", "boiling_label"]:
-            return id_prop_df
-        elif not down_sampling:
+        elif not down_sampling and split == "train":  # The down_sampling switch is only used to control whether to down sample the training set
             return id_prop_df
 
         ## for classification task, we need to sample data from each class
         ## to balance the dataset. We use the minority class as the sample size.
+        ## The validation set and test set are forced to be balenced using down sampling in task: ["acid_label", "base_label", "boiling_label"]
         cls_counts = id_prop_df[prop_cols[0]].value_counts()
         sample_size_cls = cls_counts.min()
         cls_dfs = []
@@ -434,45 +423,7 @@ def sample_data(id_prop_file, split, prop_cols, augment=False, id_prop_file_aug=
             cls_dfs.append(cls_df)
         id_prop_df = pd.concat(cls_dfs, axis=0)
         
-        return id_prop_df
-
-    # if not prop_cols or prop_cols[0] not in ["acid_label", "base_label", "boiling_label"]:
-    #     return id_prop_df
-
-    id_prop_df_aug = pd.read_csv(id_prop_file_aug, index_col=0)
-    id_prop_df_aug = id_prop_df_aug[id_prop_df_aug["Partition"] == split]
-    
-    
-    if len(id_prop_df[prop_cols[0]].unique()) <= 5:  ## detect if the task is classification
-        ## for classification task, we need to sample data from augmented data
-        ## to balance the dataset. We use the difference between the max mean sample size
-        ## and the current sample size as the sample size for each class.
-        cls_counts = id_prop_df[prop_cols[0]].value_counts()
-        cls_counts_aug = id_prop_df_aug[prop_cols[0]].value_counts()
-        cls_counts_total = cls_counts + cls_counts_aug
-        
-        sample_size_cls_avg = min(cls_counts_total.min(), max_sample_size[split]//len(cls_counts))
-        
-        cls_dfs = []
-        for cls in cls_counts.index[::-1]:
-            cls_df = id_prop_df[id_prop_df[prop_cols[0]] == cls]
-            sample_size_cls = sample_size_cls_avg - len(cls_df)
-            if sample_size_cls > 0:
-                cls_df_aug = id_prop_df_aug[id_prop_df_aug[prop_cols[0]] == cls]
-                cls_df_aug = cls_df_aug.sample(n=min(sample_size_cls, len(cls_df_aug)), 
-                                               replace=False, random_state=random_state)
-                cls_df = pd.concat([cls_df, cls_df_aug], axis=0)
-            elif sample_size_cls < 0:
-                cls_df = cls_df.sample(n=sample_size_cls_avg, 
-                                       replace=True, random_state=random_state)
-            cls_dfs.append(cls_df)
-        id_prop_df_aug = pd.concat(cls_dfs, axis=0)
-    else:
-        id_prop_df_aug = id_prop_df_aug.sample(n=max(0, min(max_sample_size[split]-len(id_prop_df), 
-                                                     len(id_prop_df_aug))),
-                                               replace=False, random_state=random_state)
-        id_prop_df_aug = pd.concat([id_prop_df, id_prop_df_aug], axis=0)
-    return id_prop_df_aug
+    return id_prop_df
 
 
 def collate_pool(dataset_list):
