@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2024-09-13 17:24:43
+LastEditTime: 2025-04-24 19:20:01
 '''
 
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer)
@@ -436,8 +436,8 @@ def calculate_lsv_from_tree(tree_dic, latent_vectors_test, k=5):
     # Calculate distances between test points and training points
 
     balltree = tree_dic["tree"]
-    labels_train= tree_dic["labels_train"]
-    avg_traintrain = tree_dic["avg_dist_traintrian"]
+    labels_train= tree_dic["labels_train"].flatten()
+    # avg_traintrain = tree_dic["avg_dist_traintrian"]
     nearest_dists, nearest_neighbors = balltree.query(latent_vectors_test, k=k, dualtree=True)
     # nearest_dists /= avg_traintrain
 
@@ -475,7 +475,7 @@ def calculate_lse_from_tree(tree_dic, latent_vectors_test, k=5):
     """
     
     balltree = tree_dic["tree"]
-    labels_train= tree_dic["labels_train"]
+    labels_train= tree_dic["labels_train"].flatten()
     avg_traintrain = tree_dic["avg_dist_traintrian"]
     nearest_dists, nearest_neighbors = balltree.query(latent_vectors_test, k=k, dualtree=True)
 

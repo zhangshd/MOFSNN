@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-17 19:08:40
 LastEditors: zhangshd
-LastEditTime: 2024-08-27 14:54:32
+LastEditTime: 2025-04-24 18:28:44
 '''
 
 import os
@@ -68,7 +68,18 @@ def load_callbacks(patience=10, min_delta=0.0, monitor='val_loss', mode='min', l
 
     return callbacks
 
-def load_model_from_dir(model_dir):
+def load_model_from_dir(model_dir, custom_checkpoint=None):
+    """
+    Load a model from a directory with optional specific checkpoint path.
+    
+    Args:
+        model_dir (str or Path): Directory containing model checkpoints and hparams.yaml
+        custom_checkpoint (str or Path, optional): Specific checkpoint file to load. 
+                                                  If None, will use the first non-last checkpoint found.
+                                                  
+    Returns:
+        tuple: (model, trainer) - The loaded model and a trainer instance
+    """
     torch.set_float32_matmul_precision("medium")
     model_dir = Path(model_dir)
     with open(model_dir/'hparams.yaml', 'r') as f:
@@ -80,8 +91,34 @@ def load_model_from_dir(model_dir):
                       accelerator=hparams["accelerator"],
                       devices=find_usable_cuda_devices(1),
                       )
-    model_file = [file for file in (model_dir / 'checkpoints').glob('*.ckpt') if 'last' not in file.name][0]
-    model = MInterface.load_from_checkpoint(model_file, **hparams)
+    
+    # Allow specifying a custom checkpoint path
+    if custom_checkpoint is not None:
+        model_file = Path(custom_checkpoint)
+    else:
+        model_file = None
+        last_model_file = None
+        model_checkpoints = []
+        for file in model_dir.glob('**/*.ckpt'):
+            if 'last' in file.name:
+                last_model_file = file
+            elif 'best' in file.name:
+                model_file = file
+                print(f"Loading the best model checkpoint: {model_file}")
+                break
+            else:
+                model_checkpoints.append(file)
+        model_checkpoints.sort(key=lambda x: int(x.stem.split('-')[0].split('=')[-1]))  # Sort by epoch. e.g., epoch=06-val_Metric=0.3317.ckpt
+        if model_file is None and model_checkpoints:
+            model_file = model_checkpoints[-1]
+            print(f"Loading the last model checkpoint: {model_file}")
+        if model_file is None and last_model_file is not None:
+            model_file = last_model_file
+            print("Loading the last model checkpoint.")
+        if model_file is None:
+            raise FileNotFoundError("No checkpoint files found in the specified directory.")
+    
+    model = MInterface.load_from_checkpoint(str(model_file), **hparams)
     return model, trainer
 
 def load_model_path(root=None, version=None, v_num=None, best=False):

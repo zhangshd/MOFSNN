@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 10:58:34
 LastEditors: zhangshd
-LastEditTime: 2025-04-22 16:12:30
+LastEditTime: 2025-04-26 11:08:01
 '''
 
 import os
@@ -27,6 +27,7 @@ from pathlib import Path
 import optuna
 from config import *
 from types import SimpleNamespace
+from typing import Union
 
 from cgcnn.module.module import MInterface
 from cgcnn.datamodule.data_interface import DInterface
@@ -35,6 +36,12 @@ from cgcnn.utils import MODEL_NAME_TO_DATASET_CLS, MODEL_NAME_TO_MODULE_CLS
 
 # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
+def float_or_str(value) -> Union[float, str]:
+    """Convert a value to float if possible, otherwise return it as is."""
+    try:
+        return float(value)
+    except ValueError:
+        return value
 
 def main(args, trial: optuna.trial.Trial = None) -> float:
 
@@ -92,6 +99,25 @@ def main(args, trial: optuna.trial.Trial = None) -> float:
     else:
         callbacks = load_callbacks(args.patience, args.min_delta, monitor=args.monitor, 
                                mode=args.mode, lr_scheduler=args.lr_scheduler)
+    
+    # Configure checkpoint saving based on save_all_epochs flag
+    if hasattr(args, "save_all_epochs") and args.save_all_epochs:
+        print("Will save checkpoints for all epochs")
+        # Create a ModelCheckpoint callback for saving all epochs
+        checkpoint_callback = plc.ModelCheckpoint(
+            monitor=args.monitor,
+            filename='{epoch:02d}-' +  '{' + args.monitor + ':.3f}',
+            save_top_k=-1,  # Save all checkpoints
+            mode=args.mode,
+            save_last=True,
+            verbose=True,
+            every_n_epochs=1
+        )
+        
+        # Remove any existing ModelCheckpoint callbacks to avoid conflicts
+        callbacks = [cb for cb in callbacks if not isinstance(cb, plc.ModelCheckpoint)]
+        callbacks.append(checkpoint_callback)
+        
     if trial is not None:
         callbacks.append(PyTorchLightningPruningCallback(trial, monitor=args.monitor))
     logger = tb_logger
@@ -115,6 +141,9 @@ def main(args, trial: optuna.trial.Trial = None) -> float:
                       limit_val_batches=args.limit_val_batches,
                       log_every_n_steps=5,
                       enable_progress_bar=args.progress_bar,
+                      enable_checkpointing=True,
+                      enable_model_summary=True,
+                      check_val_every_n_epoch=1,
                       )
     if args.auto_lr_bs_find:
         tuner = Tuner(trainer)
@@ -166,7 +195,7 @@ if __name__ == '__main__':
     # parser.add_argument('--focal_gamma', default=2, type=int)
 
     # # Optimizer
-    # parser.add_argument('--optim', default='Adam', type=str)
+    parser.add_argument('--optim', default='adam', type=str)
     parser.add_argument('--lr', type=float)
     parser.add_argument('--lr_mult', type=float)
     # parser.add_argument('--weight_decay', default=1e-5, type=float)
@@ -176,12 +205,12 @@ if __name__ == '__main__':
 
 
     # # LR Scheduler
-    # parser.add_argument('--lr_scheduler', default='multi_step', 
-    #                     choices=['step', 'cosine', 'multi_step', 'reduce_on_plateau'], type=str)
+    parser.add_argument('--lr_scheduler', default='polynomial', type=str)
     # parser.add_argument('--lr_decay_steps', default=10, type=int)
     # parser.add_argument('--lr_milestones', default=[10, 20, 30, 50], nargs='+', type=int)
     # parser.add_argument('--lr_decay_rate', default=0.5, type=float)
     # parser.add_argument('--lr_decay_min_lr', default=1e-5, type=float)
+    parser.add_argument('--decay_power', default=1.0, type=float_or_str)
 
     # # Restart Control
     # parser.add_argument('--load_best', action='store_true')
@@ -229,6 +258,8 @@ if __name__ == '__main__':
 
     # # Extra Hyperparameters
     parser.add_argument('--task_cfg', default="tsd", type=str)
+    parser.add_argument('--save_all_epochs', action='store_true',
+                        help="Save checkpoints for all epochs, not just the best model")
     
     args = parser.parse_args()
     conf = cfg()
