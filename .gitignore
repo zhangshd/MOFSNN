@@ -38,11 +38,11 @@ logs
 test.ipynb
 */logs/*/*
 */inference/*
-results/*
 
 logs*
 **/raw_data
 **/CoREMOF2019
+results/**
 !results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29/
 !results/cgcnn_models/SSD_seed42_cgcnn_raw/version_4/
 !results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_29/
