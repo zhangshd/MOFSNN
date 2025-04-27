@@ -42,7 +42,8 @@ test.ipynb
 logs*
 **/raw_data
 **/CoREMOF2019
-results/**
+results/*
+results/cgcnn_models/*
 !results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29/
 !results/cgcnn_models/SSD_seed42_cgcnn_raw/version_4/
 !results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_29/
@@ -61,5 +62,6 @@ results/**
 !results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_7/
 !results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24/
 !results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43/
-!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_3
-!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_1
+!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_3/
+!results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_1/
+!results/ml_models/
