@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 10:58:34
 LastEditors: zhangshd
-LastEditTime: 2025-04-27 20:55:19
+LastEditTime: 2025-04-28 17:25:08
 '''
 
 import os
@@ -237,6 +237,9 @@ if __name__ == '__main__':
     parser.add_argument('--augment', action='store_true')
     parser.add_argument('--aug_noise_std', type=float, default=0.01)
     parser.add_argument('--balance_classes', action='store_true')
+    parser.add_argument("--aug_factor", type=int, default=None, help="Augmentation factor")
+    parser.add_argument("--aug_sample_file", type=str, default=None, 
+                        help="Path to Excel file containing sample IDs to augment")
     parser.add_argument('--down_sampling', action='store_true')
     # parser.add_argument('--tasks', nargs='+', default=['TSD', 'SSD'], type=str)
     # parser.add_argument('--task_types', nargs='+', default=['regression', 'classification'], type=str)

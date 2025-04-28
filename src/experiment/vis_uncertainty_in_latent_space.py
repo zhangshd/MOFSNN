@@ -159,10 +159,10 @@ def calculate_uncertainty(latent_vectors, uncertainty_trees, task, task_type):
     
     if "classification" in task_type:
         return calculate_lse_from_tree(uncertainty_trees[task], latent_vectors, 
-                                       k=uncertainty_trees[task]["k"])
+                                       k=uncertainty_trees[task]["k"], scale=True)
     else:
         return calculate_lsv_from_tree(uncertainty_trees[task], latent_vectors, 
-                                       k=uncertainty_trees[task]["k"])
+                                       k=uncertainty_trees[task]["k"], scale=True)
 
 def apply_dimensionality_reduction(features, method="tsne", random_state=42):
     """
@@ -791,6 +791,214 @@ def create_data_module(model):
     
     return data_module
 
+import scipy.stats as stats  # Add this import at the top of the file
+
+def create_uncertainty_error_histograms(results, tasks, model_hparams, output_dir, figsize=(20, 15), bins=20):
+    """
+    Create mirror plots showing uncertainty distribution and error rates.
+    
+    For each task, creates a subplot with:
+    - Top part (y > 0): KDE showing distribution of uncertainty values across train/val/test sets
+    - Bottom part (y < 0): Histogram showing error rate within each uncertainty bin
+    
+    Args:
+        results: Dictionary of results by task and split
+        tasks: List of task names
+        model_hparams: Model hyperparameters
+        output_dir: Output directory
+        figsize: Figure size
+        bins: Number of bins for histograms
+        
+    Returns:
+        Path to saved figure
+    """
+    # Create subplots
+    n_tasks = len(tasks)
+    n_cols = min(3, n_tasks)
+    n_rows = (n_tasks + n_cols - 1) // n_cols
+    
+    # Create figure
+    fig, axs = plt.subplots(n_rows, n_cols, figsize=figsize)
+    
+    # Ensure axs is 2D array even with single row or column
+    if n_rows == 1 and n_cols == 1:
+        axs = np.array([[axs]])
+    elif n_rows == 1:
+        axs = axs.reshape(1, -1)
+    elif n_cols == 1:
+        axs = axs.reshape(-1, 1)
+    
+    # Define colors for different splits
+    split_colors = {
+        'train': 'blue',
+        'val': 'orange',
+        'test': 'green'
+    }
+    
+    # Process each task
+    for i, task in enumerate(tasks):
+        if i >= n_rows * n_cols:
+            print(f"Warning: Not enough subplots for task {task}. Skipping.")
+            continue
+            
+        # Determine subplot indices
+        row = i // n_cols
+        col = i % n_cols
+        
+        # Get the axis for this task
+        ax = axs[row, col]
+        
+        # Check if data exists
+        if task not in results:
+            print(f"Warning: No data for task {task}. Skipping.")
+            ax.axis('off')
+            continue
+            
+        # Get task info
+        task_id = model_hparams.tasks.index(task)
+        task_type = model_hparams.task_types[task_id]
+        
+        # Calculate uncertainty range for consistent x-axis
+        all_uncertainties = []
+        for split in ['train', 'val', 'test']:
+            if split in results[task]:
+                all_uncertainties.append(results[task][split]['uncertainties'])
+        
+        if not all_uncertainties:
+            print(f"No data for task {task}. Skipping.")
+            ax.axis('off')
+            continue
+            
+        all_uncertainties = np.concatenate(all_uncertainties)
+        uncertainty_min = np.min(all_uncertainties)
+        uncertainty_max = np.max(all_uncertainties)
+        
+        # Add a small buffer to the min/max range
+        padding = (uncertainty_max - uncertainty_min) * 0.05
+        x_min = uncertainty_min - padding
+        x_max = uncertainty_max + padding
+        
+        # Create bin edges for histograms
+        bin_edges = np.linspace(x_min, x_max, bins + 1)
+        bin_width = bin_edges[1] - bin_edges[0]
+        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+        
+        # Create evaluation points for KDE curves
+        x_grid = np.linspace(x_min, x_max, 200)  # More points for smoother KDE
+        
+        # Track max density for axis scaling
+        max_density = 0
+        max_error_rate = 0  # Track max error rate for y-axis scaling
+        
+        # Plot top density curves: uncertainty distribution (y > 0)
+        for split, color in split_colors.items():
+            if split in results[task]:
+                uncertainties = results[task][split]['uncertainties'].flatten()
+                if len(uncertainties) > 10:  # Need sufficient samples for KDE
+                    try:
+                        # Calculate KDE
+                        kde = stats.gaussian_kde(uncertainties)
+                        density = kde(x_grid)
+                        if split != "train": 
+                            max_density = max(max_density, np.max(density))
+                        # Plot KDE curve
+                        ax.plot(x_grid, density, color=color, alpha=0.8, 
+                               label=f'{split} ({len(uncertainties)} samples)', 
+                               linewidth=2)
+                        # Fill under the curve
+                        ax.fill_between(x_grid, density, alpha=0.3, color=color)
+                    except Exception as e:
+                        print(f"Error calculating KDE for {task}, {split}: {str(e)}")
+        
+        # Plot bottom part: error rate within each uncertainty bin
+        for split, color in split_colors.items():
+            if split in results[task]:
+                uncertainties = results[task][split]['uncertainties'].flatten()
+                preds = results[task][split]['preds'].flatten()
+                targets = results[task][split]['targets'].flatten()
+                
+                # Identify error samples
+                error_mask = identify_error_samples(preds, targets, task_type)
+                total_errors = np.sum(error_mask)
+                
+                # Calculate error rate in each bin
+                bin_error_rates = []
+                bin_counts = []
+                
+                for j in range(len(bin_edges) - 1):
+                    # Get samples in this bin
+                    bin_mask = (uncertainties >= bin_edges[j]) & (uncertainties < bin_edges[j+1])
+                    bin_count = np.sum(bin_mask)
+                    bin_counts.append(bin_count)
+                    
+                    # Calculate error rate for this bin
+                    if bin_count > 0:
+                        bin_error_count = np.sum(error_mask & bin_mask)
+                        error_rate = bin_error_count / bin_count
+                    else:
+                        error_rate = 0
+                    
+                    bin_error_rates.append(error_rate)
+                    max_error_rate = max(max_error_rate, error_rate)
+                
+                # Convert to numpy arrays for plotting
+                bin_error_rates = np.array(bin_error_rates)
+                
+                # Plot error rates as bars
+                # Negative values for mirroring below x-axis
+                ax.bar(bin_centers, -bin_error_rates, width=bin_width*0.8, color=color, alpha=0.7,
+                      label=f'{split} error rates ({total_errors} errors)')
+                
+                # Optional: Add text with actual bin counts for bins with samples
+                for j, (count, rate) in enumerate(zip(bin_counts, bin_error_rates)):
+                    if count > 0 and rate > 0.05:  # Only show text for bins with enough samples and visible error rate
+                        ax.text(bin_centers[j], -rate-0.05, f'{count}', 
+                               ha='center', va='top', fontsize=6, color=color)
+        
+        # Set axis properties
+        ax.set_title(f"{task}")
+        ax.set_xlabel('Uncertainty')
+        ax.set_ylabel('Density (top) / Error Rate (bottom)')
+        
+        # Adjust y-limits
+        if max_density > 0:
+            density_buffer = max_density * 0.1
+            error_buffer = max(0.1, max_error_rate * 0.1)
+            # Make error rate scale up to 1.0 if any bin has high error rate
+            bottom_limit = -min(1.0, max_error_rate + error_buffer)
+            ax.set_ylim(bottom_limit, max_density + density_buffer)
+        
+        # Set x-axis limits based on uncertainty range
+        ax.set_xlim(x_min, x_max)
+        
+        # Add horizontal line at y=0
+        ax.axhline(y=0, color='k', linestyle='-', alpha=0.3)
+        
+        # Add legends with smaller font size and better positioning
+        ax.legend(fontsize=7, loc='upper right')
+    
+    # Hide any unused subplots
+    for i in range(len(tasks), n_rows * n_cols):
+        row = i // n_cols
+        col = i % n_cols
+        if row < len(axs) and col < len(axs[0]):
+            axs[row, col].axis('off')
+    
+    # Add super title
+    plt.suptitle("Uncertainty Distribution and Error Rates by Task\n(Top: Distribution, Bottom: Error Rate per Bin)", 
+                fontsize=16, y=0.98)
+    
+    # Adjust layout
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    
+    # Save figure
+    output_path = output_dir / "uncertainty_error_rate_plots.png"
+    fig.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close(fig)
+    
+    print(f"Saved uncertainty-error rate plots to {output_path}")
+    return output_path
+
 def run_analysis(model_dir, uncertainty_trees_file, output_dir, dim_reduction_methods=["tsne"], use_data_module=None):
     """
     Run the full analysis pipeline.
@@ -872,6 +1080,10 @@ def run_analysis(model_dir, uncertainty_trees_file, output_dir, dim_reduction_me
             results, model.hparams.tasks, model.hparams, 
             output_dir, dim_reduction_method=method
         )
+    
+    # Create uncertainty-error histograms
+    print("\nCreating uncertainty-error histograms...")
+    create_uncertainty_error_histograms(results, model.hparams.tasks, model.hparams, output_dir)
     
     print("Analysis complete!")
     return results

@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-20 10:00:00
 LastEditors: zhangshd
-LastEditTime: 2025-04-27 19:53:07
+LastEditTime: 2025-04-28 22:18:45
 '''
 import functools
 import os, sys
@@ -18,18 +18,20 @@ from datamodule.dataset import LoadGraphData
 
 class AugmentedGraphData(LoadGraphData):
     """
-    Data augmentation class for minority classes in classification tasks.
+    Data augmentation class for minority classes in classification tasks or specific samples.
     Performs minor perturbations on nbr_dist and cell_params.
     
-    This class identifies minority classes in classification tasks and creates
-    augmented versions of these samples by adding small Gaussian noise to 
-    nbr_dist and cell_params values.
+    This class has two modes of operation:
+    1. Class-based augmentation: Identifies minority classes in classification tasks and creates
+       augmented versions of these samples to balance the class distribution.
+    2. Sample-based augmentation: Augments only specific samples listed in an Excel file,
+       useful for high-uncertainty samples or other special cases.
     
     By default, this class will augment minority class samples to match the majority class count.
     Alternatively, a fixed augmentation factor can be specified.
     """
     
-    def __init__(self, original_dataset, aug_factor=None, noise_std=0.01, balance_classes=True):
+    def __init__(self, original_dataset, aug_factor=None, noise_std=0.01, balance_classes=True, aug_sample_file=None, task=None, task_type=None):
         """
         Initialize the augmented dataset based on the original dataset.
         
@@ -41,6 +43,11 @@ class AugmentedGraphData(LoadGraphData):
             noise_std (float): Standard deviation factor for perturbation (relative to original value)
             balance_classes (bool): If True, augment minority classes to match majority class count.
                                   If False, use fixed aug_factor for all minority samples.
+            aug_sample_file (str, optional): Path to Excel file containing sample IDs to augment.
+                                          If provided, only samples in this file will be augmented.
+                                          Each sheet should correspond to a task.
+            task (str, optional): The actual task name (e.g. "WS24_water") to match with Excel sheet names.
+                                 If None, will try to derive from property column name.
         """
         # Initialize base attributes without calling parent constructor
         self.data_dir = original_dataset.data_dir
@@ -61,25 +68,155 @@ class AugmentedGraphData(LoadGraphData):
         self.original_dataset = original_dataset
         self.noise_std = noise_std
         self.balance_classes = balance_classes
+        self.aug_sample_file = aug_sample_file
         
         # Copy required attributes for consistent processing
         self.ari = original_dataset.ari if hasattr(original_dataset, 'ari') else None
         self.gdf = original_dataset.gdf if hasattr(original_dataset, 'gdf') else None
         
+        # If no property columns, create empty dataframe and return
+        if not self.prop_cols:
+            self.id_prop_df = pd.DataFrame()
+            self.augmented_mapping = {}
+            return
+        
+        # Use provided task name if available, otherwise try to derive from property column
+        self.task = task
+        self.task_type = task_type
+
+        # Check for sample-based augmentation mode (using Excel file)
+        if aug_sample_file is not None and os.path.exists(aug_sample_file):
+            samples_to_augment = self._read_samples_from_excel(aug_sample_file)
+            
+            if samples_to_augment:
+                # Perform sample-based augmentation
+                self._augment_specific_samples(samples_to_augment, aug_factor)
+                return
+        
+        # If we get here, perform regular class-based augmentation
+        self._perform_class_based_augmentation(aug_factor)
+    
+    def _read_samples_from_excel(self, excel_path):
+        """
+        Read sample IDs to augment from an Excel file.
+        
+        Args:
+            excel_path: Path to Excel file
+            
+        Returns:
+            List of sample IDs to augment, or None if the task is not found
+        """
+        try:
+            print(f"Reading samples to augment from {excel_path}")
+            
+            # Read all sheets from Excel file
+            excel_data = pd.read_excel(excel_path, sheet_name=None)
+            
+            # Find sheet matching current task
+            for sheet_name, df in excel_data.items():
+                if sheet_name == self.task and 'cif_id' in df.columns:
+                    sample_ids = df['cif_id'].astype(str).tolist()
+                    
+                    # Log uncertainty info if available
+                    if 'uncertainty' in df.columns:
+                        min_uncertainty = df['uncertainty'].min()
+                        max_uncertainty = df['uncertainty'].max()
+                        print(f"Found {len(sample_ids)} samples to augment for task {self.task}")
+                        print(f"  Uncertainty range: {min_uncertainty:.4f} to {max_uncertainty:.4f}")
+                    else:
+                        print(f"Found {len(sample_ids)} samples to augment for task {self.task}")
+                    
+                    return sample_ids
+            
+            print(f"No matching sheet found for task {self.task} in {excel_path}")
+            return None
+            
+        except Exception as e:
+            print(f"Error reading sample file {excel_path}: {e}")
+            return None
+    
+    def _augment_specific_samples(self, sample_ids, aug_factor):
+        """
+        Augment specific samples identified by their IDs.
+        
+        Args:
+            sample_ids: List of sample IDs to augment
+            aug_factor: Augmentation factor (how many copies to create)
+        """
+        # Create a set of sample IDs for faster lookup
+        sample_id_set = set(sample_ids)
+        
+        # Find matching samples in the original dataset
+        matching_samples = []
+        for idx in self.original_dataset.id_prop_df.index:
+            if str(idx) in sample_id_set:
+                matching_samples.append(idx)
+        
+        # Create augmented versions
+        augmented_rows = []
+        self.augmented_mapping = {}
+        
+        # Set augmentation factor - default to 2 if not specified
+        samples_per_orig = aug_factor if aug_factor is not None else 2
+        
+        # Log augmentation info
+        print(f"\n=== Sample-Based Augmentation ===")
+        print(f"Found {len(matching_samples)} of {len(sample_ids)} requested samples in dataset")
+        print(f"Augmentation factor: {samples_per_orig}x")
+        
+        # Create augmented samples
+        for orig_idx in matching_samples:
+            # Get original sample data
+            row = self.original_dataset.id_prop_df.loc[orig_idx]
+            
+            # Create multiple augmented versions
+            for aug_idx in range(samples_per_orig):
+                aug_id = f"{orig_idx}_aug_{aug_idx}"
+                self.augmented_mapping[aug_id] = orig_idx
+                
+                # Create new row for augmented sample
+                aug_row = row.copy()
+                augmented_rows.append((aug_id, aug_row))
+        
+        # Create DataFrame with augmented samples
+        if augmented_rows:
+            self.id_prop_df = pd.DataFrame([row for _, row in augmented_rows], 
+                                           index=[id for id, _ in augmented_rows])
+            print(f"Created {len(self.id_prop_df)} augmented samples")
+        else:
+            self.id_prop_df = pd.DataFrame()
+            print("No samples were augmented")
+        
+        print("====================================")
+    
+    def _perform_class_based_augmentation(self, aug_factor):
+        """
+        Perform class-based augmentation to balance minority classes.
+        This is the original augmentation method from the class.
+        
+        Args:
+            aug_factor: Augmentation factor for fixed augmentation
+        """
         # Identify minority classes for each task
         # Since each dataset typically corresponds to one task, we use the first property column
         task_prop_col = self.prop_cols[0] if self.prop_cols else None
         
-        if task_prop_col is None or task_prop_col not in original_dataset.id_prop_df.columns:
+        if task_prop_col is None or task_prop_col not in self.original_dataset.id_prop_df.columns:
             # No valid property column for classification
             self.id_prop_df = pd.DataFrame()
             self.augmented_mapping = {}
             return
             
         # Get class distribution for this task
-        class_counts = original_dataset.id_prop_df[task_prop_col].value_counts()
+        class_counts = self.original_dataset.id_prop_df[task_prop_col].value_counts()
         if len(class_counts) <= 1:
             # Only one class, no minority to augment
+            self.id_prop_df = pd.DataFrame()
+            self.augmented_mapping = {}
+            return
+        elif len(class_counts) > 5:
+            # Too many classes, cannot handle
+            print(f"Too many classes ({len(class_counts)}) for class-based augmentation. Skipping.")
             self.id_prop_df = pd.DataFrame()
             self.augmented_mapping = {}
             return
@@ -103,11 +240,11 @@ class AugmentedGraphData(LoadGraphData):
                 continue
                 
             # Get all samples for this class
-            class_samples = original_dataset.id_prop_df[original_dataset.id_prop_df[task_prop_col] == class_label]
+            class_samples = self.original_dataset.id_prop_df[self.original_dataset.id_prop_df[task_prop_col] == class_label]
             orig_count = len(class_samples)
             
             # Determine how many augmented samples to create for this class
-            if balance_classes:
+            if self.balance_classes:
                 # Calculate how many total samples needed for this class to match majority class
                 total_needed = majority_count
                 # Calculate how many augmented samples to create
@@ -153,7 +290,7 @@ class AugmentedGraphData(LoadGraphData):
                     # Determine how many augmented versions to create for this sample
                     for aug_idx in range(samples_per_orig):
                         # Stop if we've created enough augmented samples for this class
-                        if balance_classes and aug_count >= aug_samples_needed:
+                        if self.balance_classes and aug_count >= aug_samples_needed:
                             break
                             
                         aug_id = f"{orig_idx}_aug_{aug_idx}"
@@ -170,7 +307,7 @@ class AugmentedGraphData(LoadGraphData):
                                          index=[id for id, _ in augmented_rows])
             
             # Print augmentation statistics
-            print("\n=== Data Augmentation Statistics ===")
+            print("\n=== Class-Based Augmentation Statistics ===")
             print(f"Majority class ({majority_class}): {majority_count} samples")
             for class_label, (orig, aug_needed, per_orig) in class_aug_counts.items():
                 print(f"Class {class_label}: {orig} original + {aug_needed} augmented = {orig + aug_needed} total samples")
@@ -210,6 +347,11 @@ class AugmentedGraphData(LoadGraphData):
             extra_fea = []
             
         targets = row[self.prop_cols].values.astype(float)
+        if self.task_type == "regression":
+            ## add noise to targets if regression
+            noise = np.random.normal(0, self.noise_std * np.abs(targets))
+            targets = targets + noise
+
         
         # Load original graph data
         with open(self.g_data[orig_id], 'rb') as f:

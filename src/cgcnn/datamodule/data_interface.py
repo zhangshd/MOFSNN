@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 11:08:17
 LastEditors: zhangshd
-LastEditTime: 2025-04-28 10:27:06
+LastEditTime: 2025-04-28 22:10:13
 '''
 import os
 import sys
@@ -50,6 +50,7 @@ class DInterface(pl.LightningDataModule):
         self.aug_noise_std = kwargs.get('aug_noise_std', 0.01)
         self.balance_classes = kwargs.get('balance_classes', True)  # New parameter
         self.task_weights = kwargs.get('task_weights', None)
+        self.aug_sample_file = kwargs.get('aug_sample_file', None)  # Added parameter
 
         print("final_train:", self.final_train)
         print("dl_sampler: ", self.dl_sampler)
@@ -73,13 +74,15 @@ class DInterface(pl.LightningDataModule):
                     self.trainset_sizes.append(len(trainset))
                     task_weights.append(len(trainset))
                     # Add augmentation for classification tasks if enabled
-                    if self.augment and 'classification' in task_type:
+                    if self.augment:
                         # Create augmented dataset for minority classes
                         augmented_trainset = AugmentedGraphData(
                             trainset, 
                             aug_factor=self.aug_factor, 
                             noise_std=self.aug_noise_std,
-                            balance_classes=self.balance_classes
+                            balance_classes=self.balance_classes,
+                            aug_sample_file=self.aug_sample_file,
+                            task=task 
                         )
                         
                         # If there are augmented samples, add them to the combined dataset
@@ -178,14 +181,23 @@ class DInterface(pl.LightningDataModule):
                           collate_fn=self.collate_fn, pin_memory=True)
     
     def train_normalizer(self):
+        """Compute normalizers for each task based on training data."""
         self.normalizers = []
         for i, task_tp in enumerate(self.task_types):
-            trainset = self.trainset.datasets[i]
             if 'classification' in task_tp:
                 normalizer = Normalizer(torch.Tensor([-1, 0., 1]))
                 self.normalizers.append(normalizer)
             else:
-                train_targets = torch.Tensor(trainset.id_prop_df.loc[:, trainset.prop_cols].values)
+                # Handle the case when trainset[i] is a ConcatDataset
+                if isinstance(self.trainsets[i], ConcatDataset):
+                    # Get the original dataset (first dataset in the concatenation)
+                    original_dataset = self.trainsets[i].datasets[0]
+                    train_targets = torch.Tensor(original_dataset.id_prop_df.loc[:, original_dataset.prop_cols].values)
+                else:
+                    # Original code path
+                    trainset = self.trainsets[i]
+                    train_targets = torch.Tensor(trainset.id_prop_df.loc[:, trainset.prop_cols].values)
+                    
                 normalizer = Normalizer(train_targets, log_labels=self.log_labels)
                 self.normalizers.append(normalizer)
         return self.normalizers
@@ -232,7 +244,7 @@ class Normalizer(object):
         self.std = self.std.to(device)
         self.device = device
 
-        return self  # 返回self以支持链式调用
+        return self
 
 def split_dataset(data_df, stratify_cols=None, val_size=0.1, test_size=0.1, batch_size=32, random_seed=42):
     np.random.seed(random_seed)

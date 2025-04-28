@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2025-04-24 19:20:01
+LastEditTime: 2025-04-28 14:27:08
 '''
 
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer)
@@ -421,7 +421,7 @@ def calculate_lse(latent_vectors_train, labels_train, latent_vectors_test, k=5):
     # print(nearest_labels.shape)
     return calculate_entropy(nearest_dists, nearest_labels, num_classes)
 
-def calculate_lsv_from_tree(tree_dic, latent_vectors_test, k=5):
+def calculate_lsv_from_tree(tree_dic, latent_vectors_test, k=5, scale=True):
     """
     Calculate Latent Space Variance (LSV) for regression tasks by considering the labels of the nearest neighbors.
 
@@ -457,11 +457,11 @@ def calculate_lsv_from_tree(tree_dic, latent_vectors_test, k=5):
         
         variances.append(variance)
     variances = np.array(variances)
-    if "scaler" in tree_dic:
+    if "scaler" in tree_dic and scale:
         variances = tree_dic["scaler"].transform(variances.reshape(-1, 1)).reshape(-1)
     return variances
 
-def calculate_lse_from_tree(tree_dic, latent_vectors_test, k=5):
+def calculate_lse_from_tree(tree_dic, latent_vectors_test, k=5, scale=True):
     """
     Calculate the Latent Space Entropy (LSE) for classification tasks.
 
@@ -484,6 +484,6 @@ def calculate_lse_from_tree(tree_dic, latent_vectors_test, k=5):
     num_classes = len(np.unique(labels_train))
     # print(nearest_labels.shape)
     entropies = calculate_entropy(nearest_dists, nearest_labels, num_classes)
-    if "scaler" in tree_dic:
+    if "scaler" in tree_dic and scale:
         entropies = tree_dic["scaler"].transform(np.array(entropies).reshape(-1, 1)).reshape(-1)
     return entropies
