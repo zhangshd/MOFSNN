@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 11:08:17
 LastEditors: zhangshd
-LastEditTime: 2025-04-27 20:07:25
+LastEditTime: 2025-04-28 10:27:06
 '''
 import os
 import sys
@@ -49,6 +49,7 @@ class DInterface(pl.LightningDataModule):
         self.aug_factor = kwargs.get('aug_factor', None)  # Changed to None as default
         self.aug_noise_std = kwargs.get('aug_noise_std', 0.01)
         self.balance_classes = kwargs.get('balance_classes', True)  # New parameter
+        self.task_weights = kwargs.get('task_weights', None)
 
         print("final_train:", self.final_train)
         print("dl_sampler: ", self.dl_sampler)
@@ -64,12 +65,13 @@ class DInterface(pl.LightningDataModule):
             if not hasattr(self, 'trainset'):
                 self.trainsets = []
                 self.trainset_sizes = []
+                task_weights = []
                 for i, (task, task_type) in enumerate(zip(self.tasks, self.task_types)):
                     dataset_dir = self.root_dir / task
                     trainset = self.dataset_cls(data_dir=dataset_dir, split='train',
                                                 task_id=i, **self.kwargs)
                     self.trainset_sizes.append(len(trainset))
-                    
+                    task_weights.append(len(trainset))
                     # Add augmentation for classification tasks if enabled
                     if self.augment and 'classification' in task_type:
                         # Create augmented dataset for minority classes
@@ -91,6 +93,7 @@ class DInterface(pl.LightningDataModule):
                         trainset.append(
                             self.dataset_cls(data_dir=dataset_dir, split='val',
                                                 task_id=i, **self.kwargs))
+                        task_weights[i] = len(trainset)
                         
                     self.trainsets.append(trainset)
                     print(f"Number of {task} training data:", len(trainset))
@@ -98,7 +101,10 @@ class DInterface(pl.LightningDataModule):
                 self.trainset = ConcatDataset(self.trainsets)
                 print("Number of total training data:", len(self.trainset))
                 print("=" * 50 + "\n")
-                self.task_weights = [len(d) / len(self.trainset) for d in self.trainsets]
+                if self.task_weights is None:
+                    self.task_weights = [w/sum(task_weights) for w in task_weights]
+                # self.task_weights = [len(d) / len(self.trainset) for d in self.trainsets]
+                print("Task weights:", self.task_weights)
             self.train_normalizer()
             if not hasattr(self, 'valset'):
                 self.valsets = []
