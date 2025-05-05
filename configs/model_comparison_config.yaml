@@ -1,0 +1,168 @@
+# Model comparison configuration file
+# This file contains model paths and display names for performance comparison
+
+# Model directories mapping
+model_dirs_map:
+  # Single task models (all with same DisplayName for grouping)
+  TSD:
+    Path: results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29
+    DisplayName: CGCNN_SG
+    Model: cgcnn_raw
+  
+  SSD:
+    Path: results/cgcnn_models/SSD_seed42_cgcnn_raw/version_4
+    DisplayName: CGCNN_SG
+    Model: cgcnn_raw
+  
+  WS24_water:
+    Path: results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_29
+    DisplayName: CGCNN_SG
+    Model: cgcnn_raw
+  
+  WS24_water4:
+    Path: results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_3
+    DisplayName: CGCNN_SG
+    Model: cgcnn_raw
+  
+  WS24_acid:
+    Path: results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_47
+    DisplayName: CGCNN_SG
+    Model: cgcnn_raw
+  
+  WS24_base:
+    Path: results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_0
+    DisplayName: CGCNN_SG
+    Model: cgcnn_raw
+  
+  WS24_boiling:
+    Path: results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_7
+    DisplayName: CGCNN_SG
+    Model: cgcnn_raw
+  
+  # Multi-task models
+  TSD_SSD_WS24_all:
+    Path: results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24
+    DisplayName: CGCNN_MT
+    Model: cgcnn_raw_multi
+  
+  # Full MOFSNN model
+  TSD_SSD_WS24_all_attn:
+    Path: results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43
+    DisplayName: MOFSNN
+    Model: att_cgcnn
+  
+  # MOFSNN variants
+  MOFSNN_no_lattice:
+    Path: results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_3
+    DisplayName: MOFSNN_no_lattice
+    Model: MOFSNN_no_lattice
+  
+  MOFSNN_no_attn:
+    Path: results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_1
+    DisplayName: MOFSNN_no_attn
+    Model: MOFSNN_no_attn
+  
+  # Subset models
+  TSD_SSD_WS24_water_WS24_water4:
+    Path: results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_seed42_att_cgcnn/version_13
+    DisplayName: MOFSNN_large
+    Model: att_cgcnn
+  
+  WS24_all:
+    Path: results/cgcnn_models/WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_34
+    DisplayName: MOFSNN_strong
+    Model: att_cgcnn
+
+  # MOFSNN augmentation models
+  TSD_SSD_WS24_all_attn_aug_balance:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_0
+    DisplayName: MOFSNN_balance_aug
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_aug_uncertainty1:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_1
+    DisplayName: MOFSNN_uncertainty_aug1
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_aug_uncertainty2:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_2
+    DisplayName: MOFSNN_uncertainty_aug2
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_aug_uncertainty3:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_3
+    DisplayName: MOFSNN_uncertainty_aug3
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_aug_uncertainty4:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_4
+    DisplayName: MOFSNN_uncertainty_aug4
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_aug_uncertainty5:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_5
+    DisplayName: MOFSNN_uncertainty_aug5
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_no_downsampling:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_6
+    DisplayName: MOFSNN_no_downsampling
+    Model: att_cgcnn
+    
+
+# Tasks to evaluate
+tasks:
+  - TSD
+  - SSD
+  - WS24_water
+  - WS24_water4
+  - WS24_acid
+  - WS24_base
+  - WS24_boiling
+
+# Task types (regression or classification)
+task_types:
+  TSD: regression
+  SSD: classification
+  WS24_water: classification
+  WS24_water4: classification
+  WS24_acid: classification
+  WS24_base: classification
+  WS24_boiling: classification
+
+# Example model comparison groups (for reference)
+comparison_groups:
+  # Standard comparison between model families
+  standard:
+    - TSD  # Representative for CGCNN Single-Task
+    - SSD  # Representative for CGCNN Single-Task
+    - WS24_water  # Representative for CGCNN Single-Task
+    - WS24_water4  # Representative for CGCNN Single-Task
+    - WS24_acid  # Representative for CGCNN Single-Task
+    - WS24_base  # Representative for CGCNN Single-Task
+    - WS24_boiling  # Representative for CGCNN Single-Task
+    - TSD_SSD_WS24_all  # CGCNN Multi-Task
+    - TSD_SSD_WS24_all_attn  # MOFSNN
+  
+  # MOFSNN ablation study
+  ablation:
+    - MOFSNN_no_lattice
+    - MOFSNN_no_attn
+    - TSD_SSD_WS24_all_attn  # Full MOFSNN
+  
+  # MOFSNN subset comparison of w/ or w/o weak correlated tasks
+  correlation:
+    - WS24_all  # MOFSNN Strong
+    - TSD_SSD_WS24_all_attn  # Full MOFSNN
+
+  # MOFSNN subset comparison of w/ or w/o small datasets
+  datasize:
+    - TSD_SSD_WS24_water_WS24_water4  # MOFSNN Large
+    - TSD_SSD_WS24_all_attn  # Full MOFSNN
+  
+  # MOFSNN augmentation comparison
+  augmentation:
+    - TSD_SSD_WS24_all_attn_aug_balance
+    - TSD_SSD_WS24_all_attn_no_downsampling
+    - TSD_SSD_WS24_all_attn  # Full MOFSNN
+
+  # MOFSNN augmentation comparison
+  augmentation_uncertainty:
+    - TSD_SSD_WS24_all_attn_aug_uncertainty1
+    - TSD_SSD_WS24_all_attn_aug_uncertainty2
+    - TSD_SSD_WS24_all_attn_aug_uncertainty3
+    - TSD_SSD_WS24_all_attn  # Full MOFSNN

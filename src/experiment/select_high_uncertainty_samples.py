@@ -145,7 +145,7 @@ def main():
                         default=os.path.join(ROOT_DIR, "results/uncertainty_visualization"),
                         help="Directory containing uncertainty data CSV files")
     parser.add_argument("--output_file", type=str, 
-                        default=os.path.join(ROOT_DIR, "results/high_uncertainty_samples.xlsx"),
+                        default=os.path.join(ROOT_DIR, "results/high_uncertainty_samples_0.5.xlsx"),
                         help="Path to output Excel file")
     parser.add_argument("--percentage", type=float, default=20.0,
                         help="Percentage of high uncertainty samples to select (default: 20%%)")

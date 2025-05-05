@@ -1,0 +1,676 @@
+#!/usr/bin/env python
+'''
+Author: zhangsd
+Date: 2024-06-01
+Description: Compare the performance of different models on test datasets
+and save summarized results to Excel.
+'''
+
+import os
+import sys
+import json
+import yaml
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from argparse import ArgumentParser
+from sklearn.metrics import (
+    r2_score, mean_absolute_error, accuracy_score,
+    balanced_accuracy_score, roc_auc_score
+)
+from typing import Dict, List, Optional, Any, Tuple
+
+# Get the directory of the script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Get the root directory of the project (two levels up from the script directory)
+ROOT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+# Add the src directory to the Python path
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
+# Default paths
+DEFAULT_OUTPUT_DIR = os.path.join(ROOT_DIR, "results/model_comparison")
+
+def read_results_file(file_path: str) -> Optional[pd.DataFrame]:
+    """
+    Read a CSV results file and return the DataFrame.
+
+    Args:
+        file_path: Path to the CSV file with model results
+
+    Returns:
+        DataFrame with the results data or None if file not found
+    """
+    if not os.path.exists(file_path):
+        print(f"Warning: File not found - {file_path}")
+        return None
+
+    try:
+        df = pd.read_csv(file_path)
+        return df
+    except Exception as e:
+        print(f"Error reading {file_path}: {e}")
+        return None
+
+def calculate_metrics(df: pd.DataFrame, task_type: str = "regression") -> Dict[str, float]:
+    """
+    Calculate performance metrics from results DataFrame.
+
+    Args:
+        df: DataFrame with 'GroundTruth' and 'Predicted' columns
+        task_type: Type of task - 'regression' or 'classification'
+
+    Returns:
+        Dictionary with calculated metrics
+    """
+    metrics = {}
+
+    try:
+        # Common preprocessing
+        y_true = df["GroundTruth"].values
+        y_pred = df["Predicted"].values
+
+        if task_type == "regression":
+            # Calculate regression metrics
+            metrics["R2"] = r2_score(y_true, y_pred)
+            metrics["MAE"] = mean_absolute_error(y_true, y_pred)
+
+        else:  # classification
+            # Calculate classification metrics
+            metrics["ACC"] = accuracy_score(y_true, y_pred)
+            metrics["BACC"] = balanced_accuracy_score(y_true, y_pred)
+
+            # Calculate AUROC if probabilities are available
+            if "Prob" in df.columns:
+                probs = df["Prob"].values
+                # Check if probabilities are stored as strings (lists)
+                if isinstance(probs[0], str):
+                    try:
+                        # Try to parse probability strings
+                        parsed_probs = []
+                        for p in probs:
+                            p_val = eval(p)
+                            if isinstance(p_val, list):
+                                parsed_probs.append(p_val)
+                            else:
+                                parsed_probs.append([1-p_val, p_val])  # Binary case
+                        probs = np.array(parsed_probs)
+                    except Exception:
+                        print("Warning: Could not parse probability strings")
+                        probs = None
+
+                if probs is not None:
+                    try:
+                        # Check if this is a multi-class problem
+                        if len(probs.shape) > 1 and probs.shape[1] > 2:
+                            # Multi-class case (including 4-class tasks)
+                            metrics["AUROC"] = roc_auc_score(y_true, probs, multi_class='ovo', average='macro')
+                        elif len(probs.shape) > 1 and probs.shape[1] == 2:
+                            # Binary case with 2-column probabilities
+                            metrics["AUROC"] = roc_auc_score(y_true, probs[:, 1])
+                        else:
+                            # Binary case with 1-column probabilities
+                            metrics["AUROC"] = roc_auc_score(y_true, probs)
+                    except Exception as e:
+                        print(f"Warning: Could not calculate AUROC: {e}")
+                        metrics["AUROC"] = np.nan
+
+    except Exception as e:
+        print(f"Error calculating metrics: {e}")
+        if task_type == "regression":
+            metrics = {"R2": np.nan, "MAE": np.nan}
+        else:
+            metrics = {"ACC": np.nan, "BACC": np.nan, "AUROC": np.nan}
+
+    return metrics
+
+def process_model_results(model_path: str, model_name: str,
+                         tasks: List[str], task_types: Dict[str, str],
+                         split: str = "test") -> List[Dict[str, Any]]:
+    """
+    Process results for a single model across multiple tasks.
+
+    Args:
+        model_path: Path to the model results directory
+        model_name: Name identifier for the model
+        tasks: List of task names to process
+        task_types: Dictionary mapping task names to task types ('regression' or 'classification')
+        split: Data split to analyze ('test' or 'external_test')
+
+    Returns:
+        List of dictionaries with metrics for each task
+    """
+    results = []
+
+    # Look for results in different possible locations
+    potential_dirs = [
+        os.path.join(model_path, "lightning_logs/version_0"),
+        os.path.join(model_path),
+        os.path.join(model_path, "evaluation")
+    ]
+
+    for task in tasks:
+        found = False
+
+        for dir_path in potential_dirs:
+            if not os.path.exists(dir_path):
+                continue
+
+            result_file = os.path.join(dir_path, f"{split}_results_{task}.csv")
+            df = read_results_file(result_file)
+
+            if df is not None:
+                found = True
+                task_metrics = calculate_metrics(df, task_types.get(task, "classification"))
+                task_metrics["Task"] = task
+                task_metrics["Model"] = model_name
+                results.append(task_metrics)
+                print(f"Processed {task} for model {model_name}")
+                break
+
+        if not found:
+            print(f"Warning: No results found for task {task}, model {model_name}")
+
+    return results
+
+def load_config(config_file: str) -> Dict[str, Any]:
+    """
+    Load configuration from a JSON or YAML file.
+
+    Args:
+        config_file: Path to the configuration file
+
+    Returns:
+        Dictionary containing the configuration
+    """
+    if not os.path.exists(config_file):
+        raise FileNotFoundError(f"Config file not found: {config_file}")
+
+    file_ext = os.path.splitext(config_file)[1].lower()
+
+    try:
+        if file_ext in ['.yaml', '.yml']:
+            with open(config_file, 'r') as f:
+                config = yaml.safe_load(f)
+                print(f"Loaded YAML configuration from {config_file}")
+                return config
+        elif file_ext in ['.json']:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                print(f"Loaded JSON configuration from {config_file}")
+                return config
+        else:
+            raise ValueError(f"Unsupported config file format: {file_ext}. Use .json, .yaml, or .yml")
+    except Exception as e:
+        raise RuntimeError(f"Error loading config file {config_file}: {e}")
+
+def filter_models_by_group(model_dirs_map: Dict[str, Dict[str, str]],
+                          comparison_groups: Dict[str, List[str]],
+                          group_name: str) -> Dict[str, Dict[str, str]]:
+    """
+    Filter models based on a comparison group and preserve the order defined in the group.
+
+    Args:
+        model_dirs_map: Dictionary mapping model names to their configuration
+        comparison_groups: Dictionary of comparison group definitions
+        group_name: Name of the comparison group to use
+
+    Returns:
+        Filtered and ordered model directory mapping
+    """
+    if not group_name or group_name not in comparison_groups:
+        print(f"No valid group specified or group '{group_name}' not found. Using all models.")
+        return model_dirs_map
+
+    # Get the list of model keys in this group
+    group_models = comparison_groups[group_name]
+    print(f"Using comparison group '{group_name}' with models: {group_models}")
+
+    # Filter the model_dirs_map and preserve the order from group_models
+    filtered_map = {}
+    for model_key in group_models:
+        if model_key in model_dirs_map:
+            filtered_map[model_key] = model_dirs_map[model_key]
+
+    if not filtered_map:
+        print(f"Warning: No matching models found for group '{group_name}'. Using all models.")
+        return model_dirs_map
+
+    return filtered_map
+
+def compare_model_performance(
+    model_dirs_map: Dict[str, Dict[str, str]],
+    tasks: List[str],
+    task_types: Dict[str, str],
+    output_dir: str = DEFAULT_OUTPUT_DIR,
+    split: str = "test",
+    output_filename: Optional[str] = None,
+    model_order: Optional[List[str]] = None
+) -> Optional[pd.DataFrame]:
+    """
+    Compare performance of multiple models across specified tasks.
+
+    Args:
+        model_dirs_map: Dictionary mapping model names to their configuration
+        tasks: List of task names to process
+        task_types: Dictionary mapping task names to task types ('regression' or 'classification')
+        output_dir: Directory to save output files
+        split: Data split to analyze ('test' or 'external_test')
+        output_filename: Optional custom filename for the output Excel file
+        model_order: Optional list specifying the order of models for results
+
+    Returns:
+        DataFrame with summarized results
+    """
+    all_results = []
+
+    # Use model_order if provided, otherwise use keys from model_dirs_map
+    models_to_process = model_order if model_order else list(model_dirs_map.keys())
+
+    # Process each model in the specified order
+    for model_key in models_to_process:
+        if model_key not in model_dirs_map:
+            print(f"Warning: Model {model_key} specified in order but not found in model_dirs_map. Skipping.")
+            continue
+
+        model_info = model_dirs_map[model_key]
+        model_path = os.path.join(ROOT_DIR, model_info["Path"])
+        display_name = model_info.get("DisplayName", model_key)
+
+        print(f"Processing model: {display_name} ({model_path})")
+
+        # Get results for this model
+        model_results = process_model_results(
+            model_path,
+            display_name,
+            tasks,
+            task_types,
+            split
+        )
+        all_results.extend(model_results)
+
+    # Convert to DataFrame
+    if not all_results:
+        print("Error: No results found!")
+        return None
+
+    df_results = pd.DataFrame(all_results)
+
+    # Set Task and Model as index
+    df_results["Task"] = df_results["Task"].apply(lambda x: str(x).strip())
+
+    # Ensure model order is preserved in the DataFrame if model_order is provided
+    if model_order:
+        # Create a categorical type with the specified order
+        display_names = [model_dirs_map[key].get("DisplayName", key) for key in model_order if key in model_dirs_map]
+        df_results["Model"] = pd.Categorical(
+            df_results["Model"],
+            categories=display_names,
+            ordered=True
+        )
+        # Sort by the categorical column to preserve order
+        df_results = df_results.sort_values("Model")
+
+    # Now set the index
+    df_results.set_index(["Task", "Model"], inplace=True)
+
+    # Round numeric results
+    numeric_cols = ["R2", "MAE", "ACC", "BACC", "AUROC"]
+    for col in numeric_cols:
+        if col in df_results.columns:
+            df_results[col] = df_results[col].apply(lambda x: round(float(x), 4) if pd.notnull(x) else x)
+
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Save results to Excel
+    if output_filename is None:
+        output_filename = f"model_performance_comparison_{split}.xlsx"
+
+    output_path = os.path.join(output_dir, output_filename)
+    df_results.to_excel(output_path)
+    print(f"Results saved to {output_path}")
+
+    return df_results
+
+def get_default_config() -> Dict[str, Any]:
+    """
+    Get default configuration for model comparison.
+
+    Returns:
+        Dictionary with default configuration
+    """
+    # Default model directories mapping
+    model_dirs_map = {
+        "CGCNN_SG": {
+            "Path": "results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29",
+            "DisplayName": "CGCNN Single-Task"
+        },
+        "CGCNN_MT": {
+            "Path": "results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24",
+            "DisplayName": "CGCNN Multi-Task"
+        },
+        "MOFSNN": {
+            "Path": "results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43",
+            "DisplayName": "MOFSNN"
+        }
+    }
+
+    # Default tasks
+    tasks = [
+        "TSD", "SSD", "WS24_water", "WS24_water4",
+        "WS24_acid", "WS24_base", "WS24_boiling"
+    ]
+
+    # Default task types
+    task_types = {
+        "TSD": "regression",
+        "SSD": "classification",
+        "WS24_water": "classification",
+        "WS24_water4": "classification",
+        "WS24_acid": "classification",
+        "WS24_base": "classification",
+        "WS24_boiling": "classification"
+    }
+
+    return {
+        "model_dirs_map": model_dirs_map,
+        "tasks": tasks,
+        "task_types": task_types,
+        "comparison_groups": {
+            "standard": ["CGCNN_SG", "CGCNN_MT", "MOFSNN"]
+        }
+    }
+
+def plot_bars(df: pd.DataFrame, figsize: Tuple[int, int]=(14, 8),
+              label_size: int=16, tick_size: int=14, bar_width: float=0.5, **kwargs) -> plt.Figure:
+    """
+    Create bar plots for model performance comparison.
+
+    Args:
+        df: DataFrame with columns 'Task', 'Model', and 'Performance'
+        figsize: Figure size as (width, height)
+        label_size: Font size for labels
+        tick_size: Font size for ticks
+        bar_width: Width of bars
+        **kwargs: Additional keyword arguments:
+            - mae_lim: Tuple for MAE y-axis limits (min, max)
+            - annotate_size: Font size for annotations
+
+    Returns:
+        matplotlib Figure object
+    """
+    mae_lim = kwargs.pop('mae_lim', (10, 60))
+    annotate_size = kwargs.pop('annotate_size', tick_size-1)
+
+    # Set plot style
+    sns.set_style("whitegrid")
+
+    # Create figure and axes
+    fig, ax1 = plt.subplots(figsize=figsize)
+    df = df[df.duplicated(subset=['Task'], keep=False)]  # Remove those groups with only one model
+
+    if "TSD" in df['Task'].unique():
+        # Plot MAE bar chart for TSD
+        tsd_plot = sns.barplot(
+            data=df[df['Task'] == 'TSD'],
+            x='Task',
+            y='Performance',
+            hue='Model',
+            dodge=True,
+            ax=ax1,
+            palette='Blues',
+            width=bar_width
+        )
+
+        # Annotate bars with their values
+        for p in tsd_plot.patches:
+            if p.get_height() == 0:
+                continue
+            height = p.get_height()
+            tsd_plot.annotate(f'{height:.1f}', (p.get_x() + p.get_width() / 2., height),
+                          ha='center', va='center', xytext=(0, 9), textcoords='offset points',
+                          fontsize=annotate_size, color='blue')
+
+        # Set left axis label
+        ax1.set_xlabel('Task', fontsize=label_size, fontweight='bold')
+        ax1.set_ylabel('MAE(←)', color='tab:blue', fontsize=label_size, fontweight='bold')
+        ax1.tick_params(axis='y', labelcolor='tab:blue', labelsize=tick_size)
+        ax1.tick_params(axis='x', labelsize=tick_size)
+        handles1, labels1 = ax1.get_legend_handles_labels()
+        ax1.legend(loc='upper left', fontsize=tick_size-1)
+        ax1.set_ylim(*mae_lim)
+
+        # Create second y-axis
+        ax2 = ax1.twinx()
+    else:
+        ax2 = ax1
+
+    # Plot ACC bar chart for other tasks
+    acc_plot = sns.barplot(
+        data=df[df['Task'] != 'TSD'],
+        x='Task',
+        y='Performance',
+        hue='Model',
+        dodge=True,
+        ax=ax2,
+        palette='Greens',
+        width=bar_width
+    )
+
+    # Annotate bars with their values
+    for p in acc_plot.patches:
+        if p.get_height() == 0:
+            continue
+        height = p.get_height()
+        acc_plot.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height),
+                      ha='center', va='center', xytext=(0, 9), textcoords='offset points',
+                      fontsize=annotate_size, color='green')
+
+    # Set right axis label
+    ax2.set_xlabel('Task', fontsize=label_size, fontweight='bold')
+    ax2.set_ylabel('ACC(→)', color='tab:green', fontsize=label_size, fontweight='bold')
+    ax2.tick_params(axis='y', labelcolor='tab:green', labelsize=tick_size)
+    ax2.tick_params(axis='x', labelsize=tick_size)
+    ax2.set_ylim(0, 1.1)
+    if ax2 is not ax1:
+        ax2.grid(False)
+
+    # Handle legend
+    handles2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(loc='upper right', fontsize=tick_size-1)
+
+    plt.tight_layout()
+    return fig
+
+def generate_visualization(df_results: pd.DataFrame,
+                        fig_dir: Optional[str] = None,
+                        split: str = "test",
+                        fig_format: str = "both",
+                        fig_dpi: int = 200,
+                        **kwargs) -> Optional[plt.Figure]:
+    """
+    Generate and save visualization for model performance comparison.
+
+    Args:
+        df_results: DataFrame with performance results
+        fig_dir: Directory to save figures (if None, figures won't be saved)
+        split: Data split name for filename
+        fig_format: Format to save figures ("tif", "svg", "both", or "png")
+        fig_dpi: DPI for saved figures
+        model_order: Optional list specifying the order of models for the plot
+        **kwargs: Additional parameters to pass to plot_bars function
+
+    Returns:
+        matplotlib Figure object or None if no visualization created
+    """
+    if df_results is None or df_results.empty:
+        print("Error: No results available for visualization")
+        return None
+
+    # Create a copy and reset index for plotting
+    df_plot = df_results.reset_index().copy()
+
+    # Preprocess data for visualization - separate TSD and other tasks
+    tsd_data = pd.DataFrame()
+    other_tasks_data = pd.DataFrame()
+
+    # For TSD (regression task), use MAE as performance metric
+    if 'TSD' in df_plot['Task'].unique() and 'MAE' in df_results.columns:
+        tsd_data = df_plot.loc[df_plot['Task'] == 'TSD', ['Task', 'Model', 'MAE']]
+        tsd_data = tsd_data.rename(columns={'MAE': 'Performance'}).dropna()
+
+    # For classification tasks, use ACC as performance metric
+    if 'ACC' in df_results.columns:
+        other_tasks_data = df_plot.loc[df_plot['Task'] != 'TSD', ['Task', 'Model', 'ACC']]
+        other_tasks_data = other_tasks_data.rename(columns={'ACC': 'Performance'}).dropna()
+
+    # Combine performance metrics for visualization
+    combined_data = pd.concat([tsd_data, other_tasks_data])
+
+    # Clean data
+    combined_data = combined_data.dropna()
+
+    if combined_data.empty:
+        print("Error: No valid data for visualization")
+        return None
+
+    # Default visualization parameters
+    viz_params = {
+        'figsize': (14, 8),
+        'label_size': 16,
+        'tick_size': 14,
+        'bar_width': 0.5,
+        'mae_lim': (10, 60),
+        'annotate_size': 11
+    }
+
+    # Update with any provided kwargs
+    viz_params.update(kwargs)
+
+    # Generate visualization
+    fig = plot_bars(combined_data, **viz_params)
+
+    # Save figure if directory is specified
+    if fig_dir:
+        os.makedirs(fig_dir, exist_ok=True)
+
+        base_filename = f"model_comparison_vis_{split}"
+
+        # Save in specified format(s)
+        if fig_format in ["tif", "both"]:
+            tif_path = os.path.join(fig_dir, f"{base_filename}.tif")
+            fig.savefig(tif_path, dpi=96)
+            print(f"Figure saved as {tif_path}")
+
+        if fig_format in ["svg", "both"]:
+            svg_path = os.path.join(fig_dir, f"{base_filename}.svg")
+            fig.savefig(svg_path, dpi=fig_dpi, transparent=True)
+            print(f"Figure saved as {svg_path}")
+
+        if fig_format == "png":
+            png_path = os.path.join(fig_dir, f"{base_filename}.png")
+            fig.savefig(png_path, dpi=fig_dpi)
+            print(f"Figure saved as {png_path}")
+
+    # Always close figure without showing
+    plt.close(fig)
+
+    return fig
+
+def main():
+    parser = ArgumentParser(description="Compare model performance across tasks and save results to Excel")
+    parser.add_argument("--output_dir", type=str, default=DEFAULT_OUTPUT_DIR,
+                      help=f"Directory to save comparison results (default: {DEFAULT_OUTPUT_DIR})")
+    parser.add_argument("--split", type=str, default="test", choices=["test", "external_test"],
+                      help="Data split to analyze (default: test)")
+    parser.add_argument("--config_file", type=str,
+                      help="Optional JSON/YAML file with model paths and configurations")
+    parser.add_argument("--output_filename", type=str, default=None,
+                      help="Custom filename for the output Excel file")
+    parser.add_argument("--model_group", type=str, default=None,
+                      help="Specify a comparison group from the config file")
+    parser.add_argument("--visualize", action="store_true",
+                      help="Generate visualization of model performance")
+    parser.add_argument("--fig_dir", type=str, default=None,
+                      help="Directory to save visualization figures")
+    parser.add_argument("--fig_format", type=str, default="both",
+                      choices=["tif", "svg", "both", "png"],
+                      help="Format to save visualization figures (default: both tif and svg)")
+    parser.add_argument("--fig_dpi", type=int, default=300,
+                      help="DPI for saved figures (default: 300)")
+    parser.add_argument("--mae_min", type=float, default=10,
+                      help="Minimum value for MAE y-axis")
+    parser.add_argument("--mae_max", type=float, default=65,
+                      help="Maximum value for MAE y-axis")
+    parser.add_argument("--bar_width", type=float, default=0.8,
+                      help="Width of bars in the plot")
+
+    args = parser.parse_args()
+
+    # Get configuration
+    if args.config_file:
+        try:
+            config = load_config(args.config_file)
+            print(f"Loaded configuration from {args.config_file}")
+        except Exception as e:
+            print(f"Error: {e}")
+            print("Using default configuration")
+            config = get_default_config()
+    else:
+        print("No config file specified. Using default configuration.")
+        config = get_default_config()
+
+    # Extract model order from comparison group if specified
+    if args.model_group and "comparison_groups" in config:
+        if args.model_group in config["comparison_groups"]:
+            model_order = config["comparison_groups"][args.model_group]
+            print(f"Using model order from comparison group '{args.model_group}': {model_order}")
+
+    # Filter models by group if specified
+    model_dirs_map = config["model_dirs_map"]
+    if args.model_group and "comparison_groups" in config:
+        model_dirs_map = filter_models_by_group(
+            model_dirs_map,
+            config["comparison_groups"],
+            args.model_group
+        )
+
+    # Run comparison with model_order
+    results_df = compare_model_performance(
+        model_dirs_map,
+        config["tasks"],
+        config["task_types"],
+        os.path.join(args.output_dir, args.model_group) if args.model_group else args.output_dir,
+        args.split,
+        args.output_filename,
+    )
+
+    # Print summary
+    if results_df is not None:
+        print("\nResults Summary:")
+        print(results_df)
+
+        # Generate visualization if requested
+        if args.visualize:
+            # Set figure directory if not specified
+            fig_dir = args.fig_dir if args.fig_dir else os.path.join(args.output_dir, args.model_group, "figures")
+
+            # Set visualization parameters
+            viz_params = {
+                'mae_lim': (args.mae_min, args.mae_max),
+                'bar_width': args.bar_width
+            }
+
+            # Generate and save visualization with model_order
+            generate_visualization(
+                results_df,
+                fig_dir=fig_dir,
+                split=args.split,
+                fig_format=args.fig_format,
+                fig_dpi=args.fig_dpi,
+                **viz_params
+            )
+
+if __name__ == "__main__":
+    main()
