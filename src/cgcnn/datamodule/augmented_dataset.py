@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-20 10:00:00
 LastEditors: zhangshd
-LastEditTime: 2025-05-05 21:51:42
+LastEditTime: 2025-05-06 16:35:25
 '''
 import functools
 import os, sys
@@ -24,30 +24,34 @@ class AugmentedGraphData(LoadGraphData):
     This class has two modes of operation:
     1. Class-based augmentation: Identifies minority classes in classification tasks and creates
        augmented versions of these samples to balance the class distribution.
-    2. Sample-based augmentation: Augments only specific samples listed in an Excel file,
-       useful for high-uncertainty samples or other special cases.
+    2. Sample-based augmentation: Augments samples based on uncertainty values from an Excel file,
+       selecting the top N% of samples with highest uncertainty for each task.
     
     By default, this class will augment minority class samples to match the majority class count.
     Alternatively, a fixed augmentation factor can be specified.
     """
     
-    def __init__(self, original_dataset, aug_factor=None, noise_std=0.01, balance_classes=True, aug_sample_file=None, task=None, task_type=None):
+    def __init__(self, original_dataset, aug_factor=None, noise_std=0.01, 
+                 balance_classes=True, aug_sample_file=None, task=None, 
+                 task_type=None, uncertainty_threshold=None):
         """
         Initialize the augmented dataset based on the original dataset.
         
         Args:
             original_dataset (LoadGraphData): The original dataset to augment
-            aug_factor (int, optional): How many augmented samples to create for each minority sample.
-                                      If None and balance_classes=True, will calculate the factor 
-                                      needed to balance class distribution.
+            aug_factor (int or dict, optional): How many augmented samples to create for each sample.
+                                      Can be an integer for all tasks or a dictionary mapping 
+                                      task name to augmentation factor (e.g., {"TSD": 5, "SSD": 2})
             noise_std (float): Standard deviation factor for perturbation (relative to original value)
             balance_classes (bool): If True, augment minority classes to match majority class count.
                                   If False, use fixed aug_factor for all minority samples.
-            aug_sample_file (str, optional): Path to Excel file containing sample IDs to augment.
-                                          If provided, only samples in this file will be augmented.
+            aug_sample_file (str, optional): Path to Excel file containing uncertainty values for samples.
                                           Each sheet should correspond to a task.
             task (str, optional): The actual task name (e.g. "WS24_water") to match with Excel sheet names.
                                  If None, will try to derive from property column name.
+            uncertainty_threshold (float or dict, optional): Threshold for selecting samples with high uncertainty.
+                                                         Can be a float (0-1) representing the top percentage
+                                                         to select, or a dictionary mapping task name to threshold.
         """
         # Initialize base attributes without calling parent constructor
         self.data_dir = original_dataset.data_dir
@@ -69,15 +73,16 @@ class AugmentedGraphData(LoadGraphData):
         self.noise_std = noise_std
         self.balance_classes = balance_classes
         self.aug_sample_file = aug_sample_file
+        self.uncertainty_threshold = uncertainty_threshold
         
         # Copy required attributes for consistent processing
         self.ari = original_dataset.ari if hasattr(original_dataset, 'ari') else None
         self.gdf = original_dataset.gdf if hasattr(original_dataset, 'gdf') else None
         
         # If no property columns, create empty dataframe and return
+        self.id_prop_df = pd.DataFrame()
+        self.augmented_mapping = {}
         if not self.prop_cols:
-            self.id_prop_df = pd.DataFrame()
-            self.augmented_mapping = {}
             return
         
         # Use provided task name if available, otherwise try to derive from property column
@@ -86,45 +91,71 @@ class AugmentedGraphData(LoadGraphData):
 
         # Check for sample-based augmentation mode (using Excel file)
         if aug_sample_file is not None and os.path.exists(aug_sample_file):
-            samples_to_augment = self._read_samples_from_excel(aug_sample_file)
+            # If aug_factor is a dictionary, extract the specific factor for this task
+            task_aug_factor = None
+            if isinstance(aug_factor, dict):
+                task_aug_factor = aug_factor.get(self.task, 0)  # Default to 1 if task not found
+            else:
+                task_aug_factor = aug_factor
             
-            if samples_to_augment:
-                # Perform sample-based augmentation
-                self._augment_specific_samples(samples_to_augment, aug_factor)
+            # Get the uncertainty threshold for this task
+            task_uncertainty_threshold = None
+            if isinstance(uncertainty_threshold, dict):
+                task_uncertainty_threshold = uncertainty_threshold.get(self.task, 0)  # Default to top 20%
+            else:
+                task_uncertainty_threshold = uncertainty_threshold if uncertainty_threshold is not None else 0
+            
+            # Read samples with uncertainty from Excel and filter by threshold
+            samples_to_augment = self._read_samples_from_excel(aug_sample_file, task_uncertainty_threshold)
+            
+            if samples_to_augment and task_aug_factor:
+                # Perform sample-based augmentation with task-specific factor
+                self._augment_specific_samples(samples_to_augment, task_aug_factor)
                 return
-        
-        # If we get here, perform regular class-based augmentation
-        self._perform_class_based_augmentation(aug_factor)
+        if balance_classes:
+            # If we get here, perform regular class-based augmentation
+            self._perform_class_based_augmentation(aug_factor)
     
-    def _read_samples_from_excel(self, excel_path):
+    def _read_samples_from_excel(self, excel_path, threshold=0.2):
         """
-        Read sample IDs to augment from an Excel file.
+        Read sample IDs with uncertainty values from an Excel file and select top N% samples
+        with highest uncertainty.
         
         Args:
             excel_path: Path to Excel file
+            threshold: Float between 0-1 representing the top percentage of uncertain samples to select
             
         Returns:
             List of sample IDs to augment, or None if the task is not found
         """
         try:
-            print(f"Reading samples to augment from {excel_path}")
+            print(f"Reading samples from {excel_path}")
             
             # Read all sheets from Excel file
             excel_data = pd.read_excel(excel_path, sheet_name=None)
             
             # Find sheet matching current task
             for sheet_name, df in excel_data.items():
-                if sheet_name == self.task and 'cif_id' in df.columns:
-                    sample_ids = df['cif_id'].astype(str).tolist()
+                if sheet_name == self.task and 'cif_id' in df.columns and 'uncertainty' in df.columns:
+                    # Sort by uncertainty (highest first)
+                    df = df.sort_values('uncertainty', ascending=False)
                     
-                    # Log uncertainty info if available
-                    if 'uncertainty' in df.columns:
-                        min_uncertainty = df['uncertainty'].min()
-                        max_uncertainty = df['uncertainty'].max()
-                        print(f"Found {len(sample_ids)} samples to augment for task {self.task}")
-                        print(f"  Uncertainty range: {min_uncertainty:.4f} to {max_uncertainty:.4f}")
-                    else:
-                        print(f"Found {len(sample_ids)} samples to augment for task {self.task}")
+                    # Calculate how many samples to select based on threshold
+                    num_samples = int(len(df) * threshold)
+                    if num_samples < 1:
+                        print(f"Not enough samples to select for task {self.task} (threshold too low)")
+                        return None
+                    
+                    # Select top uncertain samples
+                    selected_df = df.head(num_samples)
+                    sample_ids = selected_df['cif_id'].astype(str).tolist()
+                    
+                    # Log uncertainty info
+                    min_uncertainty = selected_df['uncertainty'].min()
+                    max_uncertainty = selected_df['uncertainty'].max()
+                    print(f"Found {len(sample_ids)} samples to augment for task {self.task} (top {threshold*100:.1f}%)")
+                    print(f"  Uncertainty range: {min_uncertainty:.4f} to {max_uncertainty:.4f}")
+                    print(f"  Selected {len(sample_ids)} out of {len(df)} total samples")
                     
                     return sample_ids
             
@@ -162,7 +193,7 @@ class AugmentedGraphData(LoadGraphData):
         # Log augmentation info
         print(f"\n=== Sample-Based Augmentation ===")
         print(f"Found {len(matching_samples)} of {len(sample_ids)} requested samples in dataset")
-        print(f"Augmentation factor: {samples_per_orig}x")
+        print(f"Augmentation factor for {self.task}: {samples_per_orig}x")
         
         # Create augmented samples
         for orig_idx in matching_samples:

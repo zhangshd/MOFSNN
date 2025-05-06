@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 11:08:17
 LastEditors: zhangshd
-LastEditTime: 2025-04-28 22:10:13
+LastEditTime: 2025-05-06 16:03:00
 '''
 import os
 import sys
@@ -46,17 +46,31 @@ class DInterface(pl.LightningDataModule):
         
         # Data augmentation parameters
         self.augment = kwargs.get('augment', False)
-        self.aug_factor = kwargs.get('aug_factor', None)  # Changed to None as default
+        self.aug_factor = kwargs.get('aug_factor', None)  # Can now be dict mapping task to factor
         self.aug_noise_std = kwargs.get('aug_noise_std', 0.01)
-        self.balance_classes = kwargs.get('balance_classes', True)  # New parameter
+        self.balance_classes = kwargs.get('balance_classes', True)
         self.task_weights = kwargs.get('task_weights', None)
-        self.aug_sample_file = kwargs.get('aug_sample_file', None)  # Added parameter
+        self.aug_sample_file = kwargs.get('aug_sample_file', None)
+        self.uncertainty_threshold = kwargs.get('uncertainty_threshold', None)  # New parameter
 
         print("final_train:", self.final_train)
         print("dl_sampler: ", self.dl_sampler)
         if self.augment:
-            aug_method = "balanced" if self.balance_classes else f"factor={self.aug_factor}"
+            if isinstance(self.aug_factor, dict):
+                task_factors = ", ".join([f"{t}:{f}" for t, f in self.aug_factor.items()])
+                aug_method = f"task-specific factors: {task_factors}"
+            else:
+                aug_method = "balanced" if self.balance_classes else f"factor={self.aug_factor}"
             print(f"Data augmentation: enabled ({aug_method}, noise_std={self.aug_noise_std})")
+            
+            if self.aug_sample_file:
+                print(f"Using uncertainty-based sample selection from: {self.aug_sample_file}")
+                if isinstance(self.uncertainty_threshold, dict):
+                    thresholds = ", ".join([f"{t}:{f*100:.1f}%" for t, f in self.uncertainty_threshold.items()])
+                    print(f"Task-specific uncertainty thresholds: {thresholds}")
+                else:
+                    threshold = self.uncertainty_threshold if self.uncertainty_threshold is not None else 0.2
+                    print(f"Uncertainty threshold: top {threshold*100:.1f}% of samples")
 
     def setup(self, stage=None):
         # This method is called on every GPU
@@ -75,14 +89,16 @@ class DInterface(pl.LightningDataModule):
                     task_weights.append(len(trainset))
                     # Add augmentation for classification tasks if enabled
                     if self.augment:
-                        # Create augmented dataset for minority classes
+                        # Create augmented dataset for minority classes or high-uncertainty samples
                         augmented_trainset = AugmentedGraphData(
                             trainset, 
                             aug_factor=self.aug_factor, 
                             noise_std=self.aug_noise_std,
                             balance_classes=self.balance_classes,
                             aug_sample_file=self.aug_sample_file,
-                            task=task 
+                            task=task,
+                            task_type=task_type,
+                            uncertainty_threshold=self.uncertainty_threshold
                         )
                         
                         # If there are augmented samples, add them to the combined dataset
@@ -106,7 +122,6 @@ class DInterface(pl.LightningDataModule):
                 print("=" * 50 + "\n")
                 if self.task_weights is None:
                     self.task_weights = [w/sum(task_weights) for w in task_weights]
-                # self.task_weights = [len(d) / len(self.trainset) for d in self.trainsets]
                 print("Task weights:", self.task_weights)
             self.train_normalizer()
             if not hasattr(self, 'valset'):

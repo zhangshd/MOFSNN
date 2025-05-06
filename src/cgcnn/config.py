@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2025-04-28 10:30:10
+LastEditTime: 2025-05-06 16:20:17
 '''
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer)
 
@@ -320,7 +320,25 @@ def tsd_ssd_ws24():
                     0.01617995264404104]
     # task_weights = None
     aug_noise_std = 0.01
-    balance_classes = True
+    balance_classes = False
+    uncertainty_threshold = {
+        'TSD': 0.5,
+        'SSD': 0.4,
+        'WS24_water': 0.4,
+        'WS24_water4': 0.4,
+        'WS24_acid': 0,
+        'WS24_base': 0,
+        'WS24_boiling': 0
+    }
+    aug_factor = {
+        'TSD': 4,
+        'SSD': 1,
+        'WS24_water': 2,
+        'WS24_water4': 2,
+        'WS24_acid': 0,
+        'WS24_base': 0,
+        'WS24_boiling': 0
+    }
 
 
 @ex.named_config

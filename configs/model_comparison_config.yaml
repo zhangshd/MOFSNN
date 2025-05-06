@@ -102,6 +102,27 @@ model_dirs_map:
     Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_6
     DisplayName: MOFSNN_no_downsampling
     Model: att_cgcnn
+
+  TSD_SSD_WS24_all_attn_aug_uncertainty11:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_11
+    DisplayName: MOFSNN_uncertainty_aug11
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_aug_uncertainty12:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_12
+    DisplayName: MOFSNN_uncertainty_aug12
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_aug_uncertainty13:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_13
+    DisplayName: MOFSNN_uncertainty_aug13
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_aug_uncertainty14:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_14
+    DisplayName: MOFSNN_uncertainty_aug14
+    Model: att_cgcnn
+  TSD_SSD_WS24_all_attn_aug_uncertainty15:
+    Path: results/cgcnn_models_augmented/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_15
+    DisplayName: MOFSNN_uncertainty_aug15
+    Model: att_cgcnn
     
 
 # Tasks to evaluate
@@ -165,4 +186,11 @@ comparison_groups:
     - TSD_SSD_WS24_all_attn_aug_uncertainty1
     - TSD_SSD_WS24_all_attn_aug_uncertainty2
     - TSD_SSD_WS24_all_attn_aug_uncertainty3
+    - TSD_SSD_WS24_all_attn  # Full MOFSNN
+
+  # MOFSNN augmentation comparison
+  augmentation_uncertainty_rate:
+    - TSD_SSD_WS24_all_attn_aug_uncertainty11
+    - TSD_SSD_WS24_all_attn_aug_uncertainty12
+    - TSD_SSD_WS24_all_attn_aug_uncertainty13
     - TSD_SSD_WS24_all_attn  # Full MOFSNN
