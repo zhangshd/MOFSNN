@@ -20,6 +20,7 @@ from sklearn.metrics import (
     balanced_accuracy_score, roc_auc_score
 )
 from typing import Dict, List, Optional, Any, Tuple
+from matplotlib.figure import Figure
 
 # Get the directory of the script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -124,7 +125,8 @@ def calculate_metrics(df: pd.DataFrame, task_type: str = "regression") -> Dict[s
 
     return metrics
 
-def process_model_results(model_path: str, model_name: str,
+def process_model_results(model_path: str, display_name: str, actual_ml_model_type: Optional[str],
+                         model_key: str,
                          tasks: List[str], task_types: Dict[str, str],
                          split: str = "test") -> List[Dict[str, Any]]:
     """
@@ -132,7 +134,11 @@ def process_model_results(model_path: str, model_name: str,
 
     Args:
         model_path: Path to the model results directory
-        model_name: Name identifier for the model
+        display_name: Display name for the model (used in output 'Model' column)
+        actual_ml_model_type: The actual ML algorithm string (e.g., "RandomForestRegressor")
+                              if this is a baseline ML model (derived from config's "Model" field).
+                              For DL models, this is also their "Model" field from config (e.g., "att_cgcnn").
+        model_key: The unique key for the model from the configuration (e.g., "Baseline-TSD", "MOFSNN")
         tasks: List of task names to process
         task_types: Dictionary mapping task names to task types ('regression' or 'classification')
         split: Data split to analyze ('test' or 'external_test')
@@ -142,34 +148,84 @@ def process_model_results(model_path: str, model_name: str,
     """
     results = []
 
-    # Look for results in different possible locations
-    potential_dirs = [
-        os.path.join(model_path, "lightning_logs/version_0"),
-        os.path.join(model_path),
-        os.path.join(model_path, "evaluation")
-    ]
-
     for task in tasks:
-        found = False
+        found_for_current_task = False
+        task_metrics_dict = {}
 
-        for dir_path in potential_dirs:
-            if not os.path.exists(dir_path):
+        is_baseline_model_by_key = model_key.startswith("Baseline-")
+
+        if is_baseline_model_by_key:
+            if not actual_ml_model_type: # Baseline models must have the 'Model' field in config specifying the algorithm
+                print(f"Warning: Baseline model '{model_key}' is missing the 'Model' (algorithm type) field in its configuration. Skipping task '{task}'.")
                 continue
 
-            result_file = os.path.join(dir_path, f"{split}_results_{task}.csv")
-            df = read_results_file(result_file)
+            expected_task_for_baseline = None
+            # Infer task from model_key like "Baseline-TaskName"
+            parts = model_key.split('-', 1) # model_key starts with "Baseline-"
+            if len(parts) > 1:
+                expected_task_for_baseline = parts[1]
+            
+            # If this baseline model is task-specific, only process its designated task.
+            if expected_task_for_baseline and task != expected_task_for_baseline:
+                continue  # Skip if the current global task is not the one for this specific baseline model
+
+            # Construct file path for baseline model results
+            # e.g., test_predicted_RandomForestRegressor.csv
+            result_file_path = os.path.join(model_path, f"{split}_predicted_{actual_ml_model_type}.csv")
+            df = read_results_file(result_file_path)
 
             if df is not None:
-                found = True
-                task_metrics = calculate_metrics(df, task_types.get(task, "classification"))
-                task_metrics["Task"] = task
-                task_metrics["Model"] = model_name
-                results.append(task_metrics)
-                print(f"Processed {task} for model {model_name}")
-                break
+                found_for_current_task = True
+                current_task_type = task_types.get(task, "classification")
+                calculated_metrics = calculate_metrics(df, current_task_type)
+                
+                task_metrics_dict = {"Task": task, "Model": display_name, **calculated_metrics}
+                results.append(task_metrics_dict)
+                print(f"Processed {task} for baseline model '{model_key}' (algo: {actual_ml_model_type}) using file '{result_file_path}'")
+            else:
+                # Warning if the specific file for the baseline model's designated task was not found
+                if not expected_task_for_baseline or task == expected_task_for_baseline: # Only warn if we were expecting this file
+                    print(f"Warning: Results file not found for baseline model '{model_key}' (algo: {actual_ml_model_type}) for task '{task}' at '{result_file_path}'")
+        
+        else:  # This is a DL model (model_key does not start with "Baseline-")
+            # Check if the DL model's key itself is a recognized task name (e.g., model_key="TSD")
+            # task_types.keys() provides all defined task names.
+            is_dl_model_for_a_specific_task_only = model_key in task_types.keys()
 
-        if not found:
-            print(f"Warning: No results found for task {task}, model {model_name}")
+            if is_dl_model_for_a_specific_task_only:
+                # If this DL model is named after a specific task (e.g. model_key="TSD"),
+                # it should only be processed for that particular task.
+                if model_key != task: # 'task' is the current task from the outer loop
+                    continue # Skip if current_task_from_outer_loop is not the specific task this model is for.
+            
+            # If we reach here, it's either:
+            # 1. A multi-task DL model (e.g. model_key="MOFSNN_all_tasks") -> process current 'task'
+            # 2. A single-task DL model AND current 'task' IS its designated task. -> process it.
+
+            potential_dirs = [
+                os.path.join(model_path, "lightning_logs/version_0"),
+                os.path.join(model_path),  # Check model_path directly
+                os.path.join(model_path, "evaluation")  # Check evaluation subdir
+            ]
+
+            for dir_path in potential_dirs:
+                if not os.path.exists(dir_path):
+                    continue
+
+                result_file_path = os.path.join(dir_path, f"{split}_results_{task}.csv")
+                df = read_results_file(result_file_path)
+
+                if df is not None:
+                    found_for_current_task = True
+                    current_task_type = task_types.get(task, "classification")
+                    calculated_metrics = calculate_metrics(df, current_task_type)
+                    task_metrics_dict = {"Task": task, "Model": display_name, **calculated_metrics}
+                    results.append(task_metrics_dict)
+                    print(f"Processed {task} for DL model '{model_key}' (DisplayName: {display_name}) from '{result_file_path}'")
+                    break  # Found results for this task for this DL model
+            
+            if not found_for_current_task:
+                 print(f"Warning: No results found for task '{task}' for DL model '{model_key}' (DisplayName: {display_name}) in checked directories: {potential_dirs}")
 
     return results
 
@@ -248,70 +304,114 @@ def compare_model_performance(
     model_order: Optional[List[str]] = None
 ) -> Optional[pd.DataFrame]:
     """
-    Compare performance of multiple models across specified tasks.
+    Compare model performance across specified tasks and save results.
 
     Args:
-        model_dirs_map: Dictionary mapping model names to their configuration
+        model_dirs_map: Dictionary mapping model keys to their configuration
+                        (Path, DisplayName, and optionally Model for baselines)
         tasks: List of task names to process
-        task_types: Dictionary mapping task names to task types ('regression' or 'classification')
-        output_dir: Directory to save output files
+        task_types: Dictionary mapping task names to task types
+        output_dir: Directory to save output Excel file and plots
         split: Data split to analyze ('test' or 'external_test')
-        output_filename: Optional custom filename for the output Excel file
-        model_order: Optional list specifying the order of models for results
+        output_filename: Optional custom name for the output Excel file
+        model_order: Optional list of model keys to set the order in the output
 
     Returns:
-        DataFrame with summarized results
+        DataFrame with summarized results or None if no results processed
     """
     all_results = []
 
-    # Use model_order if provided, otherwise use keys from model_dirs_map
-    models_to_process = model_order if model_order else list(model_dirs_map.keys())
+    for model_key, model_config in model_dirs_map.items():
+        model_specific_path = model_config["Path"]
+        model_display_name = model_config["DisplayName"]
+        # Get the actual ML model type (e.g., "RandomForestRegressor") if specified (for baselines)
+        actual_ml_model = model_config.get("Model")
 
-    # Process each model in the specified order
-    for model_key in models_to_process:
-        if model_key not in model_dirs_map:
-            print(f"Warning: Model {model_key} specified in order but not found in model_dirs_map. Skipping.")
-            continue
+        # Determine tasks for this specific model.
+        # The existing logic for 'tasks_for_this_model' was in main();
+        # Here, process_model_results is called with the global 'tasks' list,
+        # and it internally filters for baselines if model_key indicates a specific task.
+        # For DL models (non-baseline), it will attempt all tasks and report if files are found.
 
-        model_info = model_dirs_map[model_key]
-        model_path = os.path.join(ROOT_DIR, model_info["Path"])
-        display_name = model_info.get("DisplayName", model_key)
-
-        print(f"Processing model: {display_name} ({model_path})")
-
-        # Get results for this model
-        model_results = process_model_results(
-            model_path,
-            display_name,
-            tasks,
-            task_types,
-            split
+        model_task_results = process_model_results(
+            model_path=model_specific_path,
+            display_name=model_display_name,
+            actual_ml_model_type=actual_ml_model,
+            model_key=model_key,
+            tasks=tasks, # Pass the global/group-filtered list of tasks
+            task_types=task_types,
+            split=split
         )
-        all_results.extend(model_results)
+        all_results.extend(model_task_results)
 
-    # Convert to DataFrame
     if not all_results:
-        print("Error: No results found!")
+        print("No results processed. Exiting.")
         return None
 
+    # Convert to DataFrame
     df_results = pd.DataFrame(all_results)
 
-    # Set Task and Model as index
-    df_results["Task"] = df_results["Task"].apply(lambda x: str(x).strip())
+    if df_results.empty:
+        print("DataFrame is empty after processing results. Exiting.")
+        return None
 
-    # Ensure model order is preserved in the DataFrame if model_order is provided
-    if model_order:
-        # Create a categorical type with the specified order
-        display_names = [model_dirs_map[key].get("DisplayName", key) for key in model_order if key in model_dirs_map]
+    # 1. Prepare Task column for ordered sorting
+    # 'tasks' argument is config["tasks"], which has the desired order.
+    df_results["Task"] = df_results["Task"].astype(str).str.strip() # Clean task names
+    task_order_categories = tasks 
+    df_results["Task"] = pd.Categorical(
+        df_results["Task"],
+        categories=task_order_categories,
+        ordered=True
+    )
+
+    # 2. Prepare Model column (DisplayName) for ordered sorting
+    # The 'Model' column contains DisplayNames.
+    # 'model_order' argument is a list of model KEYS (e.g., "Baseline-TSD", "MOFSNN") from comparison group.
+    # 'model_dirs_map' argument is the map (model_key -> config) that was processed;
+    # this map is already ordered if a comparison group was used.
+
+    ordered_model_display_names = []
+    seen_display_names = set()
+
+    if model_order: # Prioritize model_order (list of model KEYS from comparison group)
+        for key in model_order:
+            if key in model_dirs_map: # Check if the key from model_order is in the models processed
+                display_name = model_dirs_map[key]["DisplayName"]
+                if display_name not in seen_display_names:
+                    ordered_model_display_names.append(display_name)
+                    seen_display_names.add(display_name)
+    else:
+        # Fallback: use the order from model_dirs_map.keys()
+        # model_dirs_map is already ordered if a comparison group was used.
+        for key in model_dirs_map.keys():
+            display_name = model_dirs_map[key]["DisplayName"]
+            if display_name not in seen_display_names:
+                ordered_model_display_names.append(display_name)
+                seen_display_names.add(display_name)
+    
+    # Filter this master ordered list to include only those display names actually present in df_results["Model"]
+    # This ensures categories in pd.Categorical are relevant to the data.
+    final_model_categories = [dn for dn in ordered_model_display_names if dn in df_results["Model"].unique()]
+    
+    # Add any DisplayNames from df_results that were not captured by the above logic
+    # (e.g., if a model was processed but its DisplayName wasn't in the derived order for some reason)
+    # This places them at the end of the sort order for models.
+    for dn_in_df in df_results["Model"].unique():
+        if dn_in_df not in final_model_categories:
+            final_model_categories.append(dn_in_df)
+
+    if final_model_categories: # Only set categorical if there are categories to set
         df_results["Model"] = pd.Categorical(
             df_results["Model"],
-            categories=display_names,
+            categories=final_model_categories,
             ordered=True
         )
-        # Sort by the categorical column to preserve order
-        df_results = df_results.sort_values("Model")
+    
+    # 3. Sort the DataFrame: first by Task (already categorical and ordered), then by Model (now categorical and ordered)
+    df_results.sort_values(by=["Task", "Model"], inplace=True)
 
-    # Now set the index
+    # 4. Set the multi-index
     df_results.set_index(["Task", "Model"], inplace=True)
 
     # Round numeric results
@@ -335,24 +435,93 @@ def compare_model_performance(
 
 def get_default_config() -> Dict[str, Any]:
     """
-    Get default configuration for model comparison.
+    Get default configuration for model comparison, reflecting the 'standard'
+    group from the model_comparison_config.yaml file.
 
     Returns:
         Dictionary with default configuration
     """
-    # Default model directories mapping
+    # Default model directories mapping based on 'standard' group
     model_dirs_map = {
-        "CGCNN_SG": {
+        "Baseline-TSD": {
+            "Path": "results/ml_models/TSD/RAC_and_zeo_features_with_id_prop/Label",
+            "DisplayName": "Baseline",
+            "Model": "RandomForestRegressor"
+        },
+        "Baseline-SSD": {
+            "Path": "results/ml_models/SSD/RAC_and_zeo_features_with_id_prop/Label",
+            "DisplayName": "Baseline",
+            "Model": "SVC"
+        },
+        "Baseline-WS24_water": {
+            "Path": "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water_label",
+            "DisplayName": "Baseline",
+            "Model": "RandomForestClassifier"
+        },
+        "Baseline-WS24_water4": {
+            "Path": "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water4_label",
+            "DisplayName": "Baseline",
+            "Model": "RandomForestClassifier"
+        },
+        "Baseline-WS24_acid": {
+            "Path": "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/acid_label",
+            "DisplayName": "Baseline",
+            "Model": "GaussianProcessClassifier"
+        },
+        "Baseline-WS24_base": {
+            "Path": "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/base_label",
+            "DisplayName": "Baseline",
+            "Model": "RandomForestClassifier"
+        },
+        "Baseline-WS24_boiling": {
+            "Path": "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/boiling_label",
+            "DisplayName": "Baseline",
+            "Model": "RandomForestClassifier"
+        },
+        "TSD": { # Representative for CGCNN Single-Task
             "Path": "results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29",
-            "DisplayName": "CGCNN Single-Task"
+            "DisplayName": "CGCNN_SG",
+            "Model": "cgcnn_raw"
         },
-        "CGCNN_MT": {
+        "SSD": { # Representative for CGCNN Single-Task
+            "Path": "results/cgcnn_models/SSD_seed42_cgcnn_raw/version_4",
+            "DisplayName": "CGCNN_SG",
+            "Model": "cgcnn_raw"
+        },
+        "WS24_water": { # Representative for CGCNN Single-Task
+            "Path": "results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_29",
+            "DisplayName": "CGCNN_SG",
+            "Model": "cgcnn_raw"
+        },
+        "WS24_water4": { # Representative for CGCNN Single-Task
+            "Path": "results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_3",
+            "DisplayName": "CGCNN_SG",
+            "Model": "cgcnn_raw"
+        },
+        "WS24_acid": { # Representative for CGCNN Single-Task
+            "Path": "results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_47",
+            "DisplayName": "CGCNN_SG",
+            "Model": "cgcnn_raw"
+        },
+        "WS24_base": { # Representative for CGCNN Single-Task
+            "Path": "results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_0",
+            "DisplayName": "CGCNN_SG",
+            "Model": "cgcnn_raw"
+        },
+        "WS24_boiling": { # Representative for CGCNN Single-Task
+            "Path": "results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_7",
+            "DisplayName": "CGCNN_SG",
+            "Model": "cgcnn_raw"
+        },
+        "TSD_SSD_WS24_all": { # CGCNN Multi-Task
             "Path": "results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24",
-            "DisplayName": "CGCNN Multi-Task"
+            "DisplayName": "CGCNN_MT",
+            "Model": "cgcnn_raw_multi"
         },
-        "MOFSNN": {
+        "TSD_SSD_WS24_all_attn": { # MOFSNN
             "Path": "results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43",
-            "DisplayName": "MOFSNN"
+            "DisplayName": "MOFSNN",
+            "Model": "att_cgcnn"
         }
     }
 
@@ -373,17 +542,37 @@ def get_default_config() -> Dict[str, Any]:
         "WS24_boiling": "classification"
     }
 
+    # Default comparison group
+    comparison_groups = {
+        "standard": [
+            "Baseline-TSD",
+            "Baseline-SSD",
+            "Baseline-WS24_water",
+            "Baseline-WS24_water4",
+            "Baseline-WS24_acid",
+            "Baseline-WS24_base",
+            "Baseline-WS24_boiling",
+            "TSD",
+            "SSD",
+            "WS24_water",
+            "WS24_water4",
+            "WS24_acid",
+            "WS24_base",
+            "WS24_boiling",
+            "TSD_SSD_WS24_all",
+            "TSD_SSD_WS24_all_attn"
+        ]
+    }
+
     return {
         "model_dirs_map": model_dirs_map,
         "tasks": tasks,
         "task_types": task_types,
-        "comparison_groups": {
-            "standard": ["CGCNN_SG", "CGCNN_MT", "MOFSNN"]
-        }
+        "comparison_groups": comparison_groups
     }
 
 def plot_bars(df: pd.DataFrame, figsize: Tuple[int, int]=(14, 8),
-              label_size: int=16, tick_size: int=14, bar_width: float=0.5, **kwargs) -> plt.Figure:
+              label_size: int=16, tick_size: int=14, bar_width: float=0.5, **kwargs) -> Figure:
     """
     Create bar plots for model performance comparison.
 
@@ -488,7 +677,7 @@ def generate_visualization(df_results: pd.DataFrame,
                         split: str = "test",
                         fig_format: str = "both",
                         fig_dpi: int = 200,
-                        **kwargs) -> Optional[plt.Figure]:
+                        **kwargs) -> Optional[Figure]:
     """
     Generate and save visualization for model performance comparison.
 
@@ -626,6 +815,8 @@ def main():
         if args.model_group in config["comparison_groups"]:
             model_order = config["comparison_groups"][args.model_group]
             print(f"Using model order from comparison group '{args.model_group}': {model_order}")
+    else:
+        args.model_group = "standard"
 
     # Filter models by group if specified
     model_dirs_map = config["model_dirs_map"]

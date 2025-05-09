@@ -44,7 +44,6 @@ logs*
 **/CoREMOF2019
 results/*
 !results/cgcnn_models/
-!results/ml_models/
 results/cgcnn_models/*
 !results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29/
 !results/cgcnn_models/SSD_seed42_cgcnn_raw/version_4/

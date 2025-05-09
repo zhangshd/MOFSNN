@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-15 11:32:23
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:19:48
+LastEditTime: 2025-05-08 16:42:08
 '''
 import subprocess
 from pathlib import Path
@@ -40,7 +40,8 @@ def run_slurm_job(work_dir, executor="sbatch", script_name="run"):
     return process
 
 if __name__ == '__main__':
-    work_dir = Path("./")
+    work_dir = Path(__file__).resolve().parent
+    ROOT_DIR = Path(__file__).resolve().parent.parent.parent
     label_columns = ["water_label","water4_label", "acid_label", "base_label", "boiling_label"]
     script_name = "run_slurm.sh"
     in_file_name="RAC_and_zeo_features_with_id_prop.csv"
@@ -48,11 +49,11 @@ if __name__ == '__main__':
         task_name = "WS24"
         name_column="MofName"
         model_type = "classification"
-        model_list = ["RF", "GP", "SVM", "LR"]
+        model_list = ["RF", "GP", "SVM"]
         model_list = " ".join(model_list)
         search_metric = "val_AUC"
         job_name = f"ml_train_{task_name}_{label_column}"
-        data_dir = f"./data/{task_name}"
+        data_dir = f"{ROOT_DIR}/data/ml_data/{task_name}"
         
         job_script = job_templet.format(job_name=job_name,
                                         label_column=label_column,
@@ -77,14 +78,14 @@ if __name__ == '__main__':
 
     # task_names = ["SSD"]
     # script_name = "run_slurm.sh"
-    # model_list = ["RF", "GP", "SVM", "LR"]
+    # model_list = ["RF", "GP", "SVM"]
     # in_file_name = "RAC_and_zeo_features_with_id_prop.csv"
     # model_list = " ".join(model_list)
     # for task_name in task_names:
     #     job_name = f"ml_train_{task_name}_new_feat"
     #     label_column="Label"
     #     name_column="MofName"
-    #     data_dir = f"./data/{task_name}"
+    #     data_dir = f"{ROOT_DIR}/data/ml_data/{task_name}"
     #     if task_name == "TSD":
     #         model_type = "regression"
     #         search_metric = "val_R2"

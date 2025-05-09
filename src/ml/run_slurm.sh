@@ -8,4 +8,4 @@
 export PATH=/opt/share/miniconda3/envs/mofmthnn/bin/:$PATH
 export LD_LIBRARY_PATH=/opt/share/miniconda3/envs/mofmthnn/lib/:$LD_LIBRARY_PATH
 
-srun python -u main.py --model_type classification --model_list RF GP SVM LR  --search_max_evals 100 --search_metric val_AUC  --label_column boiling_label --group_column boiling_label --name_column MofName  --feature_selector_list RFE f1 mutual_info  --data_dir ./data/WS24 --in_file_name RAC_and_zeo_features_with_id_prop.csv
+srun python -u main.py --model_type classification --model_list RF GP SVM LR  --search_max_evals 100 --search_metric val_AUC  --label_column boiling_label --group_column boiling_label --name_column MofName  --feature_selector_list RFE f1 mutual_info  --data_dir /home/zhangsd/repos/MOFSNN/data/ml_data/WS24 --in_file_name RAC_and_zeo_features_with_id_prop.csv

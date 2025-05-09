@@ -3,6 +3,37 @@
 
 # Model directories mapping
 model_dirs_map:
+
+  # Baseline models
+  Baseline-TSD:
+    Path: results/ml_models/TSD/RAC_and_zeo_features_with_id_prop/Label
+    DisplayName: Baseline
+    Model: RandomForestRegressor
+  Baseline-SSD:
+    Path: results/ml_models/SSD/RAC_and_zeo_features_with_id_prop/Label
+    DisplayName: Baseline
+    Model: SVC
+  Baseline-WS24_water:
+    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water_label
+    DisplayName: Baseline
+    Model: RandomForestClassifier
+  Baseline-WS24_water4:
+    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water4_label
+    DisplayName: Baseline
+    Model: RandomForestClassifier
+  Baseline-WS24_acid:
+    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/acid_label
+    DisplayName: Baseline
+    Model: GaussianProcessClassifier
+  Baseline-WS24_base:
+    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/base_label
+    DisplayName: Baseline
+    Model: RandomForestClassifier
+  Baseline-WS24_boiling:
+    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/boiling_label
+    DisplayName: Baseline
+    Model: RandomForestClassifier
+
   # Single task models (all with same DisplayName for grouping)
   TSD:
     Path: results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29
@@ -149,6 +180,13 @@ task_types:
 comparison_groups:
   # Standard comparison between model families
   standard:
+    - Baseline-TSD
+    - Baseline-SSD
+    - Baseline-WS24_water
+    - Baseline-WS24_water4
+    - Baseline-WS24_acid
+    - Baseline-WS24_base
+    - Baseline-WS24_boiling
     - TSD  # Representative for CGCNN Single-Task
     - SSD  # Representative for CGCNN Single-Task
     - WS24_water  # Representative for CGCNN Single-Task

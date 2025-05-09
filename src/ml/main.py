@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 11:09:28
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:19:34
+LastEditTime: 2025-05-07 14:31:51
 '''
 import os
 import sys
@@ -40,7 +40,7 @@ def main(data_dir, in_file_name, name_column, label_column, saved_dir=None, **kw
     t0 = time.time()
     in_file_path = os.path.join(data_dir, in_file_name)
     if saved_dir is None:
-        saved_dir = os.path.join(ROOT_DIR, "results/ml_models", os.path.basename(data_dir), f"{in_file_name[:-4]}", label_column)
+        saved_dir = os.path.join(ROOT_DIR, "results/ml_models_", os.path.basename(data_dir), f"{in_file_name[:-4]}", label_column)
     print(f"saved_dir: {saved_dir}")
 
     not_feat_cols_regression = ["MofName", "Label", "Partition"]

@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-15 15:51:31
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 20:02:53
+LastEditTime: 2025-05-07 17:03:37
 '''
 import os
 import time
@@ -469,12 +469,46 @@ class RegressionModel(BaseModel):
             self.test_metrics_df = pd.DataFrame(test_metrics_all, columns=["te_" + s for s in metrics_list],
                                                 index=[f'fold_{i + 1}' for i in range(len(self.train_val_idxs))])
             metrics_dfs.append(self.test_metrics_df)
+            
+            # 保存原始预测值
+            original_pred = test_pred_all[0].squeeze() if len(test_pred_all) == 1 else None
+            
             self.test_pred = np.mean(test_pred_all, axis=0)
-            df_te_pred = pd.DataFrame([self.test_y.squeeze(), self.test_pred.squeeze()],
-                                      index=['true_value', "pred_value"]).T
+            
+            # 计算原始预测值和平均预测值的差异
+            if original_pred is not None:
+                saved_pred = self.test_pred.squeeze()
+                diff = np.abs(original_pred - saved_pred).max()
+                print(f"预测值最大差异: {diff}")
+                
+                # 打印原始指标和重新计算的指标
+                original_metrics = test_metrics_all[0]
+                recalculated_metrics = self.cal_metrics(self.test_y.squeeze(), self.test_pred.squeeze())
+                
+                print(f"原始指标: R2={original_metrics[0]}, RMSE={original_metrics[1]}, MAE={original_metrics[2]}")
+                print(f"重新计算的指标: R2={recalculated_metrics[0]}, RMSE={recalculated_metrics[1]}, MAE={recalculated_metrics[2]}")
+                
+                # 计算指标差异
+                metrics_diff = [abs(original_metrics[i] - recalculated_metrics[i]) for i in range(3)]
+                print(f"指标差异: R2差={metrics_diff[0]}, RMSE差={metrics_diff[1]}, MAE差={metrics_diff[2]}")
+            
+            df_te_pred = pd.DataFrame({
+                "GroundTruth": self.test_y.squeeze(),
+                "Predicted": self.test_pred.squeeze()
+            })
             if saved_dir:
                 test_pred_file = os.path.join(saved_dir, f"test_predicted_{self.model_name}.csv")
                 df_te_pred.to_csv(test_pred_file, index=False)
+                
+                # 也保存原始预测值用于对比
+                if original_pred is not None:
+                    df_original_pred = pd.DataFrame({
+                        "GroundTruth": self.test_y.squeeze(),
+                        "Predicted": original_pred
+                    })
+                    original_test_pred_file = os.path.join(saved_dir, f"original_test_predicted_{self.model_name}.csv")
+                    df_original_pred.to_csv(original_test_pred_file, index=False)
+                    print(f"已保存原始预测值到 {original_test_pred_file}")
 
         all_metrics_df = pd.concat(metrics_dfs, axis=1).T
         all_metrics_df['mean'] = all_metrics_df.mean(axis=1)
@@ -558,6 +592,7 @@ class ClassificationModel(BaseModel):
         self.n_class = n_class
         self.model_type = "classification"
         self.full_trained = False
+        self.test_pred_prob_all = []
 
     def cal_metrics(self, y_true, y_pred, y_pred_prob=None, n_class=2):
         y_true = np.array(y_true, dtype=np.int8)
@@ -638,7 +673,7 @@ class ClassificationModel(BaseModel):
                 test_metrics_all.append(test_metrics)
                 if saved_dir:
                     self.visualize_chem_space(self.train_X_selected, self.test_X_selected, saved_dir=saved_dir, method="tSNE", notes="test")
-            self._aggregate_metrics(train_metrics_all, val_metrics_all, test_metrics_all, val_pred_all, val_pred_prob_all, val_y_all, test_pred_all, saved_dir)
+            self._aggregate_metrics(train_metrics_all, val_metrics_all, test_metrics_all, val_pred_all, val_pred_prob_all, val_y_all, test_pred_all, saved_dir, test_pred_prob_all)
             print('Total run time:', sec_to_time(time.time() - tick))
             return
         
@@ -687,7 +722,7 @@ class ClassificationModel(BaseModel):
                 test_pred_all.append(test_pred)
                 test_pred_prob_all.append(test_pred_prob)
                 test_metrics_all.append(self.cal_metrics(y_true=self.test_y, y_pred=test_pred, y_pred_prob=test_pred_prob, n_class=self.n_class))
-        self._aggregate_metrics(train_metrics_all, val_metrics_all, test_metrics_all, val_pred_all, val_pred_prob_all, val_y_all, test_pred_all, saved_dir)
+        self._aggregate_metrics(train_metrics_all, val_metrics_all, test_metrics_all, val_pred_all, val_pred_prob_all, val_y_all, test_pred_all, saved_dir, test_pred_prob_all)
         print('Total run time:', sec_to_time(time.time() - tick))
 
     def _aggregate_metrics(self, train_metrics_all, val_metrics_all, test_metrics_all, val_pred_all, val_pred_prob_all, val_y_all, test_pred_all, saved_dir, test_pred_prob_all=None):
@@ -709,8 +744,11 @@ class ClassificationModel(BaseModel):
             ## for classification, test_pred is the predicted class label which appears most frequently in all predictions from different models
             self.test_pred_all = np.array(test_pred_all, dtype=np.int8)
             self.test_pred = np.apply_along_axis(lambda x: np.bincount(x).argmax(), axis=0, arr=self.test_pred_all)
-            df_te_pred = pd.DataFrame([self.test_y.squeeze(), self.test_pred.squeeze()],
-                                      index=['true_value', "pred_value"]).T
+            df_te_pred = pd.DataFrame({
+                "GroundTruth": self.test_y.squeeze(),
+                "Predicted": self.test_pred.squeeze(),
+                "Prob": np.mean(test_pred_prob_all, axis=0).tolist()
+            })
             if saved_dir:
                 test_pred_file = os.path.join(saved_dir, f"test_predicted_{self.model_name}.csv")
                 df_te_pred.to_csv(test_pred_file, index=False)
