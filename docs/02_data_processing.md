@@ -195,4 +195,45 @@ Common issues and their solutions:
 3. **Memory Errors**: Reduce the number of parallel processes (`--n_cpus`) if you encounter memory issues.
 
 For more detailed error information, check the log files in the `logs/data_processing/` directory.
-</VSCode.Cell>
+
+## Dataset Reshuffling
+
+The project includes a dedicated script for checking dataset overlaps and reshuffling train/validation/test splits to ensure consistency across all datasets. This is particularly important for multi-task learning where the same MOF structures appear in multiple datasets.
+
+### Purpose of Reshuffling
+
+The `reshuffle_splits.py` script serves several key functions:
+- Creates new consistent partitions ensuring the same MOF structure has the same partition assignment across all datasets
+- Generates multiple random seeds for robust model evaluation
+
+### Features
+
+The script provides the following functionalities:
+- Maps between CoRE names and refcodes to ensure consistent MOF identification
+- Creates stratified splits based on all available label columns
+- Maintains proper distribution of different stability class labels across training, validation, and test sets
+- Generates multiple dataset versions with different random seeds for model training.
+
+### Using the Reshuffling Script
+
+To reshuffle the datasets and create consistent train/validation/test splits:
+
+```bash
+python src/data/reshuffle_splits.py
+```
+
+The script automatically:
+1. Loads the processed datasets from both ml_data and cgcnn_data directories
+2. Creates new stratified splits with proper balance across all label types
+3. Generates 5 different random seeds (0-4) for model training
+4. Saves the reshuffled datasets with seed suffix (e.g., `RAC_and_zeo_features_with_id_prop_rand0.csv`)
+
+### Output Files
+
+For each random seed (0-4), the script creates the following files:
+- In `data/ml_data/TSD/`: `RAC_and_zeo_features_with_id_prop_rand{seed}.csv`
+- In `data/ml_data/SSD/`: `RAC_and_zeo_features_with_id_prop_rand{seed}.csv` 
+- In `data/ml_data/WS24/`: `RAC_and_zeo_features_with_id_prop_rand{seed}.csv`
+- Identical files are also saved in the corresponding `data/cgcnn_data/` directories
+
+When training models that use multiple datasets, always use datasets with the same random seed to ensure proper separation of training, validation, and test data.
