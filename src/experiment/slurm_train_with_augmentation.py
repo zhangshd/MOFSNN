@@ -118,10 +118,10 @@ def main():
         'dl_sampler': 'random',
         'task_att_type': 'self',
         # Enable data augmentation
-        'augment': True,
+        'augment': False,
         'aug_noise_std': 0.01,
         'balance_classes': False,
-        'aug_sample_file': os.path.join(ROOT_DIR, "results/high_uncertainty_samples.xlsx"),
+        # 'aug_sample_file': os.path.join(ROOT_DIR, "results/high_uncertainty_samples.xlsx"),
         # 'aug_factor': 5,
         'down_sampling': True,
         'lr': 0.001,

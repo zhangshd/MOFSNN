@@ -38,6 +38,7 @@ logs
 test.ipynb
 */logs/*/*
 */inference/*
+data/*
 
 logs*
 **/raw_data

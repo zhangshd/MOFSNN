@@ -1,161 +1,198 @@
 # Data Processing
 
-This document describes the data processing steps in the MOFSNN project, detailing how raw MOF data is prepared for both traditional machine learning models and CGCNN models.
+This document describes the data processing workflow for the MOFSNN project. The processing pipeline prepares raw MOF (Metal-Organic Framework) data for both traditional ML models and CGCNN (Crystal Graph Convolutional Neural Networks) models.
 
-## Raw Data Sources
+## Datasets
 
-The project uses several datasets:
-
-1. **Thermal Stability Dataset (TSD)**: Contains thermal decomposition temperatures for MOFs
-2. **Solvent Stability Dataset (SSD)**: Contains solvent stability classifications for MOFs
-3. **Water Stability Dataset (WS24)**: Contains water stability data for MOFs
-4. **Acid/Base/Boiling Stability Datasets**: Additional stability measures from the WS24 dataset
-5. **CoREMOF2019**: A database of MOF structures in CIF format that matches with the stability datasets
+The project works with the following datasets:
+- **TSD**: Thermal stability dataset
+- **SSD**: Solvent removal stability dataset 
+- **WS24**: Water stability dataset
 
 ## Processing Pipeline
 
-### 1. TSD and SSD Data Processing
+The data processing includes the following steps:
+1. Loading raw data from CSV files
+2. Cleaning CIF structure files
+3. Generating geometric and chemical features
+4. Preparing crystal graph data for CGCNN
+5. Creating train/validation/test splits
+6. Merging features with property data
 
-The processing of TSD and SSD datasets is handled in `notebooks/01_process_TSDandSSD.ipynb`. The key steps include:
+## Setup and Requirements
 
-1. **Loading raw data**:
-   - Load CSV files containing stability data from Nandy's work
-   - Match MOF names with CIF files from CoREMOF2019 database
+The data processing script requires the following dependencies:
+- Python 3.8+
+- pandas
+- numpy
+- scikit-learn
+- ASE (Atomic Simulation Environment)
+- PyMatGen (Python Materials Genomics)
+- tqdm
 
-2. **Data cleaning**:
-   - Remove rows with missing values
-   - Standardize column names for consistency
-   - Extract relevant features and labels
+Make sure your project environment has all required dependencies installed.
 
-3. **CIF file processing**:
-   - Copy matching CIF files from CoREMOF2019 to task-specific directories
-   - Clean CIF files:
-     - Remove overlapping atoms
-     - Remove solvent molecules
-     - Standardize CIF format
+## Using the Data Processor
 
-4. **Feature generation**:
-   - Generate RACs (Revised Autocorrelation) features
-   - Generate Zeo++ features (geometric/topological descriptors)
-   - Combine features with stability labels
+The project includes a dedicated data processor script located at `src/data/data_processor.py`. This script replaces the previously used Jupyter notebooks for data processing.
 
-5. **Graph data preparation**:
-   - Convert CIF files to graph data format for CGCNN
-   - Define atomic neighbors within specified radius
-   - Extract atom features and bond connections
+### Command Line Arguments
 
-### 2. WS24 Data Processing
+The data processor supports the following command line arguments:
 
-The processing of water stability, acid stability, base stability, and boiling stability datasets is handled in `notebooks/02_process_WS24.ipynb`. The steps include:
+| Argument | Description | Default |
+|----------|-------------|---------|
+| `--raw_data_dir` | Directory containing raw data files | `data/raw_data` |
+| `--output_dir` | Directory to save processed data for CGCNN models | `data/cgcnn_data_` |
+| `--ml_output_dir` | Directory to save processed data for ML models | `data/ml_data_` |
+| `--log_dir` | Directory to save logs | `logs/data_processing` |
+| `--dataset` | Dataset to process: `all`, `tsd_ssd`, or `ws24` | `all` |
+| `--n_cpus` | Number of CPU cores to use for parallel processing | `4` |
+| `--radius` | Radius for neighbor finding in crystal graph | `8.0` |
+| `--max_num_nbr` | Maximum number of neighbors per atom | `10` |
+| `--prob_radius` | Probe radius for geometric feature calculations | `1.86` |
+| `--seed` | Random seed for reproducibility | `42` |
 
-1. **Loading raw data**:
-   - Load stability data from Terrones's work
-   - Match MOF names with CIF files from CoREMOF2019 database
+### Basic Usage
 
-2. **Data formatting**:
-   - Standardize column names and formats
-   - Separate data into different stability types
-   - Apply appropriate transformations to labels
+To process all datasets with default settings:
 
-3. **CIF file processing**:
-   - Same cleaning process as used for TSD/SSD datasets
-   - Verify structure integrity after cleaning
+```bash
+python src/data/data_processor.py
+```
 
-4. **Feature extraction**:
-   - Generate consistent feature sets across all stability types
-   - Ensure feature compatibility for multi-task learning
+To process only the TSD and SSD datasets:
 
-5. **Partitioning**:
-   - Split data into training, validation, and test sets
-   - Ensure balanced distribution across stability types
+```bash
+python src/data/data_processor.py --dataset tsd_ssd
+```
 
-### 3. External Test Set Preparation
+To process only the WS24 dataset:
 
-The preparation of external test sets is handled in `notebooks/04_prepare_external_test_set.ipynb`, which includes:
+```bash
+python src/data/data_processor.py --dataset ws24
+```
 
-1. **Selecting test structures**:
-   - Identify MOFs not included in the training sets
-   - Ensure diversity of the test set
+To customize the number of CPU cores for parallel processing:
 
-2. **Processing test structures**:
-   - Apply consistent cleaning and feature extraction steps
-   - Format data for model evaluation
+```bash
+python src/data/data_processor.py --n_cpus 8
+```
 
-## Feature Engineering
+## Data Processing Workflow
 
-### Traditional ML Features
+### TSD and SSD Datasets
 
-For traditional machine learning models, the following features are extracted:
+The processing workflow for TSD and SSD datasets follows these steps:
 
-1. **RACs features**:
-   - Molecular connectivity-based descriptors
-   - Element-specific information
-   - Bonding patterns
+1. **Loading Raw Data**: 
+   - Reads raw CSV files from the specified directory
+   - Standardizes column names and formats
 
-2. **Zeo++ features**:
-   - Surface area calculations
-   - Pore volume metrics
-   - Channel dimensions
-   - Void fraction
-   - Geometry descriptors
+2. **CIF File Processing**:
+   - Copies CIF files from the original dataset
+   - Uses refcode as the MOF name identifier
+   - Filters out MOFs without corresponding CIF files
 
-### CGCNN Features
+3. **CIF Cleaning**:
+   - Sanitizes CIF files to ensure they can be properly read by molecular modeling tools
+   - Handles errors in CIF files that might prevent further processing
 
-For CGCNN models, the following features are prepared:
+4. **Feature Generation**:
+   - Generates RAC (Revised Autocorrelation) and zeolite-inspired features
+   - Creates feature files in the specified output directory
 
-1. **Atom features**:
-   - One-hot encoding of element type
-   - Additional atomic properties
+5. **Graph Data Preparation**:
+   - Prepares graph representation data for CGCNN models
+   - Creates neighbor lists and atom type information
 
-2. **Bond features**:
-   - Distances between connected atoms
-   - Graph connectivity information
+6. **Data Analysis**:
+   - Computes statistics about atom counts and structure properties
+   - Records these statistics in the log files
 
-## Data Format
+7. **Data Merging**:
+   - Combines features with property data
+   - Creates a final CSV file with all necessary information for ML models
 
-### ML Model Data
+The script automatically checks if any step has already been completed to avoid redundant processing, making it efficient for repeated runs.
 
-Traditional ML model data is stored as CSV files with:
-- MOF identifiers
-- Stability labels
-- Feature vectors
+### WS24 Dataset
 
-### CGCNN Model Data
+The processing workflow for the WS24 dataset follows a similar pattern but includes some dataset-specific steps:
 
-CGCNN model data consists of:
-- Processed CIF files
-- Graph data files containing atom features and connectivity information
-- ID-property mapping files linking MOF identifiers to stability values
+1. **Loading Raw Data**:
+   - Reads the features and labels CSV file
+   - Processes multi-class water stability labels (water4_label)
 
-## Directory Structure
+2. **CIF File Processing**:
+   - Handles two different source directories (WS14s and WS24s)
+   - Maps dataset names to appropriate CIF file locations
+
+3. **Train/Val/Test Splitting**:
+   - Performs stratified splitting based on multiple label columns
+   - Maintains balanced distribution across all stability categories
+
+4. **Label-Specific Processing**:
+   - Creates separate datasets for each label type (water, water4, acid, base, boiling)
+   - Simplifies model training for specific prediction tasks
+
+The WS24 processing creates multiple output datasets, each optimized for a different prediction task.
+
+## Output Structure
+
+The data processor creates the following directory structure:
 
 ```
 data/
-├── raw_data/               # Original data sources
-│   ├── CoREMOF2019/        # MOF CIF files database
-│   ├── Nandy_2022_SciData/ # TSD and SSD datasets
-│   ├── WS24v2/             # Water, acid, base, boiling stability datasets
-│   └── popularMOF/         # Additional MOF structures
+├── cgcnn_data_/         # CGCNN model data
+│   ├── TSD/
+│   │   ├── cifs/                     # Original CIF files
+│   │   ├── clean_cifs/               # Cleaned CIF files with graph data
+│   │   ├── features/                 # Generated features
+│   │   ├── id_prop_feat.csv          # Combined ID, property, and features
+│   │   └── RAC_and_zeo_features_with_id_prop.csv  # Complete dataset
+│   │
+│   ├── SSD/             # Same structure as TSD
+│   │
+│   └── WS24/            # Similar structure with additional label files
 │
-├── cgcnn_data/             # Processed data for CGCNN models
-│   ├── CoREMOF2019/        # Processed CoREMOF database
-│   ├── SSD/                # Solvent stability data
-│   ├── TSD/                # Thermal stability data
-│   ├── WS24/               # Water, acid, base, boiling stability data
-│   └── TS_external_test/   # External test sets
-│
-└── ml_data/                # Processed data for ML models
-    ├── SSD/                # Solvent stability features
-    ├── TSD/                # Thermal stability features
-    └── WS24/               # Water, acid, base, boiling features
+└── ml_data_/           # Traditional ML model data
+    ├── TSD/
+    │   └── RAC_and_zeo_features_with_id_prop.csv  # Ready-to-use dataset
+    │
+    ├── SSD/             # Same structure as TSD
+    │
+    └── WS24/            # Separate directories for each label type
+        ├── water_label/
+        ├── water4_label/
+        ├── acid_label/
+        ├── base_label/
+        └── boiling_label/
 ```
 
-## Scripts and Utilities
+Logs for each processing step are stored in the `logs/data_processing/` directory.
 
-The data processing leverages several utility scripts:
+## Performance and Optimization
 
-1. **CIF cleaning**: `src/cgcnn/datamodule/clean_cif.py`
-2. **Feature generation**: `src/ml/featuring/feature_generation.py`
-3. **Graph data preparation**: `src/cgcnn/datamodule/prepare_data.py`
-4. **RACs calculation**: `src/ml/featuring/RAC_getter.py`
-5. **Solvent removal**: `src/ml/featuring/solvent_removal.py`
+The data processor includes several optimizations to improve performance:
+
+1. **Caching Mechanism**: Checks for existing processed files to skip completed steps
+
+2. **Parallel Processing**: Uses multiprocessing for computationally intensive tasks
+
+3. **Incremental Updates**: Only updates output files when source files have changed
+
+For large datasets, processing can take significant time. Consider using the `--dataset` flag to process only the datasets you need, and increase `--n_cpus` if more processing power is available.
+
+## Troubleshooting
+
+Common issues and their solutions:
+
+1. **Missing CIF Files**: Check the `mofs_without_cif.txt` file in the output directory to see which MOFs were not found in the original dataset.
+
+2. **Graph Data Preparation Failures**: Review the `mofs_prepare_failed.txt` file and the log files to identify structures that couldn't be processed.
+
+3. **Memory Errors**: Reduce the number of parallel processes (`--n_cpus`) if you encounter memory issues.
+
+For more detailed error information, check the log files in the `logs/data_processing/` directory.
+</VSCode.Cell>

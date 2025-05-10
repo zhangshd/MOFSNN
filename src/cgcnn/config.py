@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2025-05-06 16:20:17
+LastEditTime: 2025-05-10 14:23:23
 '''
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer)
 
@@ -303,7 +303,7 @@ def tsd2_ssd_ws24_water_water4():
 
 @ex.named_config
 def tsd_ssd_ws24():
-    data_dir = os.path.join(ROOT_DIR, 'data/cgcnn_data')  # Data directory
+    data_dir = os.path.join(ROOT_DIR, 'data/cgcnn_data_')  # Data directory
     batch_size = 16
     lr = 5e-3
     tasks = ['TSD', 'SSD', 'WS24_water', 'WS24_water4', 'WS24_acid', 'WS24_base', 'WS24_boiling']
@@ -321,24 +321,6 @@ def tsd_ssd_ws24():
     # task_weights = None
     aug_noise_std = 0.01
     balance_classes = False
-    uncertainty_threshold = {
-        'TSD': 0.5,
-        'SSD': 0.4,
-        'WS24_water': 0.4,
-        'WS24_water4': 0.4,
-        'WS24_acid': 0,
-        'WS24_base': 0,
-        'WS24_boiling': 0
-    }
-    aug_factor = {
-        'TSD': 4,
-        'SSD': 1,
-        'WS24_water': 2,
-        'WS24_water4': 2,
-        'WS24_acid': 0,
-        'WS24_base': 0,
-        'WS24_boiling': 0
-    }
 
 
 @ex.named_config
