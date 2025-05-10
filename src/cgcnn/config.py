@@ -183,6 +183,7 @@ def tsd():
     lr = 5e-3
     tasks = ['TSD']
     task_types = ['regression']
+    loss_aggregation = 'fixed_weight_sum'
 
 @ex.named_config
 def tsd2():
@@ -191,6 +192,7 @@ def tsd2():
     lr = 5e-3
     tasks = ['TSD2']
     task_types = ['classification']
+    loss_aggregation = 'fixed_weight_sum'
     
 
 @ex.named_config
@@ -200,6 +202,7 @@ def ssd():
     lr = 5e-3
     tasks = ['SSD']
     task_types = ['classification']
+    loss_aggregation = 'fixed_weight_sum'
 
 @ex.named_config
 def tsd_ssd():
@@ -208,6 +211,7 @@ def tsd_ssd():
     lr = 5e-3
     tasks = ['TSD', 'SSD']
     task_types = ['regression', 'classification']
+    loss_aggregation = 'fixed_weight_sum'
 
 @ex.named_config
 def tsd2_ssd():
@@ -216,6 +220,7 @@ def tsd2_ssd():
     lr = 5e-3
     tasks = ['TSD2', 'SSD']
     task_types = ['classification', 'classification']
+    loss_aggregation = 'fixed_weight_sum'
     
 @ex.named_config
 def ws24_water():
@@ -224,6 +229,7 @@ def ws24_water():
     lr = 5e-3
     tasks = ['WS24_water']
     task_types = ['classification']
+    loss_aggregation = 'fixed_weight_sum'
 
 @ex.named_config
 def ws24_water4():
@@ -232,6 +238,7 @@ def ws24_water4():
     lr = 5e-3
     tasks = ['WS24_water4']
     task_types = ['classification_4']
+    loss_aggregation = 'fixed_weight_sum'
 
 @ex.named_config
 def ws24_acid():
@@ -240,6 +247,7 @@ def ws24_acid():
     lr = 5e-3
     tasks = ['WS24_acid']
     task_types = ['classification']
+    loss_aggregation = 'fixed_weight_sum'
 
 @ex.named_config
 def ws24_base():
@@ -248,6 +256,7 @@ def ws24_base():
     lr = 5e-3
     tasks = ['WS24_base']
     task_types = ['classification']
+    loss_aggregation = 'fixed_weight_sum'
 
 @ex.named_config
 def ws24_boiling():
@@ -256,6 +265,7 @@ def ws24_boiling():
     lr = 5e-3
     tasks = ['WS24_boiling']
     task_types = ['classification']
+    loss_aggregation = 'fixed_weight_sum'
 
 @ex.named_config
 def tsd_ssd_ws24_water():
@@ -311,13 +321,13 @@ def tsd_ssd_ws24():
     dl_sampler = 'random' # Data sampler type: random, same_task_in_batch, same_ratio_prior
     loss_aggregation = 'fixed_weight_sum'  # Loss aggregation type: sum, trainable_weight_sum, sample_weight_sum, fixed_weight_sum
     # task_weights = [0.3, 0.25, 0.15, 0.15, 0.05, 0.05, 0.05]
-    task_weights = [0.39542225730071034, 
-                    0.27505919494869774, 
-                    0.13772691397000789, 
-                    0.13772691397000789, 
-                    0.022099447513812154, 
-                    0.01578531965272297, 
-                    0.01617995264404104]
+    # task_weights = [0.39542225730071034, 
+    #                 0.27505919494869774, 
+    #                 0.13772691397000789, 
+    #                 0.13772691397000789, 
+    #                 0.022099447513812154, 
+    #                 0.01578531965272297, 
+    #                 0.01617995264404104]
     # task_weights = None
     aug_noise_std = 0.01
     balance_classes = False

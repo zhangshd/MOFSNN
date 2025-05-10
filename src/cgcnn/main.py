@@ -241,6 +241,8 @@ if __name__ == '__main__':
     parser.add_argument("--aug_sample_file", type=str, default=None, 
                         help="Path to Excel file containing sample IDs to augment")
     parser.add_argument('--down_sampling', action='store_true')
+    parser.add_argument('--csv_file_name', type=str, default="RAC_and_zeo_features_with_id_prop.csv",
+                        help="Name of the CSV file containing data features and properties")
     # parser.add_argument('--tasks', nargs='+', default=['TSD', 'SSD'], type=str)
     # parser.add_argument('--task_types', nargs='+', default=['regression', 'classification'], type=str)
 
