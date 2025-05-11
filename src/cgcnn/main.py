@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 10:58:34
 LastEditors: zhangshd
-LastEditTime: 2025-04-28 17:25:08
+LastEditTime: 2025-05-12 04:25:35
 '''
 
 import os
@@ -21,7 +21,7 @@ from pytorch_lightning.accelerators import find_usable_cuda_devices
 from pytorch_lightning.profilers import AdvancedProfiler
 from pytorch_lightning.utilities.model_summary import ModelSummary
 from pytorch_lightning.tuner import Tuner
-from optuna.integration import PyTorchLightningPruningCallback
+from cgcnn.custom_callbacks import CustomPyTorchLightningPruningCallback
 import shutil
 from pathlib import Path
 import optuna
@@ -119,7 +119,7 @@ def main(args, trial: optuna.trial.Trial = None) -> float:
         callbacks.append(checkpoint_callback)
         
     if trial is not None:
-        callbacks.append(PyTorchLightningPruningCallback(trial, monitor=args.monitor))
+        callbacks.append(CustomPyTorchLightningPruningCallback(trial, monitor=args.monitor))
     logger = tb_logger
     profiler = profiler
     summary = ModelSummary(model, max_depth=-1)

@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 11:00:42
 LastEditors: zhangshd
-LastEditTime: 2025-04-22 17:52:56
+LastEditTime: 2025-05-12 05:05:00
 '''
 
 import os
@@ -20,7 +20,6 @@ from pytorch_lightning.accelerators import find_usable_cuda_devices
 from pytorch_lightning.profilers import AdvancedProfiler
 from pytorch_lightning.utilities.model_summary import ModelSummary
 from pytorch_lightning.tuner import Tuner
-from optuna.integration import PyTorchLightningPruningCallback
 import shutil
 from pathlib import Path
 from main import main
@@ -53,7 +52,7 @@ if __name__ == '__main__':
     # parser.add_argument('--focal_gamma', default=2, type=int)
 
     # # Optimizer
-    # parser.add_argument('--optim', default='Adam', type=str)
+    parser.add_argument('--optim', default='adam', type=str)
     parser.add_argument('--lr', type=float)
     parser.add_argument('--lr_mult', type=float)
     # parser.add_argument('--weight_decay', default=1e-5, type=float)
@@ -93,6 +92,8 @@ if __name__ == '__main__':
     parser.add_argument('--use_extra_fea', action='store_true')
     parser.add_argument('--dl_sampler', type=str, choices=['random', 'same_ratio_prior', 'same_task_prior'])
     parser.add_argument('--augment', action='store_true')
+    parser.add_argument('--down_sampling', action='store_true')
+    parser.add_argument('--csv_file_name', type=str, default="RAC_and_zeo_features_with_id_prop.csv")
     # parser.add_argument('--tasks', nargs='+', default=['TSD', 'SSD'], type=str)
     # parser.add_argument('--task_types', nargs='+', default=['regression', 'classification'], type=str)
 
@@ -179,7 +180,8 @@ if __name__ == '__main__':
         return best_metric
 
     def bayesian_optimization(study_name, optuna_name):
-        storage_name = f"sqlite:///{os.path.join(ROOT_DIR, 'results/cgcnn_models', optuna_name)}.db"
+        storage_name = f"sqlite:///{os.path.join(args.log_dir, optuna_name)}.db"
+        print(f"Storage name: {storage_name}")
         pruner = optuna.pruners.MedianPruner(n_warmup_steps=3) if args.pruning else optuna.pruners.NopPruner()
         study = optuna.create_study(direction='maximize', study_name=study_name, 
                                     pruner=pruner, storage=storage_name, load_if_exists=True)

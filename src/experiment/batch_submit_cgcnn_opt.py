@@ -31,7 +31,7 @@ export PATH=/opt/share/miniconda3/envs/mofmthnn/bin/:$PATH
 export LD_LIBRARY_PATH=/opt/share/miniconda3/envs/mofmthnn/lib/:$LD_LIBRARY_PATH
 
 echo "Starting model training with {csv_file_name}..."
-srun python -u {script_exe} {training_args} --down_sampling --csv_file_name {csv_file_name}
+srun python -u {script_exe} {training_args} --down_sampling --csv_file_name {csv_file_name} --log_dir {log_dir} --optuna_name {optuna_name}
 
 echo "Training completed."
 """.strip()
@@ -247,13 +247,16 @@ def main():
     args = parser.parse_args()
 
     # Get CSV file names based on pattern
-    csv_file_names = [args.csv_pattern.replace("*", str(i)) for i in range(5)]
+    csv_file_names = [args.csv_pattern.replace("*", str(i)) for i in range(4)]
     for name in csv_file_names:
         print(f"  - {name}")
     
     # Create a directory for job scripts
     job_scripts_dir = SCRIPT_DIR / "job_scripts"
     job_scripts_dir.mkdir(exist_ok=True, parents=True)
+    log_dir= ROOT_DIR/"results/cgcnn_models_opt"
+    log_dir.mkdir(exist_ok=True, parents=True)
+
     
     # Loop through model types
     for model_type in args.model_types:
@@ -288,14 +291,16 @@ def main():
                 
                 # Create job name (use a simplified format)
                 csv_short_name = csv_filename.replace('.csv', '').replace('RAC_and_zeo_features_with_id_prop_', '')
-                job_name = f"train_{model_name}_{csv_short_name}"
-                
+                job_name = f"opt_{model_name}_{csv_short_name}"
+                (log_dir/csv_short_name).mkdir(exist_ok=True, parents=True)
                 # Create job script
                 job_script = JOB_TEMPLATE.format(
                     job_name=job_name,
                     csv_file_name=csv_filename,
                     training_args=training_args,
-                    script_exe=str(ROOT_DIR/"src/cgcnn/main.py")
+                    script_exe=str(ROOT_DIR/"src/cgcnn/hyperopt.py"),
+                    log_dir=str(log_dir/csv_short_name),
+                    optuna_name=csv_short_name
                 )
                 
                 # Write job script to file
