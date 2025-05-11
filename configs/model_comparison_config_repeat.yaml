@@ -6,79 +6,181 @@ model_dirs_map:
 
   # Baseline models
   Baseline-TSD:
-    Path: results/ml_models/TSD/RAC_and_zeo_features_with_id_prop/Label
+    Path: [
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand0/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
+      ]
     DisplayName: Baseline
     Model: RandomForestRegressor
+
   Baseline-SSD:
-    Path: results/ml_models/SSD/RAC_and_zeo_features_with_id_prop/Label
+    Path: [
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand0/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
+      ]
     DisplayName: Baseline
-    Model: SVC
+    Model: RandomForestClassifier
+    
   Baseline-WS24_water:
-    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water_label
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water_label,
+    ]
     DisplayName: Baseline
     Model: RandomForestClassifier
+
   Baseline-WS24_water4:
-    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water4_label
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water4_label,
+    ]
     DisplayName: Baseline
     Model: RandomForestClassifier
+
   Baseline-WS24_acid:
-    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/acid_label
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/acid_label,
+    ]
     DisplayName: Baseline
     Model: GaussianProcessClassifier
+
   Baseline-WS24_base:
-    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/base_label
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/base_label,
+      ]
     DisplayName: Baseline
-    Model: RandomForestClassifier
+    Model: GaussianProcessClassifier
+    
   Baseline-WS24_boiling:
-    Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/boiling_label
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/boiling_label,
+      ]
     DisplayName: Baseline
     Model: RandomForestClassifier
 
   # Single task models (all with same DisplayName for grouping)
   TSD:
-    Path: results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29
+    Path: [
+      results/cgcnn_models/TSD_seed42_cgcnn_raw/version_29,
+      results/cgcnn_models/TSD_seed42_cgcnn_raw/version_30,
+      results/cgcnn_models/TSD_seed42_cgcnn_raw/version_31,
+      results/cgcnn_models/TSD_seed42_cgcnn_raw/version_32,
+      results/cgcnn_models/TSD_seed42_cgcnn_raw/version_33,
+    ]
     DisplayName: CGCNN_SG
     Model: cgcnn_raw
   
   SSD:
-    Path: results/cgcnn_models/SSD_seed42_cgcnn_raw/version_4
+    Path: [
+      results/cgcnn_models/SSD_seed42_cgcnn_raw/version_4,
+      results/cgcnn_models/SSD_seed42_cgcnn_raw/version_5,
+      results/cgcnn_models/SSD_seed42_cgcnn_raw/version_6,
+      results/cgcnn_models/SSD_seed42_cgcnn_raw/version_7,
+      results/cgcnn_models/SSD_seed42_cgcnn_raw/version_8,
+    ]
     DisplayName: CGCNN_SG
     Model: cgcnn_raw
   
   WS24_water:
-    Path: results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_29
+    Path: [
+      results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_29,
+      results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_30,
+      results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_31,
+      results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_32,
+      results/cgcnn_models/WS24_water_seed42_cgcnn_raw/version_33,
+    ]
     DisplayName: CGCNN_SG
     Model: cgcnn_raw
   
   WS24_water4:
-    Path: results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_3
+    Path: [
+      results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_3,
+      results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_4,
+      results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_5,
+      results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_6,
+      results/cgcnn_models/WS24_water4_seed42_cgcnn_raw/version_7,
+    ]
     DisplayName: CGCNN_SG
     Model: cgcnn_raw
   
   WS24_acid:
-    Path: results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_47
+    Path: [
+      results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_47,
+      results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_48,
+      results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_49,
+      results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_50,
+      results/cgcnn_models/WS24_acid_seed42_cgcnn_raw/version_51,
+    ]
     DisplayName: CGCNN_SG
     Model: cgcnn_raw
   
   WS24_base:
-    Path: results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_0
+    Path: [
+      results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_0,
+      results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_1,
+      results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_2,
+      results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_3,
+      results/cgcnn_models/WS24_base_seed42_cgcnn_raw/version_4,
+    ]
     DisplayName: CGCNN_SG
     Model: cgcnn_raw
   
   WS24_boiling:
-    Path: results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_7
+    Path: [
+      results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_7,
+      results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_8,
+      results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_9,
+      results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_10,
+      results/cgcnn_models/WS24_boiling_seed42_cgcnn_raw/version_11,
+    ]
     DisplayName: CGCNN_SG
     Model: cgcnn_raw
   
   # Multi-task models
   TSD_SSD_WS24_all:
-    Path: results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24
+    Path: [
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24,
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_75,
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_76,
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_77,
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_78,
+    ]
     DisplayName: CGCNN_MT
     Model: cgcnn_raw
   
   # Full MOFSNN model
   TSD_SSD_WS24_all_attn:
-    Path: results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43
+    Path: [
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43,
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_53,
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_54,
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_55,
+      results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_56,
+    ]
     DisplayName: MOFSNN
     Model: att_cgcnn
   

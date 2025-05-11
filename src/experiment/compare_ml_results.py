@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 '''
 Author: zhangsd
-Date: 2024-06-05
+Date: 2025-06-05 (Updated: 2025-06-12)
 Description: Process ML model results across tasks and save summarized results to Excel,
 compatible with compare_model_performance.py for comparing with CGCNN results.
+Supports multiple result directories per task for computing means and standard deviations.
 '''
 
 import os
@@ -13,7 +14,7 @@ import yaml
 import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Union
 
 # Get the directory of the script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -55,55 +56,124 @@ def extract_model_name_from_filename(filename: str) -> str:
         return model_name
     return "Unknown"
 
-def process_ml_results_directory(results_dir: str, task: str, task_type: str, 
-                               split: str = "test") -> List[Dict[str, Any]]:
+def process_ml_results_directory(results_dirs: Union[str, List[str]], task: str, task_type: str, 
+                               split: str = "test", include_std: bool = True) -> List[Dict[str, Any]]:
     """
-    Process all ML model result files in a directory for a specific task.
+    Process ML model result files in one or more directories for a specific task.
 
     Args:
-        results_dir: Path to directory containing ML model result files
+        results_dirs: Path to directory or list of directories containing ML model result files
         task: Name of the task
         task_type: Type of task ('regression' or 'classification')
         split: Data split to analyze ('test', 'validation' or 'external_test')
+        include_std: Whether to include standard deviation metrics when multiple directories are processed
 
     Returns:
-        List of dictionaries with metrics for each model
+        List of dictionaries with metrics for each model, including mean and std if multiple directories
     """
-    results = []
+    # Convert to list if a single path is provided
+    if isinstance(results_dirs, str):
+        results_dirs = [results_dirs]
     
-    # Check if directory exists
-    if not os.path.exists(results_dir):
-        print(f"Warning: Results directory not found - {results_dir}")
-        return results
+    # Dictionary to store metrics by model
+    model_metrics = {}
     
     # Look for result files that match the pattern
     prefix = f"{split}_predicted_"
-    file_pattern = f"{prefix}*.csv"
     
-    result_files = [f for f in os.listdir(results_dir) if f.startswith(prefix) and f.endswith(".csv")]
-    
-    if not result_files:
-        print(f"Warning: No result files found in {results_dir} with pattern {file_pattern}")
-        return results
-    
-    for result_file in result_files:
-        model_name = extract_model_name_from_filename(result_file)
-        file_path = os.path.join(results_dir, result_file)
+    # Process each directory
+    for dir_idx, results_dir in enumerate(results_dirs):
+        # Check if directory exists
+        if not os.path.exists(results_dir):
+            print(f"Warning: Results directory not found - {results_dir}")
+            continue
         
-        df = read_results_file(file_path)
-        if df is not None:
-            # Get metrics as dictionary
-            task_metrics = calculate_metrics(df, task_type)
-            # Create a new dictionary with all required fields
+        # Find result files in this directory
+        result_files = [f for f in os.listdir(results_dir) if f.startswith(prefix) and f.endswith(".csv")]
+        
+        if not result_files:
+            print(f"Warning: No result files found in {results_dir} with pattern {prefix}*.csv")
+            continue
+        
+        for result_file in result_files:
+            model_name = extract_model_name_from_filename(result_file)
+            file_path = os.path.join(results_dir, result_file)
+            
+            df = read_results_file(file_path)
+            if df is not None:
+                # Get metrics as dictionary
+                task_metrics = calculate_metrics(df, task_type)
+                
+                # Initialize dictionary for this model if not already present
+                if model_name not in model_metrics:
+                    model_metrics[model_name] = {
+                        "metrics": [],
+                        "files": []
+                    }
+                
+                # Add metrics from this directory
+                model_metrics[model_name]["metrics"].append(task_metrics)
+                model_metrics[model_name]["files"].append(file_path)
+                
+                print(f"Processed {task} for model {model_name} from {file_path}")
+    
+    # Convert metrics to final result with mean and std
+    results = []
+    for model_name, data in model_metrics.items():
+        metrics_list = data["metrics"]
+        
+        if not metrics_list:
+            continue
+        
+        # Calculate mean and std for each metric across multiple directories
+        if len(metrics_list) > 1 and include_std:
+            # Create dictionary to hold aggregates
+            mean_metrics = {}
+            std_metrics = {}
+            
+            # Get all metric keys from the first result
+            metric_keys = list(metrics_list[0].keys())
+            
+            # Calculate mean and std for each metric
+            for metric in metric_keys:
+                values = [m.get(metric, np.nan) for m in metrics_list]
+                mean_metrics[metric] = np.nanmean(values)
+                std_metrics[f"{metric}_std"] = np.nanstd(values)
+            
+            # Create result entries
             result_entry = {
                 "Task": task,
                 "Model": ALGORITHM_MAP[model_name],
                 "DisplayName": f"Baseline",
-                # Include all metrics from task_metrics
-                **task_metrics
+                # Include mean metrics and their standard deviations
+                **mean_metrics,
+                **std_metrics
             }
-            results.append(result_entry)
-            print(f"Processed {task} for model {model_name}")
+        else:
+            # Only one directory or std not requested - use metrics directly
+            if len(metrics_list) > 1:
+                # Multiple results but no std requested - average them
+                mean_metrics = {}
+                for metric in metrics_list[0].keys():
+                    values = [m.get(metric, np.nan) for m in metrics_list]
+                    mean_metrics[metric] = np.nanmean(values)
+                
+                result_entry = {
+                    "Task": task,
+                    "Model": ALGORITHM_MAP[model_name],
+                    "DisplayName": f"Baseline",
+                    **mean_metrics
+                }
+            else:
+                # Only one directory, use metrics directly
+                result_entry = {
+                    "Task": task,
+                    "Model": ALGORITHM_MAP[model_name],
+                    "DisplayName": f"Baseline",
+                    **metrics_list[0]
+                }
+        
+        results.append(result_entry)
     
     return results
 
@@ -187,14 +257,42 @@ def get_default_config() -> Dict[str, Any]:
         Dictionary with default configuration
     """
     # Default ML results directories mapping
+    # Define both single-directory and multi-directory paths for each task
+    base_dir = os.path.join(ROOT_DIR, "results/ml_models")
+    
+    # Define patterns for random seeds
+    rand_seeds = ["", "_rand0", "_rand1", "_rand2", "_rand3"]
+    
+    # Default ML results directories mapping with multiple paths for each task
     ml_results_dirs = {
-        "TSD": os.path.join(ROOT_DIR, "results/ml_models/TSD/RAC_and_zeo_features_with_id_prop/Label"),
-        "SSD": os.path.join(ROOT_DIR, "results/ml_models/SSD/RAC_and_zeo_features_with_id_prop/Label"),
-        "WS24_water": os.path.join(ROOT_DIR, "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water_label"),
-        "WS24_water4": os.path.join(ROOT_DIR, "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water4_label"),
-        "WS24_acid": os.path.join(ROOT_DIR, "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/acid_label"),
-        "WS24_base": os.path.join(ROOT_DIR, "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/base_label"),
-        "WS24_boiling": os.path.join(ROOT_DIR, "results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/boiling_label")
+        "TSD": [
+            os.path.join(base_dir, f"TSD/RAC_and_zeo_features_with_id_prop{seed}/Label")
+            for seed in rand_seeds
+        ],
+        "SSD": [
+            os.path.join(base_dir, f"SSD/RAC_and_zeo_features_with_id_prop{seed}/Label") 
+            for seed in rand_seeds
+        ],
+        "WS24_water": [
+            os.path.join(base_dir, f"WS24/RAC_and_zeo_features_with_id_prop{seed}/water_label")
+            for seed in rand_seeds
+        ],
+        "WS24_water4": [
+            os.path.join(base_dir, f"WS24/RAC_and_zeo_features_with_id_prop{seed}/water4_label")
+            for seed in rand_seeds
+        ],
+        "WS24_acid": [
+            os.path.join(base_dir, f"WS24/RAC_and_zeo_features_with_id_prop{seed}/acid_label")
+            for seed in rand_seeds
+        ],
+        "WS24_base": [
+            os.path.join(base_dir, f"WS24/RAC_and_zeo_features_with_id_prop{seed}/base_label")
+            for seed in rand_seeds
+        ],
+        "WS24_boiling": [
+            os.path.join(base_dir, f"WS24/RAC_and_zeo_features_with_id_prop{seed}/boiling_label")
+            for seed in rand_seeds
+        ]
     }
 
     # Default tasks
@@ -221,25 +319,27 @@ def get_default_config() -> Dict[str, Any]:
     }
 
 def process_ml_results(
-    ml_results_dirs: Dict[str, str],
+    ml_results_dirs: Dict[str, Union[str, List[str]]],
     tasks: List[str],
     task_types: Dict[str, str],
     output_dir: str = DEFAULT_OUTPUT_DIR,
     split: str = "test",
     output_filename: Optional[str] = None,
-    include_reference: bool = True
+    include_reference: bool = True,
+    include_std: bool = True
 ) -> Optional[pd.DataFrame]:
     """
     Process ML model results across specified tasks.
 
     Args:
-        ml_results_dirs: Dictionary mapping task names to result directories
+        ml_results_dirs: Dictionary mapping task names to result directories (str or list of str)
         tasks: List of task names to process
         task_types: Dictionary mapping task names to task types ('regression' or 'classification')
         output_dir: Directory to save output files
-        split: Data split to analyze ('test' or 'external_test')
+        split: Data split to analyze ('test', 'validation', or 'external_test')
         output_filename: Optional custom filename for the output Excel file
         include_reference: Whether to include reference results from literature
+        include_std: Whether to include standard deviations when multiple results are available
 
     Returns:
         DataFrame with summarized results
@@ -252,7 +352,7 @@ def process_ml_results(
             print(f"Warning: No results directory specified for task {task}")
             continue
         
-        results_dir = ml_results_dirs[task]
+        results_dir = ml_results_dirs[task]  # This can be a single string or a list of strings
         task_type = task_types.get(task, "classification")
         
         # Process ML model results
@@ -260,7 +360,8 @@ def process_ml_results(
             results_dir,
             task,
             task_type,
-            split
+            split,
+            include_std
         )
         
         all_results.extend(task_results)
@@ -279,11 +380,36 @@ def process_ml_results(
 
     df_results = pd.DataFrame(all_results)
 
-    # Round numeric results
+    # Round numeric results and format standard deviations
     numeric_cols = ["R2", "MAE", "ACC", "BACC", "AUROC"]
-    for col in numeric_cols:
-        if col in df_results.columns:
+    std_cols = []
+    
+    # Round all numeric columns (both metrics and their standard deviations)
+    for col in df_results.columns:
+        # Process standard metric columns
+        if (col in numeric_cols) and (col in df_results.columns):
             df_results[col] = df_results[col].apply(lambda x: round(float(x), 4) if pd.notnull(x) else x)
+            
+        # Process standard deviation columns
+        elif col.endswith('_std') and col.replace('_std', '') in numeric_cols:
+            std_cols.append(col)
+            df_results[col] = df_results[col].apply(lambda x: round(float(x), 4) if pd.notnull(x) else x)
+    
+    # Create new columns that combine mean ± std for better readability
+    for col in numeric_cols:
+        std_col = f"{col}_std"
+        if std_col in df_results.columns:
+            # Create a column with formatted values like "0.75 ± 0.02"
+            formatted_col = f"{col}_formatted"
+            df_results[formatted_col] = df_results.apply(
+                lambda row: f"{row[col]:.4f} ± {row[std_col]:.4f}" if pd.notnull(row[col]) and pd.notnull(row[std_col]) else row[col],
+                axis=1
+            )
+            
+            # If include_std is False, remove the std columns but keep formatted columns
+            if not include_std:
+                std_cols_to_drop = [c for c in df_results.columns if c.endswith('_std')]
+                df_results = df_results.drop(columns=std_cols_to_drop)
 
     # Set Task and Model as index
     df_results["Task"] = df_results["Task"].apply(lambda x: str(x).strip())
@@ -341,14 +467,26 @@ def process_ml_results(
             continue
             
         best_model = task_results.loc[best_idx, "Model"]
-        model_file = os.path.join(ml_results_dirs[task], f"{split}_predicted_{best_model}.csv")
         
-        if os.path.exists(model_file):
+        # Handle results directory which could be a single path or a list of paths
+        results_paths = ml_results_dirs[task]
+        if not isinstance(results_paths, list):
+            results_paths = [results_paths]  # Convert single path to a list
+        
+        # Try to find the model file in any of the provided paths
+        model_file = None
+        for path in results_paths:
+            candidate_file = os.path.join(path, f"{split}_predicted_{best_model}.csv")
+            if os.path.exists(candidate_file):
+                model_file = candidate_file
+                break
+        
+        if model_file and os.path.exists(model_file):
             df = pd.read_csv(model_file)
             # Save in CGCNN format
             cgcnn_result_file = os.path.join(output_dir, f"{split}_results_{task}.csv")
             df.to_csv(cgcnn_result_file, index=False)
-            print(f"Saved best ML model results for task {task} to {cgcnn_result_file}")
+            print(f"Saved best ML model results for task {task} to {cgcnn_result_file} (from {model_file})")
 
     return df_final
 
@@ -366,6 +504,8 @@ def main():
                       help="Exclude reference results from literature")
     parser.add_argument("--ml_dir", type=str, default=None,
                       help="Base directory for ML model results (overrides config)")
+    parser.add_argument("--no_std", action="store_true",
+                      help="Do not include standard deviation columns in output")
 
     args = parser.parse_args()
 
@@ -404,10 +544,21 @@ def main():
         ml_results_dirs = {}
         for task in config["tasks"]:
             # Extract the task-specific subdirectory from the default paths
-            default_dir = config["ml_results_dirs"][task]
-            rel_path = os.path.relpath(default_dir, ROOT_DIR)
-            # Construct a new path with the specified base directory
-            ml_results_dirs[task] = os.path.join(args.ml_dir, rel_path)
+            default_dirs = config["ml_results_dirs"][task]
+            
+            # Handle both single path and list of paths
+            if isinstance(default_dirs, list):
+                new_paths = []
+                for default_dir in default_dirs:
+                    rel_path = os.path.relpath(default_dir, ROOT_DIR)
+                    # Construct a new path with the specified base directory
+                    new_paths.append(os.path.join(args.ml_dir, rel_path))
+                ml_results_dirs[task] = new_paths
+            else:
+                # Single path case
+                rel_path = os.path.relpath(default_dirs, ROOT_DIR)
+                ml_results_dirs[task] = os.path.join(args.ml_dir, rel_path)
+                
         config["ml_results_dirs"] = ml_results_dirs
 
     # Process ML model results
@@ -418,7 +569,8 @@ def main():
         args.output_dir,
         args.split,
         args.output_filename,
-        not args.no_reference
+        not args.no_reference,
+        not args.no_std
     )
 
     # Print summary

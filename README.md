@@ -43,6 +43,24 @@ pip install -r requirements.txt
 mkdir -p data/raw_data
 ```
 
+## Model Evaluation Tools
+
+### 模型性能比较脚本
+
+本项目包含两个用于比较模型性能的脚本：
+
+1. `src/experiment/compare_model_performance.py`: 基础版本，处理单路径模型评估
+2. `src/experiment/compare_model_performance_repeat.py`: 增强版本，支持将Path配置为列表，可计算多次运行结果的均值和标准差
+
+使用方法示例：
+```bash
+# 标准版本
+python src/experiment/compare_model_performance.py --config_file configs/model_comparison_config.yaml
+
+# 支持重复实验的增强版本
+python src/experiment/compare_model_performance_repeat.py --config_file configs/model_comparison_config_repeat.yaml
+```
+
 ## Raw data
 The raw data is stored in the `raw_data` folder, which can get from literature. 
 ### TSD & SSD 

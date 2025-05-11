@@ -1,0 +1,285 @@
+# Model comparison configuration file
+# This file contains model paths and display names for performance comparison
+
+# Model directories mapping
+model_dirs_map:
+
+  # Baseline models of TSD
+  Baseline-TSD-RF:
+    Path: [
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand0/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
+      ]
+    DisplayName: Baseline-RF
+    Model: RandomForestRegressor
+
+  Baseline-TSD-GP:
+    Path: [
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand0/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
+      ]
+    DisplayName: Baseline-GP
+    Model: GaussianProcessRegressor
+
+  Baseline-TSD-SVM:
+    Path: [
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand0/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
+      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
+      ]
+    DisplayName: Baseline-SVM
+    Model: SVR
+
+  # Baseline models of SSD
+  Baseline-SSD-RF:
+    Path: [
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand0/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
+    ]
+    DisplayName: Baseline-RF
+    Model: RandomForestRegressor
+
+  Baseline-SSD-GP:
+    Path: [
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand0/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
+    ]
+    DisplayName: Baseline-GP
+    Model: GaussianProcessRegressor
+
+  Baseline-SSD-SVM:
+    Path: [
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand0/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
+      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
+    ]
+    DisplayName: Baseline-SVM
+    Model: SVC
+
+  # Baseline models of WS24-water
+  Baseline-WS24_water-RF:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water_label,
+    ]
+    DisplayName: Baseline-RF
+    Model: RandomForestClassifier
+
+  Baseline-WS24_water-GP:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water_label,
+    ]
+    DisplayName: Baseline-GP
+    Model: GaussianProcessClassifier
+
+  Baseline-WS24_water-SVM:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water_label,
+    ]
+    DisplayName: Baseline-SVM
+    Model: SVC
+  
+  # Baseline models of WS24-water4
+  Baseline-WS24_water4-RF:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water4_label,
+    ]
+    DisplayName: Baseline-RF
+    Model: RandomForestClassifier
+
+  Baseline-WS24_water4-GP:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water4_label,
+    ]
+    DisplayName: Baseline-GP
+    Model: GaussianProcessClassifier
+
+  Baseline-WS24_water4-SVM:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water4_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water4_label,
+    ]
+    DisplayName: Baseline-SVM
+    Model: SVC
+
+  # Baseline models of WS24-acid
+  Baseline-WS24_acid-RF:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/acid_label,
+    ]
+    DisplayName: Baseline-RF
+    Model: RandomForestClassifier
+
+  Baseline-WS24_acid-GP:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/acid_label,
+    ]
+    DisplayName: Baseline-GP
+    Model: GaussianProcessClassifier
+
+  Baseline-WS24_acid-SVM:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/acid_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/acid_label,
+    ]
+    DisplayName: Baseline-SVM
+    Model: SVC
+  
+  # Baseline models of WS24-base
+  Baseline-WS24_base-RF:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/base_label,
+    ]
+    DisplayName: Baseline-RF
+    Model: RandomForestClassifier
+
+  Baseline-WS24_base-GP:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/base_label,
+    ]
+    DisplayName: Baseline-GP
+    Model: GaussianProcessClassifier
+
+  Baseline-WS24_base-SVM:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/base_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/base_label,
+    ]
+    DisplayName: Baseline-SVM
+    Model: SVC
+  
+  # Baseline models of WS24-boiling
+  Baseline-WS24_boiling-RF:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/boiling_label,
+    ]
+    DisplayName: Baseline-RF
+    Model: RandomForestClassifier
+
+  Baseline-WS24_boiling-GP:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/boiling_label,
+    ]
+    DisplayName: Baseline-GP
+    Model: GaussianProcessClassifier
+    
+  Baseline-WS24_boiling-SVM:
+    Path: [
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand0/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/boiling_label,
+      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/boiling_label,
+    ]
+    DisplayName: Baseline-SVM
+    Model: SVC
+
+# Tasks to evaluate
+tasks:
+  - TSD
+  - SSD
+  - WS24_water
+  - WS24_water4
+  - WS24_acid
+  - WS24_base
+  - WS24_boiling
+
+# Task types (regression or classification)
+task_types:
+  TSD: regression
+  SSD: classification
+  WS24_water: classification
+  WS24_water4: classification
+  WS24_acid: classification
+  WS24_base: classification
+  WS24_boiling: classification
+
