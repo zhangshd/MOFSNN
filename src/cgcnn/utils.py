@@ -2,13 +2,14 @@
 Author: zhangshd
 Date: 2024-08-17 19:08:40
 LastEditors: zhangshd
-LastEditTime: 2025-04-24 18:28:44
+LastEditTime: 2025-05-12 19:04:46
 '''
 
 import os
 import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
+sys.path.append(SCRIPT_DIR)
 from pathlib import Path
 import pytorch_lightning.callbacks as plc
 import yaml

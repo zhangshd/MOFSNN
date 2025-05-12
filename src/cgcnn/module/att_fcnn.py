@@ -6,10 +6,10 @@ LastEditTime: 2024-08-17 19:17:40
 '''
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import torch
 import torch.nn as nn
-from module.layers import OutputLayer, SelfAttention, ExternalAttention
+from cgcnn.module.layers import OutputLayer, SelfAttention, ExternalAttention
 from torch.nn import init
 
 class AttFCNN(nn.Module):

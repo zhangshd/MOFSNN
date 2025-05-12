@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-15 15:51:31
 LastEditors: zhangshd
-LastEditTime: 2025-05-07 17:03:37
+LastEditTime: 2025-05-12 18:05:26
 '''
 import os
 import time
@@ -58,6 +58,21 @@ def split_train_test(df, test_size=0.1, group_column="", random_state=0):
     print(f'Train test split successfully: train/test = {len(train_index)}/{len(test_index)}')
     return train_index, test_index
 
+def plot_roc_curve(fpr, tpr, roc_auc, title=None, outfile=None, ax=None):
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(6, 6))
+    ax.plot(fpr, tpr, label=f'AUC = {roc_auc:.2f}')
+    ax.plot([0, 1], [0, 1], 'r--')
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.05])
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    if title is not None:
+        ax.set_title(title)
+    ax.legend(loc="lower right")
+    if outfile is not None:
+        plt.savefig(outfile, dpi=300, bbox_inches='tight', format='png')
+    return fig, ax
 
 def plot_scatter(targets, predictions, title: str=None, metrics: dict=None, outfile: str=None):
 
@@ -77,7 +92,7 @@ def plot_scatter(targets, predictions, title: str=None, metrics: dict=None, outf
     ax.set_xlim(min_value - offset, max_value + offset)
     ax.set_ylim(min_value - offset, max_value + offset)
 
-    ax.plot([min_value, max_value], [min_value, max_value], 'r--')  # 'r--'表示红色虚线
+    ax.plot([min_value, max_value], [min_value, max_value], 'r--')  # 'r--' means red dashed line
 
     if metrics:
         text_content = ""
@@ -468,29 +483,27 @@ class RegressionModel(BaseModel):
         if hasattr(self, "test_X_selected") and self.test_y is not None:
             self.test_metrics_df = pd.DataFrame(test_metrics_all, columns=["te_" + s for s in metrics_list],
                                                 index=[f'fold_{i + 1}' for i in range(len(self.train_val_idxs))])
-            metrics_dfs.append(self.test_metrics_df)
-            
-            # 保存原始预测值
-            original_pred = test_pred_all[0].squeeze() if len(test_pred_all) == 1 else None
+            metrics_dfs.append(self.test_metrics_df)                # Save original prediction values
+                original_pred = test_pred_all[0].squeeze() if len(test_pred_all) == 1 else None
             
             self.test_pred = np.mean(test_pred_all, axis=0)
             
-            # 计算原始预测值和平均预测值的差异
+            # Calculate the difference between original predictions and average predictions
             if original_pred is not None:
                 saved_pred = self.test_pred.squeeze()
                 diff = np.abs(original_pred - saved_pred).max()
-                print(f"预测值最大差异: {diff}")
+                print(f"Maximum prediction difference: {diff}")
                 
-                # 打印原始指标和重新计算的指标
+                # Print original metrics and recalculated metrics
                 original_metrics = test_metrics_all[0]
                 recalculated_metrics = self.cal_metrics(self.test_y.squeeze(), self.test_pred.squeeze())
                 
-                print(f"原始指标: R2={original_metrics[0]}, RMSE={original_metrics[1]}, MAE={original_metrics[2]}")
-                print(f"重新计算的指标: R2={recalculated_metrics[0]}, RMSE={recalculated_metrics[1]}, MAE={recalculated_metrics[2]}")
+                print(f"Original metrics: R2={original_metrics[0]}, RMSE={original_metrics[1]}, MAE={original_metrics[2]}")
+                print(f"Recalculated metrics: R2={recalculated_metrics[0]}, RMSE={recalculated_metrics[1]}, MAE={recalculated_metrics[2]}")
                 
-                # 计算指标差异
+                # Calculate metric differences
                 metrics_diff = [abs(original_metrics[i] - recalculated_metrics[i]) for i in range(3)]
-                print(f"指标差异: R2差={metrics_diff[0]}, RMSE差={metrics_diff[1]}, MAE差={metrics_diff[2]}")
+                print(f"Metric differences: R2 diff={metrics_diff[0]}, RMSE diff={metrics_diff[1]}, MAE diff={metrics_diff[2]}")
             
             df_te_pred = pd.DataFrame({
                 "GroundTruth": self.test_y.squeeze(),
@@ -500,7 +513,7 @@ class RegressionModel(BaseModel):
                 test_pred_file = os.path.join(saved_dir, f"test_predicted_{self.model_name}.csv")
                 df_te_pred.to_csv(test_pred_file, index=False)
                 
-                # 也保存原始预测值用于对比
+                # Also save original predictions for comparison
                 if original_pred is not None:
                     df_original_pred = pd.DataFrame({
                         "GroundTruth": self.test_y.squeeze(),
@@ -508,7 +521,7 @@ class RegressionModel(BaseModel):
                     })
                     original_test_pred_file = os.path.join(saved_dir, f"original_test_predicted_{self.model_name}.csv")
                     df_original_pred.to_csv(original_test_pred_file, index=False)
-                    print(f"已保存原始预测值到 {original_test_pred_file}")
+                    print(f"Original prediction values saved to {original_test_pred_file}")
 
         all_metrics_df = pd.concat(metrics_dfs, axis=1).T
         all_metrics_df['mean'] = all_metrics_df.mean(axis=1)

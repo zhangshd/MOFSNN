@@ -8,14 +8,14 @@ LastEditTime: 2024-08-17 19:32:49
 
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import random
 
 import torch
 import torch.nn as nn
 from torch.nn import init
-from module.layers import ConvLayer, OutputLayer, AttentionPooling, GlobalAvgPool, SelfAttention, ExternalAttention
+from cgcnn.module.layers import ConvLayer, OutputLayer, AttentionPooling, GlobalAvgPool, SelfAttention, ExternalAttention
 nn.MultiheadAttention
 
 

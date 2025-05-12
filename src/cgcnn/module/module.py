@@ -7,7 +7,7 @@ LastEditTime: 2024-08-17 19:34:58
 
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import torch
 from torch import nn
 import pytorch_lightning as pl
@@ -16,8 +16,8 @@ from torchmetrics import Accuracy, MatthewsCorrCoef, F1Score, AUROC
 import torch.optim as optim
 import torch.optim.lr_scheduler as lrs
 import warnings
-from module.module_utils import plot_confusion_matrix, plot_roc_curve, plot_scatter
-from module.module_utils import group_model_params, DWALoss
+from cgcnn.module.module_utils import plot_confusion_matrix, plot_roc_curve, plot_scatter
+from cgcnn.module.module_utils import group_model_params, DWALoss
 import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix, roc_curve

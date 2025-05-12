@@ -8,11 +8,11 @@ LastEditTime: 2024-08-17 19:33:30
 
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import torch
 import torch.nn as nn
-from module.layers import ConvLayer, OutputLayer
+from cgcnn.module.layers import ConvLayer, OutputLayer
 from torch.nn import init
 
 class CrystalGraphConvNet(nn.Module):

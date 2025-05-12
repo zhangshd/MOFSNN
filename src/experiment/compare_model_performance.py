@@ -661,7 +661,7 @@ def plot_bars(df: pd.DataFrame, figsize: Tuple[int, int]=(14, 8),
     ax2.set_ylabel('ACC(→)', color='tab:green', fontsize=label_size, fontweight='bold')
     ax2.tick_params(axis='y', labelcolor='tab:green', labelsize=tick_size)
     ax2.tick_params(axis='x', labelsize=tick_size)
-    ax2.set_ylim(0, 1.1)
+    ax2.set_ylim(0, 1.0)
     if ax2 is not ax1:
         ax2.grid(False)
 
@@ -788,9 +788,9 @@ def main():
                       help="Format to save visualization figures (default: both tif and svg)")
     parser.add_argument("--fig_dpi", type=int, default=300,
                       help="DPI for saved figures (default: 300)")
-    parser.add_argument("--mae_min", type=float, default=10,
+    parser.add_argument("--mae_min", type=float, default=20,
                       help="Minimum value for MAE y-axis")
-    parser.add_argument("--mae_max", type=float, default=65,
+    parser.add_argument("--mae_max", type=float, default=70,
                       help="Maximum value for MAE y-axis")
     parser.add_argument("--bar_width", type=float, default=0.8,
                       help="Width of bars in the plot")
