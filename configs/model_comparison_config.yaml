@@ -4,6 +4,12 @@
 # Model directories mapping
 model_dirs_map:
 
+  # Reference models
+  Reference:
+    Path: results/reference_pred
+    DisplayName: Reference
+    Model: Reference-ML
+
   # Baseline models
   Baseline-TSD:
     Path: results/ml_models/TSD/RAC_and_zeo_features_with_id_prop/Label
@@ -180,6 +186,7 @@ task_types:
 comparison_groups:
   # Standard comparison between model families
   standard:
+    - Reference
     - Baseline-TSD
     - Baseline-SSD
     - Baseline-WS24_water

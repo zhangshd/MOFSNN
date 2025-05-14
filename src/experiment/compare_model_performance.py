@@ -418,7 +418,7 @@ def compare_model_performance(
     numeric_cols = ["R2", "MAE", "ACC", "BACC", "AUROC"]
     for col in numeric_cols:
         if col in df_results.columns:
-            df_results[col] = df_results[col].apply(lambda x: round(float(x), 4) if pd.notnull(x) else x)
+            df_results[col] = df_results[col].apply(lambda x: round(float(x), 2) if pd.notnull(x) else x)
 
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
@@ -590,6 +590,7 @@ def plot_bars(df: pd.DataFrame, figsize: Tuple[int, int]=(14, 8),
         matplotlib Figure object
     """
     mae_lim = kwargs.pop('mae_lim', (10, 60))
+    acc_lim = kwargs.pop('acc_lim', (0, 1.0))
     annotate_size = kwargs.pop('annotate_size', tick_size-1)
 
     # Set plot style
@@ -661,7 +662,7 @@ def plot_bars(df: pd.DataFrame, figsize: Tuple[int, int]=(14, 8),
     ax2.set_ylabel('ACC(→)', color='tab:green', fontsize=label_size, fontweight='bold')
     ax2.tick_params(axis='y', labelcolor='tab:green', labelsize=tick_size)
     ax2.tick_params(axis='x', labelsize=tick_size)
-    ax2.set_ylim(0, 1.0)
+    ax2.set_ylim(*acc_lim)
     if ax2 is not ax1:
         ax2.grid(False)
 
@@ -731,6 +732,7 @@ def generate_visualization(df_results: pd.DataFrame,
         'tick_size': 14,
         'bar_width': 0.5,
         'mae_lim': (10, 60),
+        'acc_lim': (0, 1.0),
         'annotate_size': 11
     }
 
@@ -792,6 +794,12 @@ def main():
                       help="Minimum value for MAE y-axis")
     parser.add_argument("--mae_max", type=float, default=70,
                       help="Maximum value for MAE y-axis")
+    parser.add_argument("--acc_min", type=float, default=0.0,
+                      help="Minimum value for ACC y-axis")
+    parser.add_argument("--acc_max", type=float, default=1.0,
+                      help="Maximum value for ACC y-axis")
+    parser.add_argument("--annotate_size", type=int, default=8,
+                        help="Font size for annotations in the plot")
     parser.add_argument("--bar_width", type=float, default=0.8,
                       help="Width of bars in the plot")
 
@@ -850,7 +858,9 @@ def main():
             # Set visualization parameters
             viz_params = {
                 'mae_lim': (args.mae_min, args.mae_max),
-                'bar_width': args.bar_width
+                'acc_lim': (args.acc_min, args.acc_max),
+                'bar_width': args.bar_width,
+                'annotate_size': args.annotate_size
             }
 
             # Generate and save visualization with model_order
