@@ -309,7 +309,7 @@ def main():
                       help="DPI for saved figures (default: 300)")
     parser.add_argument("--mae_min", type=float, default=10,
                       help="Minimum value for MAE y-axis")
-    parser.add_argument("--mae_max", type=float, default=65,
+    parser.add_argument("--mae_max", type=float, default=60,
                       help="Maximum value for MAE y-axis")
     parser.add_argument("--bar_width", type=float, default=0.8,
                       help="Width of bars in the plot")
