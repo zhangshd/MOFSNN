@@ -30,6 +30,7 @@ from experiment.compare_model_performance import (
 
 # Default paths
 DEFAULT_OUTPUT_DIR = os.path.join(ROOT_DIR, "results/model_comparison/ml")
+DEFAULT_MODEL_CONFIG_FILE = os.path.join(ROOT_DIR, "configs/ml_model_config.json")
 ALGORITHM_MAP = {
     "GaussianProcessClassifier": "GP",
     "RandomForestClassifier": "RF",
@@ -494,9 +495,9 @@ def main():
     parser = ArgumentParser(description="Process ML model results across tasks and save summary to Excel")
     parser.add_argument("--output_dir", type=str, default=DEFAULT_OUTPUT_DIR,
                       help=f"Directory to save comparison results (default: {DEFAULT_OUTPUT_DIR})")
-    parser.add_argument("--split", type=str, default="test", choices=["test", "external_test", "validation"],
+    parser.add_argument("--split", type=str, default="test", choices=["test", "external_test"],
                       help="Data split to analyze (default: test)")
-    parser.add_argument("--config_file", type=str,
+    parser.add_argument("--config_file", type=str, default=DEFAULT_MODEL_CONFIG_FILE,
                       help="Optional JSON/YAML file with model paths and configurations")
     parser.add_argument("--output_filename", type=str, default=None,
                       help="Custom filename for the output Excel file")

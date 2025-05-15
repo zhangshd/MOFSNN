@@ -12,8 +12,11 @@ import json
 import yaml
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from argparse import ArgumentParser
 from typing import Dict, List, Optional, Any, Union, Tuple
+from matplotlib.figure import Figure
 
 # Get the directory of the script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -286,6 +289,304 @@ def compare_model_performance_repeat(
 
     return df_results
 
+def plot_bars_with_error(df: pd.DataFrame, figsize: Tuple[int, int]=(14, 8),
+              label_size: int=16, tick_size: int=14, bar_width: float=0.5, **kwargs) -> Figure:
+    """
+    Create bar plots for model performance comparison with error bars.
+
+    Args:
+        df: DataFrame with columns 'Task', 'Model', 'Performance', and optionally 'Performance_std'
+        figsize: Figure size as (width, height)
+        label_size: Font size for labels
+        tick_size: Font size for ticks
+        bar_width: Width of bars
+        **kwargs: Additional keyword arguments:
+            - mae_lim: Tuple for MAE y-axis limits (min, max)
+            - annotate_size: Font size for annotations
+
+    Returns:
+        matplotlib Figure object
+    """
+    mae_lim = kwargs.pop('mae_lim', (10, 60))
+    acc_lim = kwargs.pop('acc_lim', (0, 1.0))
+    annotate_size = kwargs.pop('annotate_size', tick_size-1)
+    annotate = kwargs.pop('annotate', False)
+
+
+    # Set plot style
+    sns.set_style("whitegrid")
+
+    # Create figure and axes
+    fig, ax1 = plt.subplots(figsize=figsize)
+    df = df[df.duplicated(subset=['Task'], keep=False)]  # Remove those groups with only one model
+
+    if "TSD" in df['Task'].unique():
+        # Plot MAE bar chart for TSD
+        tsd_data = df[df['Task'] == 'TSD']
+        
+        # Extract standard deviation if available
+        if 'Performance_std' in tsd_data.columns:
+            yerr = tsd_data['Performance_std'].values
+        else:
+            yerr = None
+        
+        tsd_plot = sns.barplot(
+            data=tsd_data,
+            x='Task',
+            y='Performance',
+            hue='Model',
+            dodge=True,
+            ax=ax1,
+            palette='Blues',
+            width=bar_width
+        )
+        
+        # Add error bars if standard deviation is available
+        if yerr is not None:
+            # Get all unique tasks in the original dataframe to determine correct positions
+            all_unique_tasks = df['Task'].unique()
+            models = tsd_data['Model'].unique()
+            num_models = len(models)
+            
+            # Calculate positions for each bar
+            width = bar_width / num_models
+            offsets = np.linspace(-bar_width/2 + width/2, bar_width/2 - width/2, num_models)
+            
+            for task in tsd_data['Task'].unique():
+                # Find the correct position on the x-axis
+                task_idx = np.where(all_unique_tasks == task)[0][0]
+                task_data = tsd_data[tsd_data['Task'] == task]
+                
+                for i, model in enumerate(models):
+                    model_task_data = task_data[task_data['Model'] == model]
+                    if not model_task_data.empty:
+                        x_pos = task_idx + offsets[i]
+                        yerr_val = model_task_data['Performance_std'].values[0] if 'Performance_std' in model_task_data.columns else 0
+                        ax1.errorbar(
+                            x=x_pos,
+                            y=model_task_data['Performance'].values[0],
+                            yerr=yerr_val,
+                            fmt='none',
+                            ecolor='gray',
+                            capsize=5
+                        )
+                        if 'Performance_std' in model_task_data.columns:
+                            print(f"TSD error bar: task={task}, model={model}, x={x_pos}, y={model_task_data['Performance'].values[0]}, yerr={yerr_val}")
+
+        # Annotate bars with their values
+        if annotate:
+            for p in tsd_plot.patches:
+                if p.get_height() == 0:
+                    continue
+                height = p.get_height()
+                tsd_plot.annotate(f'{height:.1f}', (p.get_x() + p.get_width() / 2., height),
+                            ha='center', va='center', xytext=(0, 9), textcoords='offset points',
+                            fontsize=annotate_size, color='blue')
+
+        # Set left axis label
+        ax1.set_xlabel('Task', fontsize=label_size, fontweight='bold')
+        ax1.set_ylabel('MAE(←)', color='tab:blue', fontsize=label_size, fontweight='bold')
+        ax1.tick_params(axis='y', labelcolor='tab:blue', labelsize=tick_size)
+        ax1.tick_params(axis='x', labelsize=tick_size)
+        handles1, labels1 = ax1.get_legend_handles_labels()
+        ax1.legend(loc='upper left', fontsize=tick_size-1)
+        ax1.set_ylim(*mae_lim)
+
+        # Create second y-axis
+        ax2 = ax1.twinx()
+    else:
+        ax2 = ax1
+
+    # Plot ACC bar chart for other tasks
+    acc_data = df[df['Task'] != 'TSD']
+    
+    # Extract standard deviation if available
+    if 'Performance_std' in acc_data.columns:
+        yerr = acc_data['Performance_std'].values
+    else:
+        yerr = None
+    
+    acc_plot = sns.barplot(
+        data=acc_data,
+        x='Task',
+        y='Performance',
+        hue='Model',
+        dodge=True,
+        ax=ax2,
+        palette='Greens',
+        width=bar_width
+    )
+    
+    # Add error bars if standard deviation is available
+    if yerr is not None:
+        # Get all unique tasks in the original dataframe to determine correct positions
+        all_unique_tasks = df['Task'].unique()
+        models = acc_data['Model'].unique()
+        num_models = len(models)
+        
+        # For each classification task
+        for task in acc_data['Task'].unique():
+            # Find the correct position on the x-axis (considering TSD might be before it)
+            task_idx = np.where(all_unique_tasks == task)[0][0]
+            task_data = acc_data[acc_data['Task'] == task]
+            
+            # Calculate positions for each bar
+            width = bar_width / num_models
+            offsets = np.linspace(-bar_width/2 + width/2, bar_width/2 - width/2, num_models)
+            
+            for i, model in enumerate(models):
+                model_task_data = task_data[task_data['Model'] == model]
+                if not model_task_data.empty:
+                    x_pos = task_idx + offsets[i]
+                    yerr_val = model_task_data['Performance_std'].values[0] if 'Performance_std' in model_task_data.columns else 0
+                    ax2.errorbar(
+                        x=x_pos,
+                        y=model_task_data['Performance'].values[0],
+                        yerr=yerr_val,
+                        fmt='none',
+                        ecolor='gray',
+                        capsize=5
+                    )
+                    if 'Performance_std' in model_task_data.columns:
+                        print(f"ACC error bar: task={task}, model={model}, x={x_pos}, y={model_task_data['Performance'].values[0]}, yerr={yerr_val}")
+
+    # Annotate bars with their values
+    if annotate:
+        for p in acc_plot.patches:
+            if p.get_height() == 0:
+                continue
+            height = p.get_height()
+            acc_plot.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height),
+                        ha='center', va='center', xytext=(0, 9), textcoords='offset points',
+                        fontsize=annotate_size, color='green')
+
+    # Set right axis label
+    ax2.set_xlabel('Task', fontsize=label_size, fontweight='bold')
+    ax2.set_ylabel('ACC(→)', color='tab:green', fontsize=label_size, fontweight='bold')
+    ax2.tick_params(axis='y', labelcolor='tab:green', labelsize=tick_size)
+    ax2.tick_params(axis='x', labelsize=tick_size)
+    ax2.set_ylim(*acc_lim)
+    if ax2 is not ax1:
+        ax2.grid(False)
+
+    # Handle legend
+    handles2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(loc='upper right', fontsize=tick_size-1)
+
+    plt.tight_layout()
+    return fig
+
+def generate_visualization_with_error(df_results: pd.DataFrame,
+                              fig_dir: Optional[str] = None,
+                              split: str = "test",
+                              fig_format: str = "both",
+                              fig_dpi: int = 200,
+                              **kwargs) -> Optional[Figure]:
+    """
+    Generate and save visualization for model performance comparison with error bars.
+
+    Args:
+        df_results: DataFrame with performance results
+        fig_dir: Directory to save figures (if None, figures won't be saved)
+        split: Data split name for filename
+        fig_format: Format to save figures ("tif", "svg", "both", or "png")
+        fig_dpi: DPI for saved figures
+        **kwargs: Additional parameters to pass to plot_bars_with_error function
+
+    Returns:
+        matplotlib Figure object or None if no visualization created
+    """
+    if df_results is None or df_results.empty:
+        print("Error: No results available for visualization")
+        return None
+
+    # Create a copy and reset index for plotting
+    df_plot = df_results.reset_index().copy()
+
+    # Preprocess data for visualization - separate TSD and other tasks
+    tsd_data = pd.DataFrame()
+    other_tasks_data = pd.DataFrame()
+
+    # For TSD (regression task), use MAE as performance metric
+    if 'TSD' in df_plot['Task'].unique() and 'MAE' in df_results.columns:
+        tsd_columns = ['Task', 'Model', 'MAE']
+        if 'MAE_std' in df_results.columns:
+            tsd_columns.append('MAE_std')
+        tsd_data = df_plot.loc[df_plot['Task'] == 'TSD', tsd_columns].copy()
+        
+        # Rename columns for unified processing
+        rename_dict = {'MAE': 'Performance'}
+        if 'MAE_std' in df_results.columns:
+            rename_dict['MAE_std'] = 'Performance_std'
+        tsd_data = tsd_data.rename(columns=rename_dict).dropna(subset=['Performance'])
+
+    # For classification tasks, use ACC as performance metric
+    if 'ACC' in df_results.columns:
+        acc_columns = ['Task', 'Model', 'ACC']
+        if 'ACC_std' in df_results.columns:
+            acc_columns.append('ACC_std')
+        other_tasks_data = df_plot.loc[df_plot['Task'] != 'TSD', acc_columns].copy()
+        
+        # Rename columns for unified processing
+        rename_dict = {'ACC': 'Performance'}
+        if 'ACC_std' in df_results.columns:
+            rename_dict['ACC_std'] = 'Performance_std'
+        other_tasks_data = other_tasks_data.rename(columns=rename_dict).dropna(subset=['Performance'])
+
+    # Combine performance metrics for visualization
+    combined_data = pd.concat([tsd_data, other_tasks_data])
+
+    # Clean data
+    combined_data = combined_data.dropna(subset=['Performance'])
+
+    if combined_data.empty:
+        print("Error: No valid data for visualization")
+        return None
+
+    # Default visualization parameters
+    viz_params = {
+        'figsize': (14, 8),
+        'label_size': 16,
+        'tick_size': 14,
+        'bar_width': 0.5,
+        'mae_lim': (10, 60),
+        'acc_lim': (0, 1.0),
+        'annotate_size': 11
+    }
+
+    # Update with any provided kwargs
+    viz_params.update(kwargs)
+
+    # Generate visualization
+    fig = plot_bars_with_error(combined_data, **viz_params)
+
+    # Save figure if directory is specified
+    if fig_dir:
+        os.makedirs(fig_dir, exist_ok=True)
+
+        base_filename = f"model_comparison_vis_with_error_{split}"
+
+        # Save in specified format(s)
+        if fig_format in ["tif", "both"]:
+            tif_path = os.path.join(fig_dir, f"{base_filename}.tif")
+            fig.savefig(tif_path, dpi=96)
+            print(f"Figure saved as {tif_path}")
+
+        if fig_format in ["svg", "both"]:
+            svg_path = os.path.join(fig_dir, f"{base_filename}.svg")
+            fig.savefig(svg_path, dpi=fig_dpi, transparent=True)
+            print(f"Figure saved as {svg_path}")
+
+        if fig_format == "png":
+            png_path = os.path.join(fig_dir, f"{base_filename}.png")
+            fig.savefig(png_path, dpi=fig_dpi)
+            print(f"Figure saved as {png_path}")
+
+    # Always close figure without showing
+    plt.close(fig)
+
+    return fig
+
 def main():
     parser = ArgumentParser(description="Compare model performance across tasks with support for multiple model paths")
     parser.add_argument("--output_dir", type=str, default=DEFAULT_OUTPUT_DIR,
@@ -311,6 +612,14 @@ def main():
                       help="Minimum value for MAE y-axis")
     parser.add_argument("--mae_max", type=float, default=60,
                       help="Maximum value for MAE y-axis")
+    parser.add_argument("--acc_min", type=float, default=0.0,
+                      help="Minimum value for ACC y-axis")
+    parser.add_argument("--acc_max", type=float, default=1.0,
+                      help="Maximum value for ACC y-axis")
+    parser.add_argument("--annotate", action="store_true", 
+                        help="Whether to annotate bars with their values")
+    parser.add_argument("--annotate_size", type=int, default=8,
+                        help="Font size for annotations in the plot")
     parser.add_argument("--bar_width", type=float, default=0.8,
                       help="Width of bars in the plot")
     parser.add_argument("--no_std", action="store_true",
@@ -369,10 +678,22 @@ def main():
             # Set visualization parameters
             viz_params = {
                 'mae_lim': (args.mae_min, args.mae_max),
-                'bar_width': args.bar_width
+                'acc_lim': (args.acc_min, args.acc_max),
+                'bar_width': args.bar_width,
+                'annotate_size': args.annotate_size
             }
 
-            # Generate and save visualization
+            # Generate and save visualization with error bars
+            generate_visualization_with_error(
+                results_df,
+                fig_dir=fig_dir,
+                split=args.split,
+                fig_format=args.fig_format,
+                fig_dpi=args.fig_dpi,
+                **viz_params
+            )
+            
+            # Also generate standard visualization without error bars for comparison
             generate_visualization(
                 results_df,
                 fig_dir=fig_dir,

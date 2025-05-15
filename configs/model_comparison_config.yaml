@@ -7,7 +7,7 @@ model_dirs_map:
   # Reference models
   Reference:
     Path: results/reference_pred
-    DisplayName: Reference
+    DisplayName: Reference*
     Model: Reference-ML
 
   # Baseline models
@@ -34,7 +34,7 @@ model_dirs_map:
   Baseline-WS24_base:
     Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/base_label
     DisplayName: Baseline
-    Model: RandomForestClassifier
+    Model: GaussianProcessClassifier
   Baseline-WS24_boiling:
     Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/boiling_label
     DisplayName: Baseline

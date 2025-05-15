@@ -124,7 +124,7 @@ def main():
                         help="Base directory containing task data directories")
     parser.add_argument("--in_file_pattern", type=str, default="RAC_and_zeo_features_with_id_prop_rand*.csv", 
                         help="Pattern to match input files")
-    parser.add_argument("--search_max_evals", type=int, default=100, 
+    parser.add_argument("--search_max_evals", type=int, default=50, 
                         help="Maximum evaluations for hyperparameter search")
     parser.add_argument("--wait_time", type=int, default=2, 
                         help="Wait time in seconds between job submissions")

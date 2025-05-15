@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-15 15:51:31
 LastEditors: zhangshd
-LastEditTime: 2025-05-12 18:05:26
+LastEditTime: 2025-05-15 19:00:58
 '''
 import os
 import time
@@ -484,7 +484,7 @@ class RegressionModel(BaseModel):
             self.test_metrics_df = pd.DataFrame(test_metrics_all, columns=["te_" + s for s in metrics_list],
                                                 index=[f'fold_{i + 1}' for i in range(len(self.train_val_idxs))])
             metrics_dfs.append(self.test_metrics_df)                # Save original prediction values
-                original_pred = test_pred_all[0].squeeze() if len(test_pred_all) == 1 else None
+            original_pred = test_pred_all[0].squeeze() if len(test_pred_all) == 1 else None
             
             self.test_pred = np.mean(test_pred_all, axis=0)
             
