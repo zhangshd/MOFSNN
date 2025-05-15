@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-09 16:49:54
 LastEditors: zhangshd
-LastEditTime: 2024-09-13 17:01:29
+LastEditTime: 2025-05-16 04:29:10
 '''
 
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
@@ -20,10 +20,11 @@ from ase import io
 import os
 
 
-def standardized_cif(cif_file, out_file, primitive=False, spacegroup=False):
+def standardized_cif(cif_file, out_file, primitive=False, spacegroup=False, verbose=False):
     cif_file = str(cif_file)
-    print("*"*50)
-    print(cif_file)
+    if verbose:
+        print("*"*50)
+        print(cif_file)
 
     # preprocessed by ase
     atoms = io.read(cif_file)
@@ -53,7 +54,8 @@ def standardized_cif(cif_file, out_file, primitive=False, spacegroup=False):
         standardized_structure = spacegroup_analyzer.get_refined_structure()
         # print("Standardized Structure:", standardized_structure)
     standardized_structure.to(out_file, fmt='cif')
-    print("standardized structure saved to: ", out_file)
+    if verbose:
+        print("standardized structure saved to: ", out_file)
     return out_file
 
 def log_error(log_file, message, log_lock=None):

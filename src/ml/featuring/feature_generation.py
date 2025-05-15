@@ -6,6 +6,12 @@ import numpy as np
 import pandas as pd
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive
 import multiprocessing as mp
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
+
+ZEOPP_PATH = ROOT_DIR.parent/"zeo++-0.3/network"  # Change this path as appropriate
+RAC_GETTER_PATH = ROOT_DIR/"src/ml/featuring/RAC_getter.py"
 
 ## This script is adapted from the original example_feature_generation.py script provided by Terrones et al. in their published work:
 ## Terrones G G, Huang S P, Rivera M P, et al. Journal of the American Chemical Society, 2024, 146(29): 20333–20348.
@@ -66,10 +72,10 @@ def descriptor_generator(name, structure_path, wiggle_room, prob_radius):
 
     # Zeo++ should be installed
     # Change the zeo++-0.3/network path as appropriate
-    cmd1 = f'/home/zhangsd/repos/zeo++-0.3/network -ha -res {zeo_folder}/{name}_pd.txt {structure_path} > /dev/null 2>&1' # > /dev/null 2>&1 mutes terminal printing
-    cmd2 = f'/home/zhangsd/repos/zeo++-0.3/network -sa {prob_radius} {prob_radius} 10000 {zeo_folder}/{name}_sa.txt {structure_path} > /dev/null 2>&1'
-    cmd3 = f'/home/zhangsd/repos/zeo++-0.3/network -volpo {prob_radius} {prob_radius} 10000 {zeo_folder}/{name}_pov.txt {structure_path} > /dev/null 2>&1'
-    cmd4 = 'python RAC_getter.py %s %s %s %f' %(structure_path, name, RACs_folder, wiggle_room)
+    cmd1 = f'{ZEOPP_PATH} -ha -res {zeo_folder}/{name}_pd.txt {structure_path} > /dev/null 2>&1' # > /dev/null 2>&1 mutes terminal printing
+    cmd2 = f'{ZEOPP_PATH} -sa {prob_radius} {prob_radius} 10000 {zeo_folder}/{name}_sa.txt {structure_path} > /dev/null 2>&1'
+    cmd3 = f'{ZEOPP_PATH} -volpo {prob_radius} {prob_radius} 10000 {zeo_folder}/{name}_pov.txt {structure_path} > /dev/null 2>&1'
+    cmd4 = f'python {RAC_GETTER_PATH} %s %s %s %f' %(structure_path, name, RACs_folder, wiggle_room)
 
     # four parallelized Zeo++ and RAC commands
     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
@@ -234,6 +240,7 @@ if __name__ == '__main__':
             continue
     
     final_csv_path = os.path.join(os.path.dirname(cif_dir), 'RAC_and_zeo_features.csv')
+    print(f'Writing the final CSV to {final_csv_path}')
     final_df = pd.DataFrame.from_dict(final_df_content_dict)
     final_df = final_df.sort_values(by=['name']) # Sort names alphabetically.
     final_df.to_csv(final_csv_path, index=False)

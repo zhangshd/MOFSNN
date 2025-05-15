@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-17 19:08:40
 LastEditors: zhangshd
-LastEditTime: 2025-05-12 19:04:46
+LastEditTime: 2025-05-16 06:01:36
 '''
 
 import os
@@ -88,10 +88,14 @@ def load_model_from_dir(model_dir, custom_checkpoint=None):
     
     hparams["model"] = MODEL_NAME_TO_MODULE_CLS[hparams["model_name"]](**hparams)
 
-    trainer = Trainer(default_root_dir=hparams["log_dir"], 
-                      accelerator=hparams["accelerator"],
-                      devices=find_usable_cuda_devices(1),
-                      )
+    # Configure the trainer with appropriate devices
+    if hparams.get("accelerator", "auto") == "gpu" and torch.cuda.is_available():
+        trainer = Trainer(default_root_dir=hparams["log_dir"], 
+                          accelerator="gpu",
+                          devices=find_usable_cuda_devices(1))
+    else:
+        trainer = Trainer(default_root_dir=hparams["log_dir"], 
+                          accelerator="cpu")
     
     # Allow specifying a custom checkpoint path
     if custom_checkpoint is not None:

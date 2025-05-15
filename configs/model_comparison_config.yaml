@@ -18,7 +18,7 @@ model_dirs_map:
   Baseline-SSD:
     Path: results/ml_models/SSD/RAC_and_zeo_features_with_id_prop/Label
     DisplayName: Baseline
-    Model: SVC
+    Model: RandomForestClassifier
   Baseline-WS24_water:
     Path: results/ml_models/WS24/RAC_and_zeo_features_with_id_prop/water_label
     DisplayName: Baseline

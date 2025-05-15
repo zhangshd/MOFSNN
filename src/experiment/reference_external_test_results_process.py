@@ -1,3 +1,9 @@
+'''
+Author: zhangshd
+Date: 2025-05-16 01:55:19
+LastEditors: zhangshd
+LastEditTime: 2025-05-16 01:57:10
+'''
 import pandas as pd
 from pathlib import Path
 import json
@@ -61,6 +67,7 @@ def process_results():
                 ## This is a special case for WS24_water4, which is a 4-class classification task.
                 ## The predicted values are in the form of a list of 4 values, which need to be converted to a single value.
                 sub_df_pred.insert(1, "Predicted", sub_df_pred[col].apply(lambda x: x.index(max(x)) if isinstance(x, list) else None))
+                sub_df_gt["GroundTruth"] = sub_df_gt["GroundTruth"] - 1 # Convert to 0-indexed 
                 sub_df_pred.rename(columns={col: "Prob"}, inplace=True)
             else:
                 sub_df_pred.insert(1, "Predicted", sub_df_pred[col].apply(lambda x: 1 if x > 0.5 else 0))

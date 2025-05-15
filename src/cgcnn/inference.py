@@ -2,12 +2,15 @@
 Author: zhangshd
 Date: 2024-08-19 15:59:37
 LastEditors: zhangshd
-LastEditTime: 2025-04-22 17:46:18
+LastEditTime: 2025-05-16 05:56:55
 '''
 import os
 import sys
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
+from pathlib import Path
+SCRIPT_DIR = Path(__file__).parent
+# Get the root directory of the project
+ROOT_DIR = Path(SCRIPT_DIR).parent.parent
+sys.path.append(str(SCRIPT_DIR.parent))
 from argparse import ArgumentParser
 from pymatgen.io.cif import CifParser
 from ase.io import read
@@ -17,10 +20,9 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from pytorch_lightning import Trainer
-from pathlib import Path
+
 import pandas as pd
 import logging
-import matplotlib.pyplot as plt
 import matplotlib
 import pickle
 import os, sys
@@ -28,6 +30,13 @@ import functools
 import inspect
 from tqdm import tqdm
 import shutil
+import time
+import warnings
+import tempfile
+
+# Ignore specific warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="pymatgen.io.cif")
+warnings.filterwarnings("ignore", category=UserWarning, module="ase.io.cif")
 
 from cgcnn.module.module import MInterface
 from cgcnn.module.cgcnn import CrystalGraphConvNet
@@ -41,7 +50,40 @@ from cgcnn.module.module_utils import calculate_lse_from_tree, calculate_lsv_fro
 
 matplotlib.use('Agg')
 
+def setup_logger(name, log_file, level=logging.INFO):
+    """Set up a logger with file and console handlers."""
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    
+    # Create handlers
+    file_handler = logging.FileHandler(log_file)
+    console_handler = logging.StreamHandler()
+    
+    # Create formatters and add them to handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
+    
+    # Add handlers to logger
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+    
+    return logger
 
+def time_cost(tick: float) -> str:
+    """
+    Calculate the time cost since the given tick time.
+    
+    Args:
+        tick: Start time in seconds since epoch
+        
+    Returns:
+        Formatted string representing the time cost
+    """
+    time_cost = time.time() - tick
+    hours, remainder = divmod(time_cost, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{int(hours)}h {int(minutes)}m {int(seconds)}s"
 
 def process_cif(cif, saved_dir, clean=True, **kwargs):
 
@@ -184,99 +226,284 @@ class InferenceDataset(Dataset):
         dict_batch["task_id"] = torch.IntTensor(dict_batch["task_id"])
         return dict_batch
 
-def inference(cif_list, model_dir,  saved_dir, uncertainty_trees_file=None, **kwargs):
+def inference(cif_list, model_dir, saved_dir, uncertainty_trees_file=None, logger=None, **kwargs):
     """
+    Perform inference on a list of CIF files using a trained model.
+    
     Args:    
-        cif_list (list or str): list of cif file paths or a single cif file path.
-        model (MInterface): trained model.
+        cif_list (list or str): List of CIF file paths or a single CIF file path.
+        model_dir (str or Path): Directory containing the trained model.
+        saved_dir (str or Path): Directory for saving temporary and output files.
+        uncertainty_trees_file (str or Path, optional): Path to file containing uncertainty trees.
+        logger (logging.Logger, optional): Logger for logging progress and results.
+        **kwargs: Additional keyword arguments for inference.
+            - clean (bool): Whether to clean the CIF files before inference.
+            - batch_size (int): Batch size for inference.
+            - num_workers (int): Number of workers for data loading.
+    
+    Returns:
+        dict: Dictionary containing inference results.
     """
-
-    # set up model
+    # Set up model
+    tick = time.time()
     clean = kwargs.get("clean", True)
+    if logger:
+        logger.info(f"Loading model from {model_dir}")
+    else:
+        print(f"Loading model from {model_dir}")
+    
     model, trainer = load_model_from_dir(model_dir)
+    
     if uncertainty_trees_file is not None and os.path.exists(uncertainty_trees_file):
         with open(uncertainty_trees_file, 'rb') as f:
             uncertainty_trees = pickle.load(f)
-        print(f"Loaded uncertainty trees from {uncertainty_trees_file}")
+        if logger:
+            logger.info(f"Loaded uncertainty trees from {uncertainty_trees_file}")
+        else:
+            print(f"Loaded uncertainty trees from {uncertainty_trees_file}")
     else:
         uncertainty_trees = None
 
-    # set up dataset
+    # Set up dataset
+    if logger:
+        logger.info(f"Setting up inference dataset with {len(cif_list) if isinstance(cif_list, list) else 1} CIF files")
+    else:
+        print(f"Setting up inference dataset with {len(cif_list) if isinstance(cif_list, list) else 1} CIF files")
+    
+    batch_size = kwargs.get("batch_size", model.hparams.get("batch_size", 8))
+    num_workers = kwargs.get("num_workers", model.hparams.get("num_workers", 2))
+    
     infer_dataset = InferenceDataset(cif_list, saved_dir=saved_dir, clean=clean, **model.hparams)
     infer_dataset.setup()
+    
+    if len(infer_dataset) == 0:
+        error_msg = "No valid CIF files found for inference."
+        if logger:
+            logger.error(error_msg)
+        else:
+            print(error_msg)
+        return None
+    
+    if logger:
+        logger.info(f"Creating data loader with batch size {batch_size} and {num_workers} workers")
+    
     infer_loader = DataLoader(infer_dataset, 
-                              batch_size=min(len(infer_dataset), model.hparams.get("batch_size", 8)), 
-                            #   batch_size = 2,
+                              batch_size=min(len(infer_dataset), batch_size), 
                               shuffle=False, 
-                              num_workers=model.hparams.get("num_workers", 2),
+                              num_workers=num_workers,
                               collate_fn=infer_dataset.collate
                               )
 
+    if logger:
+        logger.info("Starting model prediction")
+    
     outputs = trainer.predict(model, infer_loader)
+    
+    if logger:
+        logger.info("Processing prediction outputs")
+    
     all_outputs = {}
-    all_outputs[f"cif_ids"] = [d["cif_id"] for d in infer_dataset]
+    all_outputs["cif_ids"] = [d["cif_id"] for d in infer_dataset]
+    
     for task in model.hparams.get("tasks"):
         task_id = model.hparams["tasks"].index(task)
         task_tp = model.hparams["task_types"][task_id]
-        all_outputs[f"{task}_pred"] = torch.cat([d[f"{task}_pred"] for d in outputs], dim=0).cpu().numpy().squeeze()
+        all_outputs[f"{task}_pred"] = torch.cat([d[f"{task}_pred"] for d in outputs], dim=0).cpu().numpy().squeeze().tolist()
+        
         if "classification" in task_tp:
-            all_outputs[f"{task}_prob"] = torch.cat([d[f"{task}_prob"] for d in outputs], dim=0).cpu().numpy()
+            all_outputs[f"{task}_prob"] = torch.cat([d[f"{task}_prob"] for d in outputs], dim=0).cpu().numpy().tolist()
+
         if uncertainty_trees is None:
             continue
 
+        if logger:
+            logger.info(f"Calculating uncertainty for task {task}")
+        
         all_outputs[f"{task}_uncertainty"] = []
-        for d in tqdm(outputs):
+        for d in tqdm(outputs, desc=f"Calculating uncertainty for {task}"):
             task_fea = d[f'{task}_last_layer_fea'].cpu().numpy().squeeze()
             if "classification" in task_tp:
                 all_outputs[f"{task}_uncertainty"].append(calculate_lse_from_tree(uncertainty_trees[task], task_fea, k=uncertainty_trees[task]["k"]))
             else:
                 all_outputs[f"{task}_uncertainty"].append(calculate_lsv_from_tree(uncertainty_trees[task], task_fea, k=uncertainty_trees[task]["k"]))
-        all_outputs[f"{task}_uncertainty"] = np.concatenate(all_outputs[f"{task}_uncertainty"], axis=0)
+        all_outputs[f"{task}_uncertainty"] = np.concatenate(all_outputs[f"{task}_uncertainty"], axis=0).tolist()
+    
+    inference_time = time.time() - tick
+    if logger:
+        logger.info(f"Inference completed in {time_cost(tick)}")
+        if len(infer_dataset) > 0:
+            logger.info(f"Average time per CIF: {inference_time / len(infer_dataset):.4f}s")
     
     return all_outputs
 
-if __name__ == "__main__":
+def process_cif_directory(dir_path: str, model_dir: str, saved_dir: str, 
+                    uncertainty_trees_file: str = None, logger: logging.Logger = None, **kwargs) -> pd.DataFrame:
+    """
+    Process all CIF files in a directory and make predictions.
+    
+    Args:
+        dir_path: Path to the directory containing CIF files
+        model_dir: Path to the directory containing the trained model
+        saved_dir: Path to directory for saving temporary and output files
+        uncertainty_trees_file: Path to file containing uncertainty trees
+        logger: Logger for logging progress and results
+        **kwargs: Additional keyword arguments
+        
+    Returns:
+        DataFrame with prediction results for all processed CIF files, or None if no files were successfully processed
+    """
+    # Find all CIF files in the directory
+    cif_files = []
+    for root, _, files in os.walk(dir_path):
+        for file in files:
+            if file.endswith('.cif'):
+                cif_files.append(os.path.join(root, file))
+    
+    if not cif_files:
+        error_msg = f"No CIF files found in directory: {dir_path}"
+        if logger:
+            logger.error(error_msg)
+        else:
+            print(error_msg)
+        return None
+    
+    cif_names = [os.path.basename(cif).replace('.cif', '') for cif in cif_files]
+    if logger:
+        logger.info(f"Found {len(cif_files)} CIF files to process")
+    else:
+        print(f"Found {len(cif_files)} CIF files to process")
+    
+    results = inference(cif_files, model_dir, saved_dir, uncertainty_trees_file, logger, **kwargs)
+    
+    if results is None:
+        error_msg = "All CIF files failed to process"
+        if logger:
+            logger.error(error_msg)
+        else:
+            print(error_msg)
+        return None
+    
+    # Create DataFrame from results
+    df_results = pd.DataFrame({k:v for k,v in results.items() if k != "cif_ids"}, index=results["cif_ids"])
+    df_results.index.name = "MofName"
+    
+    failed_cifs = set(cif_names) - set(results["cif_ids"])
+    # Log failed files
+    if failed_cifs:
+        msg = f"Failed to process {len(failed_cifs)} files: {', '.join(failed_cifs)}"
+        if logger:
+            logger.warning(msg)
+        else:
+            print(msg)
 
-    # cif_list = [
-    #     "AVIHIY_clean.cif",
-    #     "AVAQIX_clean.cif",
-    #     "BIBBUL_clean.cif",
-    #     "ELAZEX_clean.cif",
-    #     "GOYYEA_clean.cif",
-    #     "LIJXEI_clean.cif",
-    #     "NOPJUZ_clean.cif",
-    # ]
+    return df_results
 
-    # clean = False
-    # cif_dir = Path(__file__).parent/"data/CoREMOF2019/clean_cifs"
-    # # cif_list = [cif_dir/cif for cif in cif_list]
-    # notes = cif_dir.parent.name
-    # saved_dir = Path(os.getcwd())/f"inference/{notes}"
-
-    import argparse
-    parser = ArgumentParser()
-    parser.add_argument("--cif_dir", type=str)
-    parser.add_argument("--saved_dir", type=str, default="inference")
-    parser.add_argument("--clean", action="store_true", default=False)
-
-
+def main():
+    """
+    Main function for CGCNN model inference.
+    """
+    parser = ArgumentParser(description='MOF CGCNN Model Inference Script')
+    parser.add_argument('--input_path', required=True, help='Path to CIF file or directory containing CIF files')
+    parser.add_argument('--output_path', required=True, help='Path for the output CSV file')
+    parser.add_argument('--model_dir', default=str(ROOT_DIR/"results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43"), 
+                        help='Path to the model directory')
+    parser.add_argument('--uncertainty_trees_file', 
+                        default=str(ROOT_DIR/"results/evaluation/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn@version_43/uncertainty_trees.pkl"), 
+                        help='Path to uncertainty trees file')
+    parser.add_argument('--uncertainty', action='store_true', default=False, help='Whether to enable uncertainty estimation')
+    parser.add_argument('--temp_dir', type=str, default=None, help='Directory for saving temporary files')
+    parser.add_argument('--no_clean', action="store_true", default=False, help='Whether to clean CIF files before inference')
+    parser.add_argument('--batch_size', type=int, default=8, help='Batch size for inference')
+    parser.add_argument('--num_workers', type=int, default=2, help='Number of workers for data loading')
+    parser.add_argument('--verbose', action='store_true', help='Enable verbose output')
+    
     args = parser.parse_args()
-    cif_dir = Path(args.cif_dir)
-    saved_dir = Path(args.saved_dir)
-    clean = args.clean
-    saved_dir.mkdir(exist_ok=True, parents=True)
     
-    ROOT_DIR = Path(SCRIPT_DIR).parent.parent
+    # Start timing
+    tick = time.time()
+    print(f"Start time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tick))}")
     
-    model_dir = ROOT_DIR/"results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43"
-    uncertainty_trees_file = ROOT_DIR/"results/evaluation/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn@version_43/uncertainty_trees.pkl"
-    model_name = os.path.basename(model_dir)
+    # Set up logging
+    log_dir = os.path.join(ROOT_DIR, 'logs/cgcnn_inference')
+    os.makedirs(log_dir, exist_ok=True)
+    logger = setup_logger('cgcnn_inference', os.path.join(log_dir, 'cgcnn_inference.log'))
+    logger.info("Starting CGCNN model inference")
+    
+    # Process arguments
+    input_path = Path(args.input_path)
+    output_path = Path(args.output_path)
+    model_dir = Path(args.model_dir)
+    if args.temp_dir is None:
+        temp_dir = tempfile.mkdtemp()
+    else:
+        temp_dir = Path(args.temp_dir)
+        temp_dir.mkdir(exist_ok=True, parents=True)
+    
+    logger.info(f"Using model: {model_dir}")
+    if args.uncertainty and args.uncertainty_trees_file:
+        uncertainty_trees_file = args.uncertainty_trees_file
+        logger.info("Uncertainty estimation enabled")
+        logger.info(f"Using uncertainty trees: {uncertainty_trees_file}")
+    else:
+        uncertainty_trees_file = None
 
-    cif_list = sorted(cif_dir.glob("*.cif"))
+    logger.info(f"Saving temporary files to: {temp_dir}")
     
-    results = inference(cif_list, model_dir, saved_dir=saved_dir, uncertainty_trees_file=uncertainty_trees_file, clean=clean)
+    # Process input
+    if input_path.is_file() and input_path.suffix == '.cif':
+        logger.info(f"Processing single CIF file: {input_path}")
+        results = inference(
+            input_path, model_dir, saved_dir=temp_dir, 
+            uncertainty_trees_file=uncertainty_trees_file, 
+            clean=not args.no_clean, batch_size=args.batch_size, 
+            num_workers=args.num_workers, logger=logger
+        )
+        if results:
+            df_results = pd.DataFrame({k:v for k,v in results.items() if k != "cif_ids"}, index=results["cif_ids"])
+            df_results.index.name = "MofName"
+        else:
+            logger.error("Failed to process CIF file")
+            logger.info(f"End time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}")
+            logger.info(f"Time cost: {time_cost(tick)}")
+            if isinstance(temp_dir, tempfile.TemporaryDirectory):
+                temp_dir.cleanup()
+            return 1
+    elif input_path.is_dir():
+        logger.info(f"Processing directory containing CIF files: {input_path}")
+        df_results = process_cif_directory(
+            input_path, model_dir, temp_dir, 
+            uncertainty_trees_file=uncertainty_trees_file, 
+            clean=not args.no_clean, batch_size=args.batch_size, 
+            num_workers=args.num_workers, logger=logger
+        )
+        if df_results is None:
+            logger.error("No results to save")
+            logger.info(f"End time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}")
+            logger.info(f"Time cost: {time_cost(tick)}")
+            if isinstance(temp_dir, tempfile.TemporaryDirectory):
+                temp_dir.cleanup()
+            return 1
+    else:
+        logger.error(f"Invalid input path: {input_path}. Must be a CIF file or directory containing CIF files.")
+        logger.info(f"End time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}")
+        logger.info(f"Time cost: {time_cost(tick)}")
+        if isinstance(temp_dir, tempfile.TemporaryDirectory):
+            temp_dir.cleanup()
+        return 1
     
-    df_res = pd.DataFrame({k:v for k,v in results.items() if k.endswith("_pred") or "uncertainty" in k}, index=results["cif_ids"])
-    df_res.index.name = "MofName"
-    print(df_res)
-    df_res.to_csv(Path(saved_dir)/f"infer_results_{model_name}.csv", float_format='%.4f')
+    # Save results
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    df_results.to_csv(output_path, float_format='%.4f')
+    logger.info(f"Saved prediction results to {output_path}")
+    print(f"Processed {len(df_results)} MOFs. Results saved to {output_path}")
+    
+    logger.info("CGCNN model inference completed successfully")
+    logger.info(f"End time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}")
+    logger.info(f"Time cost: {time_cost(tick)}")
+    logger.info(f"Average time per CIF: {(time.time() - tick) / len(df_results):.4f}s")
+    if isinstance(temp_dir, tempfile.TemporaryDirectory):
+        temp_dir.cleanup()
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

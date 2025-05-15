@@ -24,7 +24,9 @@ MOFSNN/
 │
 ├── src/                # 源代码
 │   ├── cgcnn/          # CGCNN模型代码
-│   └── ml/             # 传统机器学习模型代码
+│   ├── ml/             # 传统机器学习模型代码
+│   │   └── mof_inference.py  # 单文件/文件夹推理脚本
+│   └── data/           # 数据处理代码
 │
 └── README.md           # 项目说明
 ```
@@ -42,6 +44,27 @@ pip install -r requirements.txt
 # 准备数据目录
 mkdir -p data/raw_data
 ```
+
+## ML Model Inference
+
+The project includes a script for making predictions on new MOF structures using pre-trained ML models:
+
+```bash
+# Process a single CIF file
+python src/ml/mof_inference.py --input_path /path/to/your/mof.cif --output_path results/predictions.csv
+
+# Process a directory containing multiple CIF files
+python src/ml/mof_inference.py --input_path /path/to/cif_directory --output_path results/predictions.csv
+```
+
+The script predicts all 7 stability properties:
+- Thermal Stability (TSD)
+- Solvent Stability (SSD)
+- Water Stability (WS24_water, binary)
+- Water Stability 4-level (WS24_water4)
+- Acid Stability (WS24_acid)
+- Base Stability (WS24_base)
+- Boiling Water Stability (WS24_boiling)
 
 ## Model Evaluation Tools
 

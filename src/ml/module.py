@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-15 15:51:31
 LastEditors: zhangshd
-LastEditTime: 2025-05-15 19:00:58
+LastEditTime: 2025-05-16 04:08:28
 '''
 import os
 import time
@@ -800,6 +800,7 @@ class ClassificationModel(BaseModel):
             all_y_pred.append(y_pred)
         # print(all_y_pred)
         y_pred_mean = np.mean(all_y_pred, axis=0)
+        y_pred_mean = y_pred_mean/np.sum(y_pred_mean, axis=1, keepdims=True)  # normalize
         if not return_prob:
             y_pred_mean = y_pred_mean.argmax(axis=1)  # prob -> class_label
             y_pred_mean = y_pred_mean.reshape((-1, 1))
