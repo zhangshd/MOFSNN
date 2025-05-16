@@ -169,6 +169,8 @@ if __name__ == '__main__':
     parser.add_argument('--cif_dir', type=str, help='Path to the folder containing the CIFs.')
     parser.add_argument('--wiggle_room', type=float, default=1, help='The wiggle room used in determining the MOF\'s adjacency matrix.')
     parser.add_argument('--prob_radius', type=float, default=0, help='The probe radius used in Zeo++ calculations.')
+    parser.add_argument('--n_jobs', type=int, default=2, help='Number of jobs to run in parallel.')
+
     args = parser.parse_args()
 
     cif_dir = args.cif_dir
@@ -181,9 +183,8 @@ if __name__ == '__main__':
     '''
     Generating features for all MOFs.
     '''
-    n_jobs = 96
-    pool = mp.Pool(processes=n_jobs)
-    print(f"Generating features for all MOFs using {n_jobs} cores.")
+    pool = mp.Pool(processes=args.n_jobs)
+    print(f"Generating features for all MOFs using {args.n_jobs} cores.")
     for i, cp in enumerate(cif_paths):
         MOF_name = os.path.basename(cp).replace('.cif', '')
 

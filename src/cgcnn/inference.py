@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-19 15:59:37
 LastEditors: zhangshd
-LastEditTime: 2025-05-16 05:56:55
+LastEditTime: 2025-05-16 12:00:05
 '''
 import os
 import sys
@@ -413,7 +413,7 @@ def main():
     parser.add_argument('--uncertainty', action='store_true', default=False, help='Whether to enable uncertainty estimation')
     parser.add_argument('--temp_dir', type=str, default=None, help='Directory for saving temporary files')
     parser.add_argument('--no_clean', action="store_true", default=False, help='Whether to clean CIF files before inference')
-    parser.add_argument('--batch_size', type=int, default=8, help='Batch size for inference')
+    parser.add_argument('--batch_size', type=int, default=16, help='Batch size for inference')
     parser.add_argument('--num_workers', type=int, default=2, help='Number of workers for data loading')
     parser.add_argument('--verbose', action='store_true', help='Enable verbose output')
     

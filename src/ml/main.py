@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 11:09:28
 LastEditors: zhangshd
-LastEditTime: 2025-05-07 14:31:51
+LastEditTime: 2025-05-16 11:03:56
 '''
 import os
 import sys
@@ -40,7 +40,7 @@ def main(data_dir, in_file_name, name_column, label_column, saved_dir=None, **kw
     t0 = time.time()
     in_file_path = os.path.join(data_dir, in_file_name)
     if saved_dir is None:
-        saved_dir = os.path.join(ROOT_DIR, "results/ml_models_", os.path.basename(data_dir), f"{in_file_name[:-4]}", label_column)
+        saved_dir = os.path.join(ROOT_DIR, "results/ml_models", os.path.basename(data_dir), f"{in_file_name[:-4]}", label_column)
     print(f"saved_dir: {saved_dir}")
 
     not_feat_cols_regression = ["MofName", "Label", "Partition"]
@@ -71,6 +71,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_type', type=str, default='classification', help='Model type: regression or classification')
     parser.add_argument('--data_dir', type=str, default=os.path.join(ROOT_DIR, 'data/ml_data'), help='Data directory')
+    parser.add_argument('--saved_dir', type=str, default=None, help='Directory to save results')
     parser.add_argument('--in_file_name', type=str, default='id_prop_feat.csv', help='Input file name')
     parser.add_argument('--random_state_list', type=int, default=[0], nargs="+", help='List of random states')
     parser.add_argument('--feature_selector_list', type=str, default=['RFE'], nargs="+", help='List of feature selectors')

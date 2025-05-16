@@ -298,7 +298,9 @@ def predict_stability(features: pd.DataFrame, loaded_models: Dict[str, Any]) -> 
     return results
 
 def process_cif_file(cif_path: Union[str, Path, List[Union[str, Path]]], 
-                     loaded_models: Dict[str, Any], prob_radius: float = 1.4) -> Optional[pd.DataFrame]:
+                     loaded_models: Dict[str, Any], prob_radius: float = 1.4,
+                     batch_size: int = 1000) -> Optional[pd.DataFrame]:
+                     
     """
     Process a single CIF file and make predictions.
     
@@ -316,30 +318,39 @@ def process_cif_file(cif_path: Union[str, Path, List[Union[str, Path]]],
         cif_paths = [str(p) for p in cif_path]
     else:
         raise ValueError("cif_path must be a string, Path, or list of strings/Paths.")
+    
+    batch_size = min(batch_size, len(cif_paths))
+    batches = [cif_paths[i:i + batch_size] for i in range(0, len(cif_paths), batch_size)]
+    all_results = []
+    for batch in batches:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            clean_cifs = []
+            for cif in batch:
+                # Clean the CIF file
+                clean_cif_path, success = clean_and_process_cif(cif, temp_dir)
+                if not success or clean_cif_path is None:
+                    print(f"Failed to clean CIF file: {cif}")
+                    continue
+                clean_cifs.append(clean_cif_path)
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        clean_cifs = []
-        for cif in cif_paths:
-            # Clean the CIF file
-            clean_cif_path, success = clean_and_process_cif(cif, temp_dir)
-            if not success or clean_cif_path is None:
-                print(f"Failed to clean CIF file: {cif}")
+            if not clean_cifs:
+                print(f"No valid CIF files found for feature generation.")
+                return None
+            
+            # Generate features for the batch
+            features = generate_features(clean_cifs, temp_dir, prob_radius)
+            if features is None:
+                print(f"Failed to generate features for CIF files: {clean_cifs}")
                 continue
-            clean_cifs.append(clean_cif_path)
-
-        if not clean_cifs:
-            print(f"No valid CIF files found for feature generation.")
-            return None
-
-        # Generate features
-        features = generate_features(clean_cifs, temp_dir, prob_radius)
-        if features is None:
-            print(f"Failed to generate features for CIF files: {clean_cifs}")
-            return None
-
-        # Make predictions
-        results = predict_stability(features, loaded_models)
-        return results
+            print(f"Generated features: {features.shape}")
+            # Make predictions for the batch
+            results = predict_stability(features, loaded_models)
+            all_results.append(results)
+    if not all_results:
+        print("No results to process.")
+        return None
+    results = pd.concat(all_results, ignore_index=True)
+    return results
 
 def process_cif_directory(dir_path: str, loaded_models: Dict[str, Any], prob_radius: float = 1.4) -> Optional[pd.DataFrame]:
     """
