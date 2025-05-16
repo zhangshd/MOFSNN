@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 11:09:28
 LastEditors: zhangshd
-LastEditTime: 2025-05-16 11:03:56
+LastEditTime: 2025-05-16 13:38:43
 '''
 import os
 import sys
@@ -15,6 +15,7 @@ import os
 import time
 from module import sec_to_time
 import argparse
+import shutil
 
 def balance_neg_samples(df, label_column, random_seed=42):
     """Balance the negative samples to match positive samples."""
@@ -31,7 +32,7 @@ def prepare_data(in_file_path, label_column, not_feat_cols):
     valid_df = df[df["Partition"] == "val"].copy()
     return train_df, test_df, valid_df, feat_cols
 
-def main(data_dir, in_file_name, name_column, label_column, saved_dir=None, **kwargs):
+def main(data_dir, in_file_name, name_column, label_column, saved_dir=None, overwrite=True, **kwargs):
     
     """Main function to handle model training and evaluation."""
 
@@ -42,6 +43,9 @@ def main(data_dir, in_file_name, name_column, label_column, saved_dir=None, **kw
     if saved_dir is None:
         saved_dir = os.path.join(ROOT_DIR, "results/ml_models", os.path.basename(data_dir), f"{in_file_name[:-4]}", label_column)
     print(f"saved_dir: {saved_dir}")
+    if overwrite and os.path.exists(saved_dir):
+        print(f"Directory {saved_dir} already exists. Overwriting...")
+        shutil.rmtree(saved_dir)
 
     not_feat_cols_regression = ["MofName", "Label", "Partition"]
     not_feat_cols_classification = ["MOF_name", "data_set", "split", "MofName", "Label", "Partition",
