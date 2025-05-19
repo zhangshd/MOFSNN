@@ -103,8 +103,10 @@ def process_cif(cif, saved_dir, clean=True, **kwargs):
         flag = clean_cif(cif, clean_cif_file)
         if not flag:
             return None
-    else:
+    elif str(clean_cif_file.resolve()) != str(cif.resolve()):
         shutil.copy(cif, clean_cif_file)
+    else:
+        logger.info(f"Using existing clean cif file: {clean_cif_file}")
     if not p_graphdata.exists():
         p_graphdata = make_prepared_data(clean_cif_file, graphdata_dir, logger, **kwargs)
     return p_graphdata

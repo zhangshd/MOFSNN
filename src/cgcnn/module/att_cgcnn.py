@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-16 11:03:25
 LastEditors: zhangshd
-LastEditTime: 2024-08-17 19:33:18
+LastEditTime: 2025-05-16 19:43:24
 '''
 
 ## This script is adapted from MOFTransformer(https://github.com/hspark1212/MOFTransformer) and CGCNN(https://github.com/txie-93/cgcnn)
@@ -31,6 +31,7 @@ class CrystalGraphConvNet(nn.Module):
         self.loss_aggregation = kwargs.get('loss_aggregation', "sum")
         print("task_types: ", self.task_types)
         self.n_tasks = len(self.task_types)
+        self.kwargs = kwargs
 
         self.embedding_atom = nn.Linear(orig_atom_fea_len, atom_fea_len)
         if self.atom_layer_norm:

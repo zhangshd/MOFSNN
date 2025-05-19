@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-17 19:08:40
 LastEditors: zhangshd
-LastEditTime: 2025-05-16 06:01:36
+LastEditTime: 2025-05-19 01:48:39
 '''
 
 import os
@@ -69,7 +69,7 @@ def load_callbacks(patience=10, min_delta=0.0, monitor='val_loss', mode='min', l
 
     return callbacks
 
-def load_model_from_dir(model_dir, custom_checkpoint=None):
+def load_model_from_dir(model_dir, custom_checkpoint=None, accelerator=None):
     """
     Load a model from a directory with optional specific checkpoint path.
     
@@ -89,13 +89,19 @@ def load_model_from_dir(model_dir, custom_checkpoint=None):
     hparams["model"] = MODEL_NAME_TO_MODULE_CLS[hparams["model_name"]](**hparams)
 
     # Configure the trainer with appropriate devices
-    if hparams.get("accelerator", "auto") == "gpu" and torch.cuda.is_available():
+    if hparams.get("accelerator", "auto") == "gpu" and torch.cuda.is_available() and accelerator is None:
         trainer = Trainer(default_root_dir=hparams["log_dir"], 
                           accelerator="gpu",
                           devices=find_usable_cuda_devices(1))
+    elif accelerator is not None:
+        trainer = Trainer(default_root_dir=hparams["log_dir"], 
+                          accelerator=accelerator)
+        hparams["accelerator"] = accelerator
     else:
         trainer = Trainer(default_root_dir=hparams["log_dir"], 
                           accelerator="cpu")
+        hparams["accelerator"] = "cpu"
+        
     
     # Allow specifying a custom checkpoint path
     if custom_checkpoint is not None:
@@ -122,8 +128,11 @@ def load_model_from_dir(model_dir, custom_checkpoint=None):
             print("Loading the last model checkpoint.")
         if model_file is None:
             raise FileNotFoundError("No checkpoint files found in the specified directory.")
-    
-    model = MInterface.load_from_checkpoint(str(model_file), **hparams)
+    if hparams["accelerator"] in ["gpu", "auto"] and torch.cuda.is_available():
+        map_location = "cuda"
+    else:
+        map_location = "cpu"
+    model = MInterface.load_from_checkpoint(str(model_file), map_location=map_location, **hparams)
     return model, trainer
 
 def load_model_path(root=None, version=None, v_num=None, best=False):

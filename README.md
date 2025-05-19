@@ -16,7 +16,11 @@ MOFSNN/
 ├── notebooks/          # Jupyter笔记本
 │   ├── 01_process_TSDandSSD.ipynb
 │   ├── 02_process_WS24.ipynb
+│   ├── 16_atom_importance_visualization.ipynb
 │   └── ...
+│
+├── examples/           # 示例脚本
+│   └── atom_importance_visualization.py
 │
 ├── results/            # 模型输出和结果
 │   ├── cgcnn_models/   # CGCNN模型
@@ -24,6 +28,12 @@ MOFSNN/
 │
 ├── src/                # 源代码
 │   ├── cgcnn/          # CGCNN模型代码
+│   │   ├── module/     # 模型模块
+│   │   │   ├── atom_visualizer.py  # 原子重要性可视化工具
+│   │   │   └── ...
+│   │   └── visualization/   # 可视化工具
+│   │       ├── ngl_visualizer.py  # NGLView可视化实现
+│   │       └── ...
 │   ├── ml/             # 传统机器学习模型代码
 │   │   └── mof_inference.py  # 单文件/文件夹推理脚本
 │   └── data/           # 数据处理代码
@@ -102,3 +112,60 @@ unzip Nandy_2022_SciData.zip
 unzip WS24v2.zip
 unzip CoREMOF2019.zip
 ```
+
+## Atom Importance Visualization
+
+The project includes tools for visualizing atom-level importance in CGCNN models, even for models using average pooling rather than attention mechanisms. This helps interpret which atoms most influence the model's predictions.
+
+### Using the Visualization Tool
+
+You can visualize atom importance using the provided example script:
+
+```bash
+# Run the atom importance visualization script
+python examples/atom_importance_visualization.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --task_idx 0 --save_dir results/atom_importance
+```
+
+Or explore interactively using the Jupyter notebooks:
+```bash
+# Static visualization notebook
+jupyter notebook notebooks/16_atom_importance_visualization.ipynb
+
+# Interactive 3D visualization notebook
+jupyter notebook notebooks/16_atom_importance_visualization_interactive.ipynb
+```
+
+### Visualization Features
+
+- Gradient-based attribution of importance to individual atoms
+- Multiple visualization methods:
+  - Static 3D plots with matplotlib
+  - Interactive 3D visualization with NGLView
+  - High-quality rendering with OVITO (if installed)
+- Support for highlighting important atoms above a threshold
+- Multi-task comparison to analyze task-specific importance patterns
+- Interactive rotation, zoom, and inspection in 3D
+- Compatible with models using average pooling or attention pooling
+- Works for both classification and regression tasks
+
+### Interactive 3D Visualization Requirements
+
+For interactive 3D visualization, additional packages are required:
+
+```bash
+# For NGLView-based visualization
+pip install nglview
+
+# For OVITO-based visualization (optional)
+pip install ovito
+# or with conda
+conda install -c conda-forge ovito
+```
+
+### Feature Updates
+
+#### 2025-05-18: Improved Atom Importance Visualization
+- Implemented Grad-CAM for atom importance visualization in CGCNN models
+- Added support for visualizing both positive and negative atom contributions
+- Updated documentation in `docs/atom_importance_visualization.md`
+- Modified `AtomImportanceVisualizer` class to use state-of-the-art explainability techniques

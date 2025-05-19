@@ -27,6 +27,7 @@ build/
 *.pyc
 *.pyo
 *.pyd
+**/.ipynb_checkpoints
 
 # Data files
 **/feature_folders*
