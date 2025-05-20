@@ -29,9 +29,9 @@ MOFSNN/
 ├── src/                # 源代码
 │   ├── cgcnn/          # CGCNN模型代码
 │   │   ├── module/     # 模型模块
-│   │   │   ├── atom_visualizer.py  # 原子重要性可视化工具
 │   │   │   └── ...
 │   │   └── visualization/   # 可视化工具
+│   │       ├── atom_visualizer.py  # 原子重要性可视化工具(Grad-CAM, Guided Grad-CAM)
 │   │       ├── ngl_visualizer.py  # NGLView可视化实现
 │   │       └── ...
 │   ├── ml/             # 传统机器学习模型代码
@@ -169,3 +169,12 @@ conda install -c conda-forge ovito
 - Added support for visualizing both positive and negative atom contributions
 - Updated documentation in `docs/atom_importance_visualization.md`
 - Modified `AtomImportanceVisualizer` class to use state-of-the-art explainability techniques
+
+#### 2025-05-19: Enhanced Atom Visualization Methods
+- Added multiple visualization methods for comprehensive model interpretation:
+  - **Grad-CAM with ReLU**: Standard implementation showing positive contributions only
+  - **Grad-CAM without ReLU**: Modified version showing both positive and negative contributions
+  - **Guided Grad-CAM**: High-resolution visualization combining Grad-CAM with Guided Backpropagation
+- Added method comparison functionality in `compare_visualization_methods.py` example
+- Created detailed documentation in `docs/visualization_method_comparison.md`
+- Updated API to allow method selection via `method` parameter

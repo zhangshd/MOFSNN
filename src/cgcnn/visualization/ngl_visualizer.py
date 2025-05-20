@@ -61,7 +61,6 @@ class NGLAtomVisualizer:
         max_size: float = 2.0,
         highlight_threshold: float = 0.5,
         show_legend: bool = True,
-        show_labels: bool = True,
         show_cell: bool = True,
         width: str = "100%",
         height: str = "500px",
@@ -99,8 +98,6 @@ class NGLAtomVisualizer:
             Threshold for highlighting important atoms (based on absolute value, normalized to [0,1])
         show_legend : bool, optional
             Whether to show a color legend
-        show_labels : bool, optional
-            Whether to show atom labels
         show_cell : bool, optional
             Whether to show the unit cell
         width : str, optional

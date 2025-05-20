@@ -8,9 +8,6 @@ import os
 import numpy as np
 import torch
 import torch.nn as nn
-import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap, Normalize
-from typing import Dict, List, Optional, Union, Tuple, Any
 
 # Check if NGLView is available
 try:
@@ -30,9 +27,13 @@ except ImportError:
 
 class AtomImportanceVisualizer:
     """
-    A class for visualizing atom importance in CGCNN models using Grad-CAM analysis.
-    This implementation omits the final ReLU activation to preserve both positive and
-    negative contribution scores from atoms.
+    A class for visualizing atom importance in CGCNN models using various gradient-based
+    analysis methods including Grad-CAM, Grad-CAM without ReLU, and Guided Grad-CAM.
+    
+    Different visualization methods:
+    - Grad-CAM: Uses ReLU activation to focus on positive contributions only
+    - Grad-CAM without ReLU: Preserves both positive and negative contributions
+    - Guided Grad-CAM: Combines Guided Backpropagation with Grad-CAM for fine-grained visualization
     """
     def __init__(self, model):
         """
@@ -47,6 +48,7 @@ class AtomImportanceVisualizer:
         self.model.eval()  # Set model to evaluation mode
         self.gradients = None
         self.atom_features = None
+        self.input_gradients = None  # For Guided Backpropagation
         
     def _save_gradients(self, module, grad_input, grad_output):
         """Hook function to save gradients during backpropagation"""
@@ -58,8 +60,29 @@ class AtomImportanceVisualizer:
         """Hook function to save features during forward pass"""
         self.atom_features = output.detach()
     
-    def _register_hooks(self):
-        """Register hooks to capture atom features and gradients"""
+    def _save_input_gradients(self, module, grad_input, grad_output):
+        """Hook function to save input gradients for guided backpropagation"""
+        if grad_input and len(grad_input) > 0 and grad_input[0] is not None:
+            self.input_gradients = grad_input[0].detach()
+    
+    def _guided_backprop_relu_hook(self, module, grad_input, grad_output):
+        """
+        Hook for Guided Backpropagation - modifies gradients in ReLU during backprop
+        Only positive gradients are allowed to flow back, and only through positive activations
+        """
+        if grad_input and len(grad_input) > 0 and grad_input[0] is not None:
+            positive_grad_output = torch.clamp(grad_output[0], min=0.0)
+            return (positive_grad_output,)
+    
+    def _register_hooks(self, method='grad_cam_no_relu'):
+        """
+        Register hooks to capture features, gradients, and implement guided backpropagation if needed
+        
+        Parameters
+        ----------
+        method : str
+            Visualization method: 'grad_cam', 'grad_cam_no_relu', or 'guided_grad_cam'
+        """
         # Clear any existing hooks
         self.handles = []
         
@@ -72,13 +95,21 @@ class AtomImportanceVisualizer:
         # Register backward hook to capture gradients
         self.handles.append(target_layer.register_full_backward_hook(self._save_gradients))
         
-    def calculate_atom_importance(self, atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, 
-                                 extra_fea=None, task_idx=0, return_gradients=False):
-        """
-        Calculate atom importance scores using Grad-CAM
+        # For Guided Grad-CAM, also register hooks for guided backpropagation
+        if method == 'guided_grad_cam':
+            # Save input gradients from the last conv layer
+            self.handles.append(target_layer.register_full_backward_hook(self._save_input_gradients))
+            
+            # Replace ReLU backward hooks with guided backprop hooks
+            for module in self.model.modules():
+                if isinstance(module, nn.ReLU):
+                    self.handles.append(module.register_full_backward_hook(self._guided_backprop_relu_hook))
         
-        This implementation follows Grad-CAM principles but omits the final ReLU activation
-        to preserve both positive and negative contribution scores from atoms.
+    def calculate_atom_importance(self, atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, 
+                                 extra_fea=None, task_idx=0, return_gradients=False,
+                                 method='grad_cam_no_relu'):
+        """
+        Calculate atom importance scores using various gradient-based visualization methods
         
         Parameters
         ----------
@@ -96,19 +127,31 @@ class AtomImportanceVisualizer:
             Index of the task to analyze
         return_gradients : bool, default=False
             Whether to return raw gradients along with importance scores
+        method : str, default='grad_cam_no_relu'
+            Visualization method to use. Options:
+            - 'grad_cam': Standard Grad-CAM with ReLU activation (positive contributions only)
+            - 'grad_cam_no_relu': Grad-CAM without ReLU (preserves positive and negative contributions)
+            - 'guided_grad_cam': Guided Grad-CAM (combines Grad-CAM with Guided Backpropagation)
             
         Returns
         -------
         dict
             Contains atom importance scores and optionally raw gradients
         """
+        if method not in ['grad_cam', 'grad_cam_no_relu', 'guided_grad_cam']:
+            raise ValueError(f"Unsupported method: {method}. Choose from 'grad_cam', 'grad_cam_no_relu', or 'guided_grad_cam'")
+        
+        # Store original atom features for guided backpropagation
+        original_atom_fea = atom_fea.clone().detach().requires_grad_(True) if method == 'guided_grad_cam' else None
+        
         # Reset gradients and cached features/gradients
         self.model.zero_grad()
         self.gradients = None
         self.atom_features = None
+        self.input_gradients = None
         
-        # Register hooks to capture feature maps and gradients
-        self._register_hooks()
+        # Register hooks according to the selected method
+        self._register_hooks(method=method)
         
         # Forward pass with gradient tracking
         with torch.set_grad_enabled(True):
@@ -118,7 +161,7 @@ class AtomImportanceVisualizer:
                 outputs, _ = self.model(atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, None)
             
             target = outputs[task_idx]
-            print("Predicted output:", target)
+            print(f"Predicted output [{method}]:", target)
             
             # For regression, we compute gradient of the output directly
             # For classification, we compute gradient of the specific class prediction
@@ -126,16 +169,17 @@ class AtomImportanceVisualizer:
                 if target.shape[1] > 1:  # Multi-class
                     target = torch.max(target, dim=1)[0]
             
-            # Compute gradients w.r.t the target layer's activations (not input features)
+            # Compute gradients w.r.t the target layer's activations
             target.mean().backward()
         
         # Make sure we have captured the features and gradients
         if self.gradients is None or self.atom_features is None:
             raise RuntimeError("Failed to capture features or gradients. Hooks may not be properly registered.")
             
-        # Calculate importance scores using Grad-CAM
+        # Calculate importance scores based on the selected method
         importance_per_crystal = []
         gradients_per_crystal = []
+        guided_gradients_per_crystal = []
         
         # Global average pooling of gradients to get weights
         # Shape: [num_features_in_conv_output]
@@ -146,6 +190,15 @@ class AtomImportanceVisualizer:
         weighted_activations = self.atom_features * alpha_k_c.unsqueeze(0)
         atom_importance_scores = torch.sum(weighted_activations, dim=1)
         
+        # Apply ReLU for standard Grad-CAM (positive contributions only)
+        if method in ['grad_cam', 'guided_grad_cam']:
+            atom_importance_scores = torch.relu(atom_importance_scores)
+        
+        # For Guided Grad-CAM, we need to get the guided gradients
+        guided_gradients = None
+        if method == 'guided_grad_cam' and self.input_gradients is not None:
+            guided_gradients = self.input_gradients
+        
         # Process importance scores for each crystal
         for idx_map in crystal_atom_idx:
             # Get importance scores for atoms in this crystal
@@ -155,6 +208,18 @@ class AtomImportanceVisualizer:
             if return_gradients:
                 crystal_gradients = self.gradients[idx_map].detach().cpu().numpy()
                 gradients_per_crystal.append(crystal_gradients)
+            
+            # For Guided Grad-CAM, we need to multiply Grad-CAM heatmap with guided gradients
+            if method == 'guided_grad_cam' and guided_gradients is not None:
+                # Get guided gradients for this crystal
+                crystal_guided_grads = guided_gradients[idx_map].detach().cpu().numpy()
+                guided_gradients_per_crystal.append(crystal_guided_grads)
+                
+                # Element-wise product of Grad-CAM and guided gradients
+                # This is the core of Guided Grad-CAM
+                atom_importance = atom_importance.reshape(-1, 1) * crystal_guided_grads
+                # Take the sum along feature dimensions
+                atom_importance = np.sum(atom_importance, axis=1)
             
             # Normalize importance scores by the maximum absolute value to preserve signs
             max_abs_value = np.max(np.abs(atom_importance)) + 1e-10
@@ -168,10 +233,14 @@ class AtomImportanceVisualizer:
             
         result = {
             'atom_importance': importance_per_crystal,
+            'method': method
         }
         
         if return_gradients:
             result['gradients'] = gradients_per_crystal
+            
+        if method == 'guided_grad_cam' and guided_gradients is not None:
+            result['guided_gradients'] = guided_gradients_per_crystal
             
         return result
     
@@ -180,7 +249,7 @@ class AtomImportanceVisualizer:
     def visualize_atom_importance(self, atoms, atom_importance, atom_elements=None,
                                     title=None, colormap='coolwarm',
                                     highlight_threshold=0.7, show_legend=True, 
-                                    show_labels=False, show_cell=True,
+                                    show_cell=True,
                                     width="100%", height="500px", **kwargs):
         """
         Visualize atom importance scores in interactive 3D using NGLView
@@ -201,8 +270,6 @@ class AtomImportanceVisualizer:
             Threshold for highlighting important atoms (based on absolute importance values)
         show_legend : bool, default=True
             Whether to show a color legend
-        show_labels : bool, default=False
-            Whether to show atom labels (default is False now, as labels have been simplified)
         show_cell : bool, default=True
             Whether to show the unit cell
         width : str, optional
@@ -236,7 +303,6 @@ class AtomImportanceVisualizer:
             colormap=colormap,
             highlight_threshold=highlight_threshold,
             show_legend=show_legend,
-            show_labels=show_labels,
             show_cell=show_cell,
             width=width,
             height=height,
@@ -284,7 +350,8 @@ class AtomImportanceVisualizer:
         return views
     
     def analyze_mof(self, atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, atoms,
-                       atom_elements=None, extra_fea=None, task_idx=0, colormap='coolwarm', **kwargs):
+                       atom_elements=None, extra_fea=None, task_idx=0, colormap='coolwarm', 
+                       method='grad_cam_no_relu', compare_methods=False, **kwargs):
         """
         Complete workflow to analyze and interactively visualize atom importance in a MOF
         
@@ -308,6 +375,10 @@ class AtomImportanceVisualizer:
             Index of task(s) to analyze. If a list, will compare multiple tasks.
         colormap : str, default='coolwarm'
             Matplotlib colormap name. 'coolwarm' is good for diverging data with positive/negative values.
+        method : str, default='grad_cam_no_relu'
+            Visualization method to use: 'grad_cam', 'grad_cam_no_relu', or 'guided_grad_cam'
+        compare_methods : bool, default=False
+            If True, generates visualizations for all methods for comparison
         **kwargs
             Additional visualization parameters
             
@@ -320,6 +391,38 @@ class AtomImportanceVisualizer:
             print("NGLView or NGLAtomVisualizer is not available. Cannot create interactive visualization.")
             print("Install with: pip install nglview")
             return None
+
+        # For method comparison, analyze with all methods
+        if compare_methods:
+            methods = ['grad_cam', 'grad_cam_no_relu', 'guided_grad_cam']
+            method_results = {}
+            
+            for method_name in methods:
+                try:
+                    result = self.calculate_atom_importance(
+                        atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, 
+                        extra_fea=extra_fea, task_idx=task_idx if not isinstance(task_idx, (list, tuple)) else task_idx[0],
+                        method=method_name
+                    )
+                    
+                    method_title = {
+                        'grad_cam': 'Grad-CAM (ReLU)',
+                        'grad_cam_no_relu': 'Grad-CAM (w/o ReLU)',
+                        'guided_grad_cam': 'Guided Grad-CAM'
+                    }[method_name]
+                    
+                    method_results[method_title] = result['atom_importance'][0]
+                except Exception as e:
+                    print(f"Error calculating {method_name}: {str(e)}")
+            
+            # Return multi-method comparison
+            return self.compare_task_importance(
+                atoms=atoms,
+                task_importances=method_results,
+                atom_elements=atom_elements,
+                colormap=colormap,
+                **kwargs
+            )
             
         # If analyzing multiple tasks, generate task_importances dict
         if isinstance(task_idx, (list, tuple)):
@@ -331,7 +434,7 @@ class AtomImportanceVisualizer:
                 
                 result = self.calculate_atom_importance(
                     atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, 
-                    extra_fea=extra_fea, task_idx=idx
+                    extra_fea=extra_fea, task_idx=idx, method=method
                 )
                 task_results[task_name] = result['atom_importance'][0]
             
@@ -347,15 +450,21 @@ class AtomImportanceVisualizer:
             # Calculate importance for single task
             result = self.calculate_atom_importance(
                 atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, 
-                extra_fea=extra_fea, task_idx=task_idx
+                extra_fea=extra_fea, task_idx=task_idx, method=method
             )
             
             importance = result['atom_importance'][0]
             
-            # Create title
-            title = f"Task {task_idx} - Atom Importance (Grad-CAM)"
+            # Create title with method information
+            method_suffix = {
+                'grad_cam': '(Grad-CAM with ReLU)',
+                'grad_cam_no_relu': '(Grad-CAM w/o ReLU)',
+                'guided_grad_cam': '(Guided Grad-CAM)'
+            }.get(method, '')
+            
+            title = f"Task {task_idx} - Atom Importance {method_suffix}"
             if hasattr(self.model, 'task_types') and task_idx < len(self.model.task_types):
-                title = f"Task {task_idx} ({self.model.task_types[task_idx]}) - Atom Importance (Grad-CAM)"
+                title = f"Task {task_idx} ({self.model.task_types[task_idx]}) - Atom Importance {method_suffix}"
             
             # Return single task visualization
             return self.visualize_atom_importance(
@@ -366,3 +475,98 @@ class AtomImportanceVisualizer:
                 colormap=colormap,
                 **kwargs
             )
+    
+    def compare_visualization_methods(self, atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, atoms,
+                                  atom_elements=None, extra_fea=None, task_idx=0, 
+                                  colormap='coolwarm', **kwargs):
+        """
+        Compare different atom importance visualization methods
+        
+        This is a specialized method that explicitly shows the differences between
+        Grad-CAM, Grad-CAM without ReLU, and Guided Grad-CAM visualizations.
+        
+        Parameters
+        ----------
+        atom_fea : torch.Tensor
+            Atom features
+        nbr_fea : torch.Tensor
+            Neighbor features
+        nbr_fea_idx : torch.LongTensor
+            Neighbor indices
+        crystal_atom_idx : list of torch.LongTensor
+            Mapping from crystal idx to atom idx
+        atoms : ase.Atoms
+            ASE Atoms object representing the crystal structure
+        atom_elements : list, optional
+            Element names for each atom
+        extra_fea : torch.Tensor, optional
+            Extra features
+        task_idx : int, default=0
+            Index of the task to analyze
+        colormap : str, default='coolwarm'
+            Matplotlib colormap name
+        **kwargs
+            Additional visualization parameters
+            
+        Returns
+        -------
+        dict
+            Dictionary of NGLView widgets for each method
+        """
+        print("Comparing atom importance visualization methods...")
+        print("1. Grad-CAM (with ReLU): Only positive contributions are shown")
+        print("2. Grad-CAM (without ReLU): Both positive and negative contributions are preserved")
+        print("3. Guided Grad-CAM: Fine-grained visualization combining Grad-CAM with guided backpropagation")
+        
+        methods = {
+            'Grad-CAM (with ReLU)': 'grad_cam',
+            'Grad-CAM (without ReLU)': 'grad_cam_no_relu',
+            'Guided Grad-CAM': 'guided_grad_cam'
+        }
+        
+        method_results = {}
+        
+        for title, method_name in methods.items():
+            try:
+                print(f"\nCalculating {title}...")
+                result = self.calculate_atom_importance(
+                    atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, 
+                    extra_fea=extra_fea, task_idx=task_idx,
+                    method=method_name
+                )
+                method_results[title] = result['atom_importance'][0]
+                print(f"✓ {title} calculation complete")
+                
+                # Print statistics about the importance scores
+                importance = result['atom_importance'][0]
+                print(f"   Range: [{np.min(importance):.3f}, {np.max(importance):.3f}]")
+                print(f"   Mean: {np.mean(importance):.3f}, Std: {np.std(importance):.3f}")
+                print(f"   Number of atoms with positive scores: {np.sum(importance > 0)}/{len(importance)}")
+                
+                if method_name != 'grad_cam':  # Not applicable for standard Grad-CAM which is all positive
+                    print(f"   Number of atoms with negative scores: {np.sum(importance < 0)}/{len(importance)}")
+                    
+            except Exception as e:
+                print(f"Error calculating {title}: {str(e)}")
+                print("This method will not be included in the comparison")
+        
+        # Print method comparison summary
+        print("\nMethod Comparison Summary:")
+        print("---------------------------")
+        print("- Grad-CAM (with ReLU): Only positive contributions are shown. Highlights atoms that positively contribute to the prediction.")
+        print("- Grad-CAM (without ReLU): Both positive and negative contributions are preserved. Red indicates positive contribution, blue indicates negative.")
+        print("- Guided Grad-CAM: Fine-grained visualization that combines class-specificity with high resolution details.")
+        
+        if not HAS_NGLVIEW or NGLAtomVisualizer is None:
+            print("\nNGLView or NGLAtomVisualizer is not available. Cannot create interactive visualization.")
+            print("Install with: pip install nglview")
+            return method_results
+        
+        # Return multi-method comparison visualization
+        return self.compare_task_importance(
+            atoms=atoms,
+            task_importances=method_results,
+            atom_elements=atom_elements,
+            colormap=colormap,
+            **kwargs
+        )

@@ -16,7 +16,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(script_dir)
 sys.path.append(parent_dir)
 
-from src.cgcnn.module.atom_visualizer import AtomImportanceVisualizer
+from src.cgcnn.visualization.atom_visualizer import AtomImportanceVisualizer
 from src.cgcnn.module.att_cgcnn import CrystalGraphConvNet
 from src.cgcnn.inference import InferenceDataset
 from src.cgcnn.datamodule.prepare_data import make_prepared_data
@@ -114,7 +114,7 @@ def load_dataset(cif_path, radius=8.0, max_num_nbr=10, dmin=0, step=0.2):
     return dataset
 
 def visualize_atom_importance(model, cif_path, task_idx=0, visualize=True, save_path=None,
-                             highlight_threshold=0.7, colormap='plasma'):
+                             highlight_threshold=0.7, colormap='plasma', method='grad_cam_no_relu'):
     """
     Visualize atom importance for a MOF structure
     
@@ -134,6 +134,8 @@ def visualize_atom_importance(model, cif_path, task_idx=0, visualize=True, save_
         Threshold for highlighting important atoms
     colormap : str, optional
         Matplotlib colormap name
+    method : str, optional
+        Visualization method: 'grad_cam', 'grad_cam_no_relu', or 'guided_grad_cam'
         
     Returns
     -------
@@ -148,10 +150,6 @@ def visualize_atom_importance(model, cif_path, task_idx=0, visualize=True, save_
     
     # Get data for the first (and only) structure
     data_dict = dataset[0]
-    atom_fea = data_dict["atom_fea"] 
-    nbr_fea = data_dict["nbr_fea"]
-    nbr_fea_idx = data_dict["nbr_fea_idx"]
-    extra_fea = data_dict["extra_fea"]
     cif_id = data_dict["cif_id"]
     
     # Get atom coordinates and elements from the CIF file
@@ -173,7 +171,8 @@ def visualize_atom_importance(model, cif_path, task_idx=0, visualize=True, save_
     # Calculate atom importance
     result = visualizer.calculate_atom_importance(
         atom_fea_batch, nbr_fea_batch, nbr_fea_idx_batch, crystal_atom_idx_batch,
-        extra_fea=data_batch["extra_fea"], task_idx=task_idx, return_gradients=True
+        extra_fea=data_batch["extra_fea"], task_idx=task_idx, return_gradients=True,
+        method=method
     )
     
     # Store original data
@@ -205,7 +204,8 @@ def visualize_atom_importance(model, cif_path, task_idx=0, visualize=True, save_
     
     return result
 
-def main(model_path, cif_path, task_idx=0, save_dir=None):
+def main(model_path, cif_path, task_idx=0, save_dir=None, method='grad_cam_no_relu',
+         colormap='coolwarm', highlight_threshold=0.7):
     """
     Main function to visualize atom importance for a MOF structure
     
@@ -219,15 +219,30 @@ def main(model_path, cif_path, task_idx=0, save_dir=None):
         Index of the task to analyze
     save_dir : str, optional
         Directory to save visualizations
+    method : str, optional
+        Visualization method: 'grad_cam', 'grad_cam_no_relu', or 'guided_grad_cam'
+    colormap : str, optional
+        Matplotlib colormap name
+    highlight_threshold : float, optional
+        Threshold for highlighting important atoms
     """
     # Load model
     model = load_model(model_path)
     print(f"Loaded model from {model_path}")
     print(f"Model task types: {model.task_types}")
     
+    # Print visualization method info
+    method_info = {
+        'grad_cam': "Grad-CAM with ReLU (positive contributions only)",
+        'grad_cam_no_relu': "Grad-CAM without ReLU (positive and negative contributions)",
+        'guided_grad_cam': "Guided Grad-CAM (fine-grained visualization)"
+    }
+    print(f"Using visualization method: {method_info.get(method, method)}")
+    
     # Visualize atom importance
     result = visualize_atom_importance(
-        model, cif_path, task_idx=task_idx, visualize=True, save_path=save_dir
+        model, cif_path, task_idx=task_idx, visualize=True, save_path=save_dir,
+        method=method, colormap=colormap, highlight_threshold=highlight_threshold
     )
     
     # Print summary
@@ -248,7 +263,15 @@ if __name__ == "__main__":
     parser.add_argument("--cif_path", type=str, required=True, help="Path to CIF file")
     parser.add_argument("--task_idx", type=int, default=0, help="Task index to analyze")
     parser.add_argument("--save_dir", type=str, default=None, help="Directory to save visualizations")
+    parser.add_argument("--method", type=str, default='grad_cam_no_relu', 
+                      choices=['grad_cam', 'grad_cam_no_relu', 'guided_grad_cam'],
+                      help="Visualization method to use")
+    parser.add_argument("--colormap", type=str, default='coolwarm', 
+                      help="Matplotlib colormap for visualization")
+    parser.add_argument("--highlight_threshold", type=float, default=0.7,
+                      help="Threshold for highlighting important atoms (0.0-1.0)")
     
     args = parser.parse_args()
     
-    main(args.model_path, args.cif_path, args.task_idx, args.save_dir)
+    main(args.model_path, args.cif_path, args.task_idx, args.save_dir,
+        method=args.method, colormap=args.colormap, highlight_threshold=args.highlight_threshold)

@@ -6,16 +6,28 @@ The MOFSNN project now includes advanced tools for visualizing atom-level import
 
 ## Atom Importance Methods
 
-The project implements two approaches to calculate atom importance:
+The project implements three approaches to calculate atom importance:
 
-1. **Grad-CAM Implementation** (Current Default)
+1. **Grad-CAM (without ReLU)** (Default)
    - Based on the Gradient-weighted Class Activation Mapping technique
    - Captures both positive and negative contributions of atoms to model predictions
    - Shows how atoms promote or inhibit specific predictions
    - Uses weights derived from gradients flowing into the final convolutional layer
    - Omits the final ReLU activation to preserve positive and negative contributions
 
-2. **Gradient Magnitude** (Legacy Implementation)
+2. **Grad-CAM (with ReLU)**
+   - Standard implementation of Gradient-weighted Class Activation Mapping
+   - Only shows positive contributions to predictions
+   - Applies ReLU to the weighted activations (ReLU(weighted sum))
+   - Highlights atoms that positively contribute to predictions
+
+3. **Guided Grad-CAM**
+   - Combines Grad-CAM with Guided Backpropagation
+   - Provides fine-grained visualization with high detail
+   - Shows both class-specific focus and structural details
+   - Implemented as element-wise multiplication of Grad-CAM and guided gradients
+
+4. **Gradient Magnitude** (Legacy Implementation)
    - Based on the magnitude of gradients of the input features
    - Only shows the strength of influence, not the direction (positive/negative)
 
@@ -41,8 +53,14 @@ The project supports multiple visualization approaches:
 You can use the visualization tools from the command line:
 
 ```bash
-# Basic static visualization
+# Basic visualization with default method (Grad-CAM without ReLU)
 python examples/atom_importance_visualization.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --task_idx 0 --save_dir results/atom_importance
+
+# Specify a different visualization method
+python examples/atom_importance_visualization.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --task_idx 0 --method guided_grad_cam --save_dir results/atom_importance
+
+# Compare all visualization methods
+python examples/compare_atom_visualization_methods.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --save_html
 
 # Interactive NGLView visualization
 python examples/interactive_atom_visualization.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --task_idx 0 --save_html --save_dir results/atom_importance
@@ -77,7 +95,7 @@ jupyter-nbextension enable nglview --py --sys-prefix
 Here's a simple example of using the visualization API in your code:
 
 ```python
-from src.cgcnn.module.atom_visualizer import AtomImportanceVisualizer
+from src.cgcnn.visualization.atom_visualizer import AtomImportanceVisualizer
 import ase.io
 
 # Load model and structure
@@ -87,12 +105,24 @@ atoms = ase.io.read('/path/to/structure.cif')
 # Create visualizer
 visualizer = AtomImportanceVisualizer(model)
 
-# Calculate atom importance
+# Calculate atom importance with the default method (Grad-CAM without ReLU)
 results = visualizer.calculate_atom_importance(atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx)
 importance = results['atom_importance'][0]
 
+# Calculate atom importance with standard Grad-CAM (with ReLU)
+results_relu = visualizer.calculate_atom_importance(
+    atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, 
+    method='grad_cam'
+)
+
+# Calculate atom importance with Guided Grad-CAM
+results_guided = visualizer.calculate_atom_importance(
+    atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, 
+    method='guided_grad_cam'
+)
+
 # Interactive visualization with NGLView
-view = visualizer.visualize_atom_importance_ngl(
+view = visualizer.visualize_atom_importance(
     atoms=atoms,
     atom_importance=importance,
     title="Atom Importance in MOF Structure",
@@ -102,8 +132,14 @@ view = visualizer.visualize_atom_importance_ngl(
 # Display the view in a Jupyter notebook
 display(view)
 
+# Compare all methods at once
+method_views = visualizer.compare_visualization_methods(
+    atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx, 
+    atoms=atoms
+)
+
 # Compare importance across multiple tasks
-task_views = visualizer.compare_task_importance_ngl(
+task_views = visualizer.compare_task_importance(
     atoms=atoms,
     task_importances={
         "Task 0": importance_task0,
@@ -168,3 +204,28 @@ The NGLView visualization implementation uses a simplified, consistent approach:
 - Support for different color schemes and scaling options
 - Compatible with models using average pooling or attention mechanisms
 - Works for both classification and regression tasks
+
+## Comparing Visualization Methods
+
+You can compare different visualization methods to gain more comprehensive insights into model behavior:
+
+```bash
+# Compare visualization methods from command line
+python examples/compare_atom_visualization_methods.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --task_idx 0 --save_html
+```
+
+Each method has specific strengths:
+
+1. **Grad-CAM (with ReLU)**
+   - Best for: Focusing only on atoms that positively contribute to predictions
+   - Use when: You want to identify the most important atoms promoting a property
+
+2. **Grad-CAM (without ReLU)**
+   - Best for: Understanding both promoting and inhibiting effects
+   - Use when: You need to see the full picture of atom contributions
+
+3. **Guided Grad-CAM**
+   - Best for: Detailed, fine-grained structural analysis
+   - Use when: You need high-resolution visualization of specific structural features
+
+For a detailed comparison of methods, see the dedicated document: [Visualization Method Comparison](visualization_method_comparison.md)
