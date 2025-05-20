@@ -113,11 +113,18 @@ unzip WS24v2.zip
 unzip CoREMOF2019.zip
 ```
 
-## Atom Importance Visualization
+## Model Visualization Tools
 
-The project includes tools for visualizing atom-level importance in CGCNN models, even for models using average pooling rather than attention mechanisms. This helps interpret which atoms most influence the model's predictions.
+The project includes advanced tools for visualizing and explaining CGCNN model predictions at different levels:
 
-### Using the Visualization Tool
+1. **Atom Importance Visualization** - Understand which atoms influence predictions
+2. **Feature Importance Visualization** - Analyze the importance of crystal and extra features
+
+### Atom Importance Visualization
+
+This tool helps interpret which atoms most influence the model's predictions, even for models using average pooling rather than attention mechanisms.
+
+#### Using the Atom Visualization Tool
 
 You can visualize atom importance using the provided example script:
 
@@ -135,7 +142,7 @@ jupyter notebook notebooks/16_atom_importance_visualization.ipynb
 jupyter notebook notebooks/16_atom_importance_visualization_interactive.ipynb
 ```
 
-### Visualization Features
+#### Atom Visualization Features
 
 - Gradient-based attribution of importance to individual atoms
 - Multiple visualization methods:
@@ -147,6 +154,38 @@ jupyter notebook notebooks/16_atom_importance_visualization_interactive.ipynb
 - Interactive rotation, zoom, and inspection in 3D
 - Compatible with models using average pooling or attention pooling
 - Works for both classification and regression tasks
+
+### Feature Importance Visualization
+
+This tool helps analyze the relative importance of crystal features and extra features at the `conv_to_fc` layer where they are combined, using a Grad-CAM approach.
+
+#### Using the Feature Visualization Tool
+
+You can visualize feature importance using the provided example script:
+
+```bash
+# Visualize feature importance for a single task
+python examples/feature_importance_visualization.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --task_idx 0 --save_dir results/feature_importance
+
+# Show both positive and negative contributions
+python examples/feature_importance_visualization.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --no_relu
+
+# Compare feature importance across all tasks
+python examples/feature_importance_visualization.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --compare_tasks
+
+# Analyze specific sample in batch (instead of batch average)
+python examples/feature_importance_visualization.py --model_path /path/to/model/checkpoint.ckpt --cif_path /path/to/structure.cif --sample_idx 0
+```
+
+#### Feature Visualization Capabilities
+
+- Analyze importance of both crystal features (`crys_fea`) and extra features (`extra_fea`)
+- Visualize importance as a colored strip with clear separation between feature types
+- Apply ReLU to focus on positive contributions or disable it to see both positive and negative influences
+- Compare feature importance patterns across multiple tasks
+- Analyze individual samples in a batch (rather than batch average)
+- Print detailed statistics about the most important features
+- Generate high-quality visualizations suitable for publications
 
 ### Interactive 3D Visualization Requirements
 
@@ -178,3 +217,12 @@ conda install -c conda-forge ovito
 - Added method comparison functionality in `compare_visualization_methods.py` example
 - Created detailed documentation in `docs/visualization_method_comparison.md`
 - Updated API to allow method selection via `method` parameter
+
+#### 2025-05-20: Feature Importance Visualization
+- Implemented a new feature importance visualization method that uses Grad-CAM approach
+- Added visualization for both crystal features (`crys_fea`) and extra features (`extra_fea`)
+- Introduced colored strip visualization with clear separation between feature types
+- Added support for comparing feature importance across multiple tasks
+- Created easy-to-use example script in `examples/feature_importance_visualization.py`
+- Added optional ReLU activation for focusing on positive feature contributions
+- Supported per-sample analysis for detailed examination of individual samples

@@ -168,73 +168,41 @@ class NGLAtomVisualizer:
         cmap = plt.get_cmap(colormap)
         colors = [to_hex(cmap(val)) for val in norm_importance]
         
-        # Create NGLView widget
-        try:
-            import nglview as nv
-            self.view = nv.show_ase(atoms)
-            
-            # Clear default representation and add base representation
-            self.view.clear()
-            self.view.add_ball_and_stick(aspectRatio=3.0)
-            
-            # Apply custom atom colors and sizes
-            for i, (color, size_factor) in enumerate(zip(colors, size_importance)):
-                atom_size = min_size + (max_size - min_size) * size_factor
-                self.view.add_ball_and_stick(selection=f"@{i}", color=color, radius=atom_size*size_scale, aspectRatio=1)
-            
-            # Initialize GUI components if available
-            if hasattr(self.view, '_init_gui') and callable(self.view._init_gui):
-                self.view._init_gui()        
-            # Highlight important atoms            
-            if highlight_threshold is not None:
-                # Identify atoms above the importance threshold (based on absolute values)
-                important_indices = np.where(size_importance >= highlight_threshold)[0]
-                if len(important_indices) > 0:
-                    # Create selection of important atoms
-                    selection_string = " or ".join([f"@{idx}" for idx in important_indices])
+        import nglview as nv
+        self.view = nv.show_ase(atoms)
+        
+        # Clear default representation and add base representation
+        self.view.clear()
+        self.view.add_ball_and_stick(aspectRatio=3.0)
+        
+        # Apply custom atom colors and sizes
+        for i, (color, size_factor) in enumerate(zip(colors, size_importance)):
+            atom_size = min_size + (max_size - min_size) * size_factor
+            self.view.add_ball_and_stick(selection=f"@{i}", color=color, radius=atom_size*size_scale, aspectRatio=1)
+        
+        # Initialize GUI components if available
+        if hasattr(self.view, '_init_gui') and callable(self.view._init_gui):
+            self.view._init_gui()        
+        # Highlight important atoms            
+        if highlight_threshold is not None:
+            # Identify atoms above the importance threshold (based on absolute values)
+            important_indices = np.where(size_importance >= highlight_threshold)[0]
+            if len(important_indices) > 0:
+                # Create selection of important atoms
+                selection_string = " or ".join([f"@{idx}" for idx in important_indices])
+                
+                # Add special representation for important atoms
+                self.view.add_spacefill(selection=selection_string, opacity=0.4)
+                
+                # Print important atoms to console for reference
+                # if atom_elements is not None:
+                    # print("Important atoms with high contribution values:")
+                    # for idx in important_indices:
+                    #     if idx < len(atom_elements) and idx < len(atom_importance):
+                    #         element = atom_elements[idx]
+                    #         imp_value = atom_importance[idx]
+                    #         print(f"  {element} (atom {idx}): {imp_value:.3f}")
                     
-                    # Add special representation for important atoms
-                    self.view.add_spacefill(selection=selection_string, opacity=0.4)
-                    
-                    # Print important atoms to console for reference
-                    if atom_elements is not None:
-                        print("Important atoms with high contribution values:")
-                        for idx in important_indices:
-                            if idx < len(atom_elements) and idx < len(atom_importance):
-                                element = atom_elements[idx]
-                                imp_value = atom_importance[idx]
-                                print(f"  {element} (atom {idx}): {imp_value:.3f}")
-                        
-                        # Add simple atom selection handler for clicked atoms 
-                        try:
-                            # Create the picked property if it doesn't exist
-                            if not hasattr(self.view, 'picked'):
-                                self.view.picked = {"atom1": {"serial": -1}}
-                            
-                            # Define a reliable callback function
-                            def on_picked(change):
-                                try:
-                                    if change and 'new' in change and change['new']:
-                                        if 'atom1' in change['new'] and 'index' in change['new']['atom1']:
-                                            idx = change['new']['atom1']['index']
-                                            if idx < len(atom_elements) and idx < len(atom_importance):
-                                                element = atom_elements[idx]
-                                                imp_value = atom_importance[idx]
-                                                print(f"Selected atom: {element} (atom {idx}), Importance: {imp_value:.3f}")
-                                except Exception as e:
-                                    # Ignore errors in callback
-                                    pass
-                            
-                            # Register the callback safely
-                            if hasattr(self.view, 'observe'):
-                                self.view.observe(on_picked, names=["picked"])
-                                print("Click on atoms to see detailed importance values in the console")
-                        except Exception as e:
-                            # If observe fails, don't interrupt the visualization
-                            pass
-        except Exception as e:
-            print(f"Error creating NGLView visualization: {traceback.format_exc()}")
-            return None
         
         # Set view properties
         if show_cell:
