@@ -14,7 +14,8 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import glob
 import re
-from typing import Dict, List, Tuple, Optional, Any, Union, Set
+import math
+from typing import Dict, List, Tuple, Optional, Any, Union, Set, Sequence
 
 
 def extract_model_name_from_path(path: Union[str, Path]) -> str:
@@ -71,7 +72,7 @@ def load_uncertainty_data(file_path: Union[str, Path], model_name_map: Dict[str,
 
 
 def find_uncertainty_csv_files(
-    model_result_dirs: List[Union[str, Path]],
+    model_result_dirs: Sequence[Union[str, Path]],
     task_name: str,
     split: str = 'val',
     uncertainty_type: Optional[str] = None
@@ -113,26 +114,35 @@ def find_uncertainty_csv_files(
 
 
 def compare_uncertainty_evolution(
-    model_result_dirs: List[Union[str, Path]],
+    model_result_dirs: Sequence[Union[str, Path]],
     model_name_map: Dict[str, str],
     task_name: str,
     output_dir: Union[str, Path],
     split: str = 'val',
     uncertainty_type: Optional[str] = None,
     best_epoch_marker: bool = True,
-    output_filename: Optional[str] = None
+    output_filename: Optional[str] = None,
+    ax: Optional[plt.Axes] = None,
+    base_fontsize: int = 12,
+    show_legend: bool = True,
+    show_xlabel: bool = True,
+    show_ylabel: bool = True,
 ) -> Optional[pd.DataFrame]:
     """
     Compare the uncertainty evolution of different models for the same task and data split.
     
     Args:
         model_result_dirs: List of directories containing model results
+        model_name_map: Mapping from directory names to display names
         task_name: Name of the task to compare
         output_dir: Directory to save comparison plots
         split: Data split to analyze ('train', 'val', or 'test')
         uncertainty_type: Type of uncertainty to compare ('LSV' or 'LSE'), if None, will be determined from files
         best_epoch_marker: Whether to mark best epochs in the plot
         output_filename: Custom filename for the output plot, if None will generate automatically
+        ax: Matplotlib axis object to plot on, if None creates a new figure
+        base_fontsize: Base font size for plot elements
+        show_legend: Whether to show the legend on the plot
         
     Returns:
         Combined DataFrame with all model data, or None if no data found
@@ -182,8 +192,12 @@ def compare_uncertainty_evolution(
     if uncertainty_type is None:
         uncertainty_type = actual_uncertainty_type
     
-    # Generate plot
-    plt.figure(figsize=(12, 8))
+    # Create figure if ax is not provided
+    standalone_figure = ax is None
+    if standalone_figure:
+        fig, ax = plt.subplots(figsize=(12, 8))
+        
+    # Now ax is guaranteed to be a valid Axes object
     
     # Use distinct colors, line styles, and markers for different models
     line_styles = ['-', '--', '-.', ':']
@@ -206,13 +220,13 @@ def compare_uncertainty_evolution(
         line_style = line_styles[i % len(line_styles)]
         marker = markers[i % len(markers)]
         
-        plt.plot(
+        ax.plot(
             model_data['epoch'], 
             model_data['uncertainty'], 
             linestyle=line_style,
-            marker=marker,
-            markersize=8,
-            markevery=max(1, len(model_data) // 10),  # Show marker every ~10 points
+            # marker=marker,
+            # markersize=6,
+            # markevery=max(1, len(model_data) // 10),  # Show marker every ~10 points
             alpha=0.8,
             label=model
         )
@@ -234,74 +248,88 @@ def compare_uncertainty_evolution(
             # Plot a large distinctive marker at the best epoch point for each model
             if not has_legend_entry:
                 # Only add to legend once
-                plt.plot(
+                ax.plot(
                     epoch, 
                     uncertainty,
                     marker='*',  # Star marker for best epochs
-                    markersize=16,  # Larger size
+                    markersize=12,  # Larger size
                     markerfacecolor='gold',  # Gold color for all best epoch markers
                     markeredgecolor='black',
-                    markeredgewidth=1.5,
+                    markeredgewidth=1.0,
                     linestyle='None',  # No line, just the marker
                     label='Best Epoch'
                 )
                 has_legend_entry = True
             else:
                 # Don't add to legend for subsequent models
-                plt.plot(
+                ax.plot(
                     epoch, 
                     uncertainty,
                     marker='*',  # Star marker for best epochs
-                    markersize=16,  # Larger size
+                    markersize=12,  # Larger size
                     markerfacecolor='gold',  # Gold color for all best epoch markers
                     markeredgecolor='black',
-                    markeredgewidth=1.5,
+                    markeredgewidth=1.0,
                     linestyle='None'  # No line, just the marker
                 )
             
-            # Add a text annotation with the epoch number
-            plt.annotate(
-                f'{model}',
-                xy=(epoch, uncertainty),
-                xytext=(5, 5),  # Offset text slightly
-                textcoords='offset points',
-                fontsize=8,
-                fontweight='normal',
-                bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.8)
-            )
+            # Add a text annotation with the model name
+            # Only add annotations if this is a standalone figure (too crowded otherwise)
+            if standalone_figure or model == 'adam_polynomial':
+                ax.annotate(
+                    f'{model}',
+                    xy=(epoch, uncertainty),
+                    xytext=(5, 5),  # Offset text slightly
+                    textcoords='offset points',
+                    fontsize=base_fontsize,
+                    fontweight='normal',
+                    bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.8)
+                )
     
     # Set plot title and labels
     split_names = {'train': 'Training', 'val': 'Validation', 'test': 'Test'}
     split_name = split_names.get(split, split.capitalize())
     
-    plt.title(f'{uncertainty_type} Evolution for Task "{task_name}" ({split_name} Set)', fontsize=14)
-    plt.xlabel('Epoch', fontsize=12)
-    plt.ylabel(f'Average {uncertainty_type}', fontsize=12)
-    plt.grid(True, linestyle='--', alpha=0.7)
+    # Make title shorter if not a standalone figure
+    if standalone_figure:
+        ax.set_title(f'{uncertainty_type} Evolution for Task "{task_name}" ({split_name} Set)', 
+                   fontsize=base_fontsize+3, fontweight='bold')
+    else:
+        ax.set_title(f'{task_name} ({uncertainty_type})', 
+                   fontsize=base_fontsize+3, fontweight='bold')
+    if show_xlabel:
+        ax.set_xlabel('Epoch', fontsize=base_fontsize+2)
+    if show_ylabel:
+        ax.set_ylabel(f'Average {uncertainty_type}', fontsize=base_fontsize+2)
+    
+    ax.grid(True, linestyle='--', alpha=0.7)
     
     # Add legend with better formatting
-    plt.legend(loc='best', fontsize=10, framealpha=0.7, fancybox=True, frameon=True)
+    if show_legend and (standalone_figure or ax is not None):
+        ax.legend(loc='best', fontsize=base_fontsize, framealpha=0.7, fancybox=True, frameon=True)
     
-    # Save figure
-    if output_filename:
-        output_file = output_dir / output_filename
-    else:
-        output_file = output_dir / f"model_comparison_{task_name}_{uncertainty_type}_{split}.png"
-    
-    plt.tight_layout()
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    print(f"Saved comparison plot to {output_file}")
-    plt.close()
-    
-    # Save combined data to CSV
-    csv_output = output_file.with_suffix('.csv')
-    combined_df.to_csv(csv_output, index=False)
-    print(f"Saved combined data to {csv_output}")
+    # Only save if this is a standalone figure
+    if standalone_figure:
+        # Save figure
+        if output_filename:
+            output_file = output_dir / output_filename
+        else:
+            output_file = output_dir / f"model_comparison_{task_name}_{uncertainty_type}_{split}.png"
+        
+        plt.tight_layout()
+        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        print(f"Saved comparison plot to {output_file}")
+        plt.close()
+        
+        # Save combined data to CSV
+        csv_output = output_file.with_suffix('.csv')
+        combined_df.to_csv(csv_output, index=False)
+        print(f"Saved combined data to {csv_output}")
     
     return combined_df
 
 
-def get_available_tasks(model_result_dirs: List[Union[str, Path]]) -> Set[str]:
+def get_available_tasks(model_result_dirs: Sequence[Union[str, Path]]) -> Set[str]:
     """
     Find all available tasks in the model result directories.
     
@@ -350,25 +378,45 @@ if __name__ == "__main__":
     output_dir = ROOT_DIR/"results/uncertainty_evolution/comparison"
     
     # Get available tasks across all model results
+    task_pool = ["TSD", "SSD", "WS24_water", "WS24_water4", "WS24_acid", "WS24_base", "WS24_boiling"]
     tasks = get_available_tasks(model_result_dirs)
-    
+    tasks = [task for task in task_pool if task in tasks]
+
     if not tasks:
         print("No tasks found in the specified model result directories.")
     else:
         print(f"Available tasks: {', '.join(sorted(tasks))}")
+
+        # Calculate grid dimensions
+        n_tasks = len(tasks)
+        n_cols = min(4, n_tasks)
+        n_rows = math.ceil(n_tasks / n_cols)
+        
+        # Create figure with subplots
+        fig_width = 8 * n_cols
+        fig_height = 6 * n_rows
+        fig, axs = plt.subplots(n_rows, n_cols, figsize=(fig_width, fig_height), 
+                                sharex=True,   # Share axes for better comparison
+                                gridspec_kw={'wspace': 0.15, 'hspace': 0.1},
+                                squeeze=False)
+        axs_flat = axs.flatten()
         
         # For each task, create comparison plots for validation set
-        for task in sorted(tasks):
+        for i, task in enumerate(tasks):
             # Compare LSV (for regression tasks)
+            show_xlabel = i > n_rows  # Show x-label only on the last row
             compare_uncertainty_evolution(
                 model_result_dirs,
                 model_name_map,
                 task,
                 output_dir,
                 split='val',
-                uncertainty_type='LSV'
+                uncertainty_type='LSV',
+                ax=axs_flat[i],  # Use flattened subplot axes
+                base_fontsize=10,
+                show_xlabel=show_xlabel,
             )
-            
+
             # Compare LSE (for classification tasks)
             compare_uncertainty_evolution(
                 model_result_dirs,
@@ -376,7 +424,15 @@ if __name__ == "__main__":
                 task,
                 output_dir,
                 split='val',
-                uncertainty_type='LSE'
+                uncertainty_type='LSE',
+                ax=axs_flat[i],  # Use flattened subplot axes
+                base_fontsize=10,
+                show_xlabel=show_xlabel,
             )
-        
-        print(f"Completed uncertainty evolution comparison for {len(tasks)} tasks.")
+        # Hide unused subplots
+        for j in range(len(tasks), len(axs_flat)):
+            axs_flat[j].set_visible(False)
+        output_file = Path(output_dir) / f"all_tasks_val_combined.png"
+        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        print(f"Saved combined plot to {output_file}")
+        plt.close(fig)

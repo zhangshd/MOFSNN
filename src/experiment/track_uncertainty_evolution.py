@@ -26,7 +26,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 from cgcnn.module.module_utils import calculate_lse_from_tree, calculate_lsv_from_tree
 
 
-def extract_epoch_from_dir(directory: Union[str, Path]) -> Optional[int]:
+def extract_epoch_from_dir(directory: Union[str, Path]) -> int:
     """
     Extract epoch number from directory name.
     
@@ -34,18 +34,19 @@ def extract_epoch_from_dir(directory: Union[str, Path]) -> Optional[int]:
         directory: Directory path, expected to contain 'epoch_XXX' pattern
         
     Returns:
-        Extracted epoch number or None if not found
+        Extracted epoch number or -1 if not found
     """
     match = re.search(r'epoch_(\d+)', str(directory))
     if match:
         return int(match.group(1))
-    return None
+    return -1  # Return -1 instead of None for compatibility with sorting
 
 
 def track_uncertainty_evolution(
     checkpoints_dir: Union[str, Path], 
     output_dir: Union[str, Path],
-    patience: int = 50  # Add patience parameter with default value 50
+    patience: int = 50,  # Add patience parameter with default value 50
+    base_fontsize: int = 12,
 ) -> Dict[str, Dict[str, List[Tuple[int, float]]]]:
     """
     Track the evolution of uncertainty metrics during model training using
@@ -56,7 +57,8 @@ def track_uncertainty_evolution(
                         (from build_latent_vec_tree.py)
         output_dir: Directory to save output analysis results
         patience: Early stopping patience value (default: 50)
-        
+        base_fontsize: Base font size for plots (default: 12)
+
     Returns:
         Dictionary with uncertainty results for each task and data split
     """
@@ -198,15 +200,6 @@ def track_uncertainty_evolution(
         if best_epoch in epochs:
             plt.axvline(x=best_epoch, color='k', linestyle='--', alpha=0.7, 
                        label=f'Best Epoch ({best_epoch})')
-            
-            # Add annotation for best epoch
-            # y_min, y_max = plt.ylim()
-            # y_pos = y_min + 0.9 * (y_max - y_min)  # Position text at 90% of y-axis
-            # plt.annotate(f'Best Epoch: {best_epoch}',
-            #             xy=(best_epoch, y_pos),
-            #             xytext=(best_epoch + 5, y_pos),  # Offset text slightly
-            #             arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.2"),
-            #             bbox=dict(boxstyle="round,pad=0.3", fc="yellow", alpha=0.3))
         
         plt.title(f'Average {uncertainty_type} for {task} during Training')
         plt.xlabel('Epoch')
@@ -232,62 +225,39 @@ def track_uncertainty_evolution(
     regression_tasks = [task for task in tasks if "classification" not in task_types[task]]
     classification_tasks = [task for task in tasks if "classification" in task_types[task]]
     
-    # Create combined plots with dual y-axes for different data splits
-    for split in ['train', 'val', 'test']:
-        # Check if we have both types of tasks for this split
+    # Determine which splits have valid data
+    splits = ['train', 'val', 'test']
+    valid_splits = [split for split in splits if any(len(results[task][split]) > 0 for task in tasks)]
+    
+    if not valid_splits:
+        print("No valid data to plot for combined visualization")
+        return results
+    
+    num_splits = len(valid_splits)
+    print(f"\nCreating combined plot with {num_splits} splits: {', '.join(valid_splits)}")
+    
+    # Create a figure large enough to hold all subplots with good visibility
+    fig, axes = plt.subplots(1, num_splits, figsize=(8 * num_splits, 8), constrained_layout=True)
+    
+    # If only one split is available, convert axes to a list for consistent indexing
+    if num_splits == 1:
+        axes = [axes]
+    
+    # Dictionary to store secondary axes for dual-axis plots
+    secondary_axes = {}
+    
+    # Plot each split in its corresponding subplot
+    for i, split in enumerate(valid_splits):
+        print(f"  Creating subplot for {split} split")
+        
+        # Check if we need dual y-axes for this split
         has_regression = any(len(results[task][split]) > 0 for task in regression_tasks)
         has_classification = any(len(results[task][split]) > 0 for task in classification_tasks)
         
-        if not (has_regression and has_classification):
-            # Create standard combined plot if we don't need dual y-axes
-            plt.figure(figsize=(12, 8))
-            line_styles = ['-', '--', '-.', ':']
-            markers = ['o', 's', '^', 'x', 'D', '*']
-            
-            for i, task in enumerate(tasks):
-                task_type = task_types[task]
-                uncertainty_type = "LSE" if "classification" in task_type else "LSV"
-                
-                if not results[task][split]:
-                    continue
-                
-                plot_epochs, plot_uncertainties = zip(*sorted(results[task][split]))
-                plt.plot(
-                    plot_epochs, plot_uncertainties, 
-                    linestyle=line_styles[i % len(line_styles)],
-                    marker=markers[i % len(markers)],
-                    label=f'{task} ({uncertainty_type})',
-                    alpha=0.8  # Set transparency to 0.8
-                )
-            
-            # Add vertical line for best epoch
-            if best_epoch in epochs:
-                plt.axvline(x=best_epoch, color='k', linestyle='--', alpha=0.7, 
-                           label=f'Best Epoch ({best_epoch})')
-                
-            #     # Add annotation for best epoch
-            #     y_min, y_max = plt.ylim()
-            #     y_pos = y_min + 0.9 * (y_max - y_min)
-            #     plt.annotate(f'Best Epoch: {best_epoch}',
-            #                 xy=(best_epoch, y_pos),
-            #                 xytext=(best_epoch + 5, y_pos),
-            #                 arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.2"),
-            #                 bbox=dict(boxstyle="round,pad=0.3", fc="yellow", alpha=0.3))
-            
-            plt.title(f'Uncertainty Evolution for All Tasks ({split_labels[split]})')
-            plt.xlabel('Epoch')
-            plt.ylabel('Average Uncertainty')
-            plt.legend()
-            plt.grid(True, linestyle='--', alpha=0.7)
-            
-            combined_output_file = output_dir / f"all_tasks_uncertainty_evolution_{split}.png"
-            plt.savefig(combined_output_file, dpi=300, bbox_inches='tight')
-            plt.close()
-            print(f"Saved combined uncertainty evolution plot to {combined_output_file}")
-        else:
-            # Create dual y-axis plot
-            fig, ax1 = plt.subplots(figsize=(14, 8))
-            ax2 = ax1.twinx()  # Create a second y-axis
+        if has_regression and has_classification:
+            print(f"  Using dual y-axes for {split} (regression and classification tasks)")
+            # Create secondary y-axis for this subplot
+            secondary_axes[i] = axes[i].twinx()
             
             line_styles = ['-', '--', '-.', ':']
             markers = ['o', 's', '^', 'x', 'D', '*']
@@ -296,32 +266,32 @@ def track_uncertainty_evolution(
             labels = []  # Combined labels for both types
             
             # Plot regression tasks on left y-axis
-            for i, task in enumerate(regression_tasks):
+            for j, task in enumerate(regression_tasks):
                 if not results[task][split]:
                     continue
                     
                 plot_epochs, plot_uncertainties = zip(*sorted(results[task][split]))
-                line, = ax1.plot(
+                line, = axes[i].plot(
                     plot_epochs, plot_uncertainties, 
-                    linestyle=line_styles[i % len(line_styles)],
-                    marker=markers[i % len(markers)],
-                    color=plt.cm.tab10(i),
+                    linestyle=line_styles[j % len(line_styles)],
+                    # marker=markers[j % len(markers)],
+                    color=f'C{j}',  # Use default color cycle
                     alpha=0.8  # Set transparency to 0.8
                 )
                 lines1.append(line)
                 labels.append(f'{task} (LSV)')
             
             # Plot classification tasks on right y-axis
-            for i, task in enumerate(classification_tasks):
+            for j, task in enumerate(classification_tasks):
                 if not results[task][split]:
                     continue
                     
                 plot_epochs, plot_uncertainties = zip(*sorted(results[task][split]))
-                line, = ax2.plot(
+                line, = secondary_axes[i].plot(
                     plot_epochs, plot_uncertainties, 
-                    linestyle=line_styles[i % len(line_styles)],
-                    marker=markers[(i + len(regression_tasks)) % len(markers)],
-                    color=plt.cm.tab10(i + len(regression_tasks)),
+                    linestyle=line_styles[j % len(line_styles)],
+                    # marker=markers[(j + len(regression_tasks)) % len(markers)],
+                    color=f'C{j + len(regression_tasks)}',  # Use default color cycle with offset
                     alpha=0.8  # Set transparency to 0.8
                 )
                 lines2.append(line)
@@ -329,44 +299,82 @@ def track_uncertainty_evolution(
             
             # Add vertical line for best epoch on both axes
             if best_epoch in epochs:
-                line_best = ax1.axvline(x=best_epoch, color='k', linestyle='--', alpha=0.7)
-                
-                # Add annotation for best epoch
-                # y_min, y_max = ax1.get_ylim()
-                # y_pos = y_min + 0.9 * (y_max - y_min)
-                # ax1.annotate(f'Best Epoch: {best_epoch}',
-                #             xy=(best_epoch, y_pos),
-                #             xytext=(best_epoch + 5, y_pos),
-                #             arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.2"),
-                #             bbox=dict(boxstyle="round,pad=0.3", fc="yellow", alpha=0.3))
+                line_best = axes[i].axvline(x=best_epoch, color='k', linestyle='--', alpha=0.7)
                 
                 # Add best epoch to legend
-                lines2.append(line_best)
+                lines1.append(line_best)
                 labels.append(f'Best Epoch ({best_epoch})')
             
             # Set labels and title
-            ax1.set_xlabel('Epoch')
-            ax1.set_ylabel('Average LSV (Regression)', color='tab:blue', fontsize=12)
-            ax2.set_ylabel('Average LSE (Classification)', color='tab:red', fontsize=12)
-            plt.title(f'Uncertainty Evolution for All Tasks ({split_labels[split]})')
+            axes[i].set_xlabel('Epoch', fontsize=base_fontsize+2)
+            if i == 0:
+                axes[i].set_ylabel('Average LSV (Regression)', fontsize=base_fontsize+2)
+            if i == num_splits - 1:
+                secondary_axes[i].set_ylabel('Average LSE (Classification)', fontsize=base_fontsize+2)
             
             # Add combined legend
             all_lines = lines1 + lines2
-            plt.legend(all_lines, labels, loc='upper center', bbox_to_anchor=(0.5, -0.12), 
-                       fancybox=True, shadow=True, ncol=3)
+            if all_lines and labels and i == 0:  # Ensure we have lines and labels to avoid empty legend
+                # axes[i].legend(all_lines, labels, loc='upper center', bbox_to_anchor=(0.5, -0.08), 
+                #           fancybox=True, shadow=True, ncol=3)
+                axes[i].legend(all_lines, labels, loc='upper center',
+                          fancybox=True, shadow=True, ncol=2)
             
             # Set grid
-            ax1.grid(True, linestyle='--', alpha=0.7)
+            axes[i].grid(True, linestyle='--', alpha=0.7)
             
-            # Adjust layout to fit the legend
-            plt.tight_layout()
-            plt.subplots_adjust(bottom=0.2)
+        else:
+            print(f"  Using single y-axis for {split}")
+            # Create standard plot without dual y-axes
+            line_styles = ['-', '--', '-.', ':']
+            markers = ['o', 's', '^', 'x', 'D', '*']
             
-            # Save figure
-            combined_output_file = output_dir / f"all_tasks_dual_axis_uncertainty_evolution_{split}.png"
-            plt.savefig(combined_output_file, dpi=300, bbox_inches='tight')
-            plt.close()
-            print(f"Saved dual-axis combined uncertainty evolution plot to {combined_output_file}")
+            for j, task in enumerate(tasks):
+                task_type = task_types[task]
+                uncertainty_type = "LSE" if "classification" in task_type else "LSV"
+                
+                if not results[task][split]:
+                    continue
+                
+                plot_epochs, plot_uncertainties = zip(*sorted(results[task][split]))
+                axes[i].plot(
+                    plot_epochs, plot_uncertainties, 
+                    linestyle=line_styles[j % len(line_styles)],
+                    # marker=markers[j % len(markers)],
+                    label=f'{task} ({uncertainty_type})',
+                    alpha=0.8  # Set transparency to 0.8
+                )
+            
+            # Add vertical line for best epoch
+            if best_epoch in epochs:
+                axes[i].axvline(x=best_epoch, color='k', linestyle='--', alpha=0.7, 
+                           label=f'Best Epoch ({best_epoch})')
+            
+            # Set labels
+            axes[i].set_xlabel('Epoch', fontsize=base_fontsize)
+            axes[i].set_ylabel('Average Uncertainty', fontsize=base_fontsize)
+            
+            # Add legend in standard position
+            axes[i].legend(loc='best')
+        
+        # Set title and grid for this subplot
+        split_display = {'train': 'Training', 'val': 'Validation', 'test': 'Test'}
+        axes[i].set_title(f'Uncertainty Evolution for All Tasks ({split_display.get(split, split.capitalize())} Set)', 
+                     fontsize=base_fontsize+3, fontweight='bold')
+    
+    # Set an overall title for the combined figure
+    # fig.suptitle('Uncertainty Evolution Across All Data Splits', 
+    #           fontsize=base_fontsize+4, fontweight='bold', y=0.98)
+    
+    # Adjust layout for better spacing
+    plt.subplots_adjust(bottom=0.15, top=0.95, hspace=0.3)
+    
+    # Save the combined figure
+    combined_output_file = output_dir / "all_splits_combined_uncertainty_evolution.png"
+    plt.savefig(combined_output_file, dpi=300)
+    plt.close(fig)
+    
+    print(f"Saved combined plot with all splits to {combined_output_file}")
     
     return results
 
