@@ -125,7 +125,8 @@ class FeatureImportanceVisualizer:
                     target = target[:, 1]  # Assuming binary classification
             elif hasattr(self.model, 'task_types') and self.model.task_types[task_idx] == 'classification_4':
                 # For classification_4, we take the class with the highest score
-                target = torch.max(target, dim=1)[0]
+                # target = torch.max(target, dim=1)[0]
+                target = target[:, 2:]
 
             # Compute gradients w.r.t the conv_to_fc input features
             target.mean().backward()
@@ -285,8 +286,8 @@ class FeatureImportanceVisualizer:
             
             # Add region annotations
             if show_labels:
-                ax.text(crys_fea_len/2, 1.05, 'Crystal Features', ha='center', va='bottom', fontsize=12, fontweight='bold')
-                ax.text(crys_fea_len + extra_fea_len/2, 1.05, 'Extra Features', ha='center', va='bottom', fontsize=12, fontweight='bold')
+                ax.text(crys_fea_len/2, 1.05, 'Atom Features', ha='center', va='bottom', fontsize=12, fontweight='bold')
+                ax.text(crys_fea_len + extra_fea_len/2, 1.05, 'Lattice Features', ha='center', va='bottom', fontsize=12, fontweight='bold')
         
         # Set x-axis properties
         ax.set_xlim(0, total_features)

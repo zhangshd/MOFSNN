@@ -349,6 +349,8 @@ def process_all_checkpoints(model_dir, output_dir=None, k=5):
         match = re.search(r'epoch=(\d+)', filename)
         if match:
             return int(match.group(1))
+        elif "last" in filename:
+            return -1  # Last checkpoint
         return 0
     
     # Sort checkpoints by epoch

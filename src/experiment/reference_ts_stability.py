@@ -872,16 +872,16 @@ def main():
             # Run predictions using the correct feature sets
             results['thermal_stability'] = predict_thermal(features_ts_csv)
             results['solvent_stability'] = predict_solvent(features_ts_csv)
-            # results['water_stability'] = predict_water(features_wa_csv)
-            # results['acid_stability'] = predict_acid(features_wa_csv)
+            results['water_stability'] = predict_water(features_wa_csv)
+            results['acid_stability'] = predict_acid(features_wa_csv)
 
             # Print results clearly
             print("\n--- Stability Predictions ---")
             print(f"Input CIF:          {os.path.abspath(args.cif_file)}")
             print(f"Thermal Stability:  {results.get('thermal_stability', None)}°C")
             print(f"Solvent Stability:  {results.get('solvent_stability', None)} (Probability)")
-            # print(f"Water Stability:    {results.get('water_stability', None)} (Probability)")
-            # print(f"Acid Stability:     {results.get('acid_stability', None)} (Probability)")
+            print(f"Water Stability:    {results.get('water_stability', None)} (Probability)")
+            print(f"Acid Stability:     {results.get('acid_stability', None)} (Probability)")
         else:
             print("\n--- Prediction Failed ---")
             print("Feature calculation failed or did not produce necessary files. Cannot proceed with predictions.")

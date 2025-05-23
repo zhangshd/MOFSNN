@@ -36,6 +36,7 @@ except ImportError:
 from matplotlib.colors import Normalize
 from tqdm import tqdm
 import pickle
+import json
 
 from cgcnn.utils import load_model_from_dir
 from cgcnn.module.module_utils import calculate_lse_from_tree, calculate_lsv_from_tree
@@ -98,12 +99,14 @@ def predict_and_collect_features(model, dataloader, device):
     all_preds = {}
     all_targets = {}
     all_cif_ids = {}
+    all_extra_features = {}
     
     for task_id, task in enumerate(model.hparams.tasks):
         all_features[task] = []
         all_preds[task] = []
         all_targets[task] = []
         all_cif_ids[task] = []
+        all_extra_features[task] = []
     
     with torch.no_grad():
         for batch in tqdm(dataloader, desc="Processing batch"):
@@ -124,7 +127,8 @@ def predict_and_collect_features(model, dataloader, device):
                 # Get task-specific data
                 task_targets = batch['targets'][task_mask].cpu().numpy()
                 task_cif_ids = np.array(batch['cif_id'])[task_mask.cpu().numpy()]
-                
+                task_extra_features = batch['extra_fea'][task_mask].cpu().numpy()
+
                 # Get predictions
                 if model.hparams.task_types[task_id] == 'regression':
                     task_preds = model.denormalize(outputs[task_id][task_mask], task_id).cpu().numpy()
@@ -139,6 +143,7 @@ def predict_and_collect_features(model, dataloader, device):
                 all_preds[task].append(task_preds)
                 all_targets[task].append(task_targets)
                 all_cif_ids[task].extend(task_cif_ids)
+                all_extra_features[task].append(task_extra_features)
     
     # Concatenate all batches
     for task in model.hparams.tasks:
@@ -146,8 +151,9 @@ def predict_and_collect_features(model, dataloader, device):
             all_features[task] = np.concatenate(all_features[task], axis=0)
             all_preds[task] = np.concatenate(all_preds[task], axis=0)
             all_targets[task] = np.concatenate(all_targets[task], axis=0)
-    
-    return all_features, all_preds, all_targets, all_cif_ids
+            all_extra_features[task] = np.concatenate(all_extra_features[task], axis=0)
+
+    return all_features, all_preds, all_targets, all_cif_ids, all_extra_features
 
 def calculate_uncertainty(latent_vectors, uncertainty_trees, task, task_type):
     """
@@ -228,7 +234,8 @@ def identify_error_samples(predictions, targets, task_type):
         # Avoid division by zero by adding a small epsilon
         epsilon = 1e-10
         relative_error = np.abs(predictions - targets) / (np.abs(targets) + epsilon)
-        error_mask = relative_error > 0.3  # >30% error
+        error_mask = relative_error > 0.2  # >20% error
+        # error_mask = np.abs(predictions - targets) > 45.2
     else:
         # For classification tasks, find samples with mismatched predictions
         error_mask = predictions != targets
@@ -409,14 +416,14 @@ def create_visualization_figure(task, features, preds, targets, uncertainties, t
         else:
             # Create continuous colormap for regression
             norm_target = Normalize(vmin=np.min(targets), vmax=np.max(targets))
-            cmap_target = plt.colormaps['plasma']
+            cmap_target = plt.colormaps['viridis_r']
             
             scatter_target = create_scatter_plot(ax_target, reduced_vectors, targets, 
                                                cmap_target, norm=norm_target)
             
             # Add colorbar
             cbar_target = plt.colorbar(scatter_target, ax=ax_target, fraction=0.046, pad=0.04)
-            cbar_target.set_label('Target Value')
+            cbar_target.set_label('$T_d$')
         
         # --- Second row: uncertainty visualization ---
         ax_uncertainty = axs[1, col_idx]
@@ -435,7 +442,7 @@ def create_visualization_figure(task, features, preds, targets, uncertainties, t
         cbar_uncertainty.set_label('Uncertainty')
         
         # Add error markers to both plots
-        error_label = f'Error samples ({np.sum(error_mask)})'
+        error_label = f'error samples ({np.sum(error_mask)})'
         error_scatter_target = plot_error_samples(ax_target, reduced_vectors, error_mask, error_label)
         error_scatter_uncertainty = plot_error_samples(ax_uncertainty, reduced_vectors, error_mask, error_label)
         
@@ -453,14 +460,14 @@ def create_visualization_figure(task, features, preds, targets, uncertainties, t
             
             # For uncertainty plot: add just error samples
             if error_scatter_uncertainty:
-                ax_uncertainty.legend(loc='best', fontsize=8)
+                ax_uncertainty.legend(loc='best', fontsize=10)
         else:
             # For regression tasks: add error samples legend to both plots
             if error_scatter_target:
                 ax_target.legend(loc='best', fontsize=8)
             
             if error_scatter_uncertainty:
-                ax_uncertainty.legend(loc='best', fontsize=8)
+                ax_uncertainty.legend(loc='best', fontsize=10)
         
         # Set labels
         ax_target.set_title(f"{method_display_name} - Target Values")
@@ -472,7 +479,7 @@ def create_visualization_figure(task, features, preds, targets, uncertainties, t
         ax_uncertainty.set_ylabel(f"{method_display_name} 2")
     
     # Add super title
-    plt.suptitle(f"Latent Space Visualization for {task} Task", fontsize=16, y=0.98)
+    plt.suptitle(f"Latent Space Visualization for {task} Task", fontsize=16, fontweight='bold')
     
     # Adjust layout
     plt.tight_layout(rect=[0, 0, 1, 0.96])
@@ -483,9 +490,10 @@ def create_visualization_figure(task, features, preds, targets, uncertainties, t
     plt.close(fig)
     
     print(f"Saved visualization for task {task} to {output_path}")
-    return output_path
+    return output_path, reduced_vectors_cache
 
-def create_combined_visualization(results, tasks, model_hparams, output_dir, dim_reduction_method="tsne", figsize=(20, 15)):
+def create_combined_visualization(results, tasks, model_hparams, output_dir, dim_reduction_method="tsne", 
+                                  figsize=(20, 15), base_font_size=12):
     """
     Create combined visualization for all tasks with a specific dimensionality reduction method.
     Two figures are created: one colored by uncertainty and one by target values.
@@ -570,7 +578,7 @@ def create_combined_visualization(results, tasks, model_hparams, output_dir, dim
         
         # Identify error samples
         error_mask = identify_error_samples(preds, targets, task_type)
-        error_label = f'Error samples ({np.sum(error_mask)})'
+        error_label = f'error samples ({np.sum(error_mask)})'
         
         # ----- Uncertainty plot -----
         norm_uncertainty = Normalize(vmin=np.min(uncertainties), vmax=np.max(uncertainties))
@@ -583,17 +591,18 @@ def create_combined_visualization(results, tasks, model_hparams, output_dir, dim
         
         # Add error samples to uncertainty plot with label
         error_scatter_uncertainty = plot_error_samples(ax_uncertainty, reduced_vectors, error_mask, error_label)
-        
+
+        is_classification = 'classification' in task_type
+
         # Add colorbar for uncertainty
         fig_uncertainty.colorbar(scatter_uncertainty, ax=ax_uncertainty, 
-                                label='Uncertainty', fraction=0.046, pad=0.04)
-        
+                                label='LSE' if is_classification else 'LSV', fraction=0.046, pad=0.04)
+
         # Add legend for error samples on uncertainty plot
         if error_scatter_uncertainty:
             ax_uncertainty.legend(loc='best', fontsize=8)
         
         # ----- Target plot -----
-        is_classification = 'classification' in task_type
         
         if is_classification:
             # Classification tasks - create separate scatter for each class
@@ -617,7 +626,7 @@ def create_combined_visualization(results, tasks, model_hparams, output_dir, dim
         else:
             # Regression tasks - continuous colormap
             norm_target = Normalize(vmin=np.min(targets), vmax=np.max(targets))
-            cmap_target = plt.colormaps['plasma']
+            cmap_target = plt.colormaps['viridis_r']
             
             scatter_target = create_scatter_plot(
                 ax_target, reduced_vectors, targets, 
@@ -626,24 +635,24 @@ def create_combined_visualization(results, tasks, model_hparams, output_dir, dim
             
             # Add colorbar for target values
             fig_target.colorbar(scatter_target, ax=ax_target, 
-                              label='Target Value', fraction=0.046, pad=0.04)
+                              label='$T_d$', fraction=0.046, pad=0.04)
         
         # Add error samples to target plot with label
         error_scatter_target = plot_error_samples(ax_target, reduced_vectors, error_mask, error_label)
         
         # Add legend for target plot
         if is_classification or error_scatter_target:
-            ax_target.legend(loc='best', fontsize=8)
+            ax_target.legend(loc='best', fontsize=base_font_size)
         
         # Set titles and labels
-        ax_uncertainty.set_title(f"{task}")
-        ax_target.set_title(f"{task}")
-        
-        ax_uncertainty.set_xlabel(f"{method_display_name} 1")
-        ax_uncertainty.set_ylabel(f"{method_display_name} 2")
-        ax_target.set_xlabel(f"{method_display_name} 1")
-        ax_target.set_ylabel(f"{method_display_name} 2")
-    
+        ax_uncertainty.set_title(f"{task}", fontsize=base_font_size+2, fontweight='bold')
+        ax_target.set_title(f"{task}", fontsize=base_font_size+2, fontweight='bold')
+
+        ax_uncertainty.set_xlabel(f"{method_display_name} 1", fontsize=base_font_size+2)
+        ax_uncertainty.set_ylabel(f"{method_display_name} 2", fontsize=base_font_size+2)
+        ax_target.set_xlabel(f"{method_display_name} 1", fontsize=base_font_size+2)
+        ax_target.set_ylabel(f"{method_display_name} 2", fontsize=base_font_size+2)
+
     # Hide unused subplots
     for i in range(len(tasks), len(axes_uncertainty)):
         axes_uncertainty[i].axis('off')
@@ -651,14 +660,14 @@ def create_combined_visualization(results, tasks, model_hparams, output_dir, dim
         axes_target[i].axis('off')
     
     # Add super titles
-    fig_uncertainty.suptitle(f"Latent Space Visualization using {method_display_name}\nColored by Uncertainty", 
-                           fontsize=16, y=0.98)
-    fig_target.suptitle(f"Latent Space Visualization using {method_display_name}\nColored by Target Values", 
-                      fontsize=16, y=0.98)
-    
+    # fig_uncertainty.suptitle(f"Latent Space Visualization using {method_display_name} Colored by Uncertainty", 
+    #                        fontsize=base_font_size+6, fontweight='bold')
+    # fig_target.suptitle(f"Latent Space Visualization using {method_display_name} Colored by Target Values", 
+    #                   fontsize=base_font_size+6, fontweight='bold')
+
     # Adjust layout
-    fig_uncertainty.tight_layout(rect=[0, 0, 1, 0.97])
-    fig_target.tight_layout(rect=[0, 0, 1, 0.97])
+    fig_uncertainty.tight_layout(rect=[0, 0, 1, 1])
+    fig_target.tight_layout(rect=[0, 0, 1, 1])
     
     # Save figures
     uncertainty_path = output_dir / f"all_tasks_{dim_reduction_method.lower()}_uncertainty_visualization.png"
@@ -698,10 +707,9 @@ def collect_and_process_data(model, data_module, device, uncertainty_trees, outp
             if not dataloader:
                 print(f"No data in {split} set. Skipping.")
                 continue
-            
             # Predict and collect features
-            features, preds, targets, cif_ids = predict_and_collect_features(model, dataloader, device)
-            
+            features, preds, targets, cif_ids, extra_features = predict_and_collect_features(model, dataloader, device)
+
             # Process each task
             for task_id, task in enumerate(model.hparams.tasks):
                 if task not in features or len(features[task]) == 0:
@@ -724,18 +732,19 @@ def collect_and_process_data(model, data_module, device, uncertainty_trees, outp
                     'preds': preds[task],
                     'targets': targets[task],
                     'uncertainties': uncertainties,
-                    'cif_ids': cif_ids[task]
+                    'cif_ids': cif_ids[task],
+                    'extra_features': extra_features[task] ## input extra features
                 }
                 
                 # Save results to CSV
-                df = pd.DataFrame({
-                    'cif_id': cif_ids[task],
-                    'prediction': preds[task].squeeze(),
-                    'target': targets[task].squeeze(),
-                    'uncertainty': uncertainties.squeeze()
-                })
+                # df = pd.DataFrame({
+                #     'cif_id': cif_ids[task],
+                #     'prediction': preds[task].squeeze(),
+                #     'target': targets[task].squeeze(),
+                #     'uncertainty': uncertainties.squeeze()
+                # })
                 
-                df.to_csv(output_dir / f"{task}_{split}_results.csv", index=False)
+                # df.to_csv(output_dir / f"{task}_{split}_results.csv", index=False)
         except Exception as e:
             print(f"Error processing {split} set: {str(e)}")
             import traceback
@@ -999,6 +1008,97 @@ def create_uncertainty_error_histograms(results, tasks, model_hparams, output_di
     print(f"Saved uncertainty-error rate plots to {output_path}")
     return output_path
 
+def find_nearest_neighbors(features, cif_ids, preds, targets, uncertainties, extra_features, reduced_vectors=None, k=5, df_info=None):
+    """
+    Find the k nearest neighbors for each sample in the feature space.
+    
+    Args:
+        features: Feature vectors as numpy array [n_samples, n_features]
+        cif_ids: List of CIF IDs for all samples
+        preds: Model predictions as numpy array
+        targets: Ground truth targets as numpy array
+        uncertainties: Uncertainty values as numpy array
+        reduced_vectors: Optional reduced vectors (e.g., from t-SNE, UMAP, PCA)
+        k: Number of nearest neighbors to find (default: 5)
+        
+    Returns:
+        Dictionary with nearest neighbor information for each sample
+    """
+    from sklearn.neighbors import NearestNeighbors
+    import numpy as np
+    
+    # Ensure all inputs are numpy arrays
+    features = np.array(features)
+    preds = np.array(preds).flatten()
+    targets = np.array(targets).flatten()
+    uncertainties = np.array(uncertainties).flatten()
+    extra_features = np.array(extra_features)
+    
+    # Initialize nearest neighbors model on feature space
+    nn_model = NearestNeighbors(n_neighbors=k+1)  # +1 because the sample itself is included
+    nn_model.fit(features)
+    
+    # Find nearest neighbors (returns distances and indices)
+    distances, indices = nn_model.kneighbors(features)
+    
+    # Create result dictionary
+    nearest_neighbors_dict = {}
+    
+    # For each sample, collect neighbor information
+    for i in range(len(features)):
+        # Skip the first neighbor (which is the sample itself)
+        neighbor_indices = indices[i, 1:k+1]
+        neighbor_distances = distances[i, 1:k+1]
+        
+        # Collect neighbor information
+        neighbors = []
+        for j, (idx, dist) in enumerate(zip(neighbor_indices, neighbor_distances)):
+            neighbor_info = {
+                'cif_id': cif_ids[idx],
+                'pred': float(preds[idx]),
+                'target': float(targets[idx]),
+                'uncertainty': float(uncertainties[idx]),
+                'distance': float(dist),
+                'extra_features': extra_features[idx].tolist()
+            }
+            if df_info is not None and len(df_info) > 0 and  'MofName' in df_info.columns and cif_ids[idx] in df_info['MofName'].values:
+                neighbor_info["topology"] = df_info.loc[df_info['MofName'] == cif_ids[idx], 'topology'].values[0]
+                neighbor_info["linkers"] = df_info.loc[df_info['MofName'] == cif_ids[idx], 'linkers'].values[0]
+                neighbor_info["node_fomula"] = df_info.loc[df_info['MofName'] == cif_ids[idx], 'node_fomula'].values[0]
+
+
+            
+            # Add reduced vectors if available
+            if reduced_vectors is not None:
+                neighbor_info['reduced_vector'] = reduced_vectors[idx].tolist()
+                
+            neighbors.append(neighbor_info)
+        
+        # Create sample entry
+        sample_info = {
+            'cif_id': cif_ids[i],
+            'pred': float(preds[i]),
+            'target': float(targets[i]),
+            'uncertainty': float(uncertainties[i]),
+            'extra_features': extra_features[i].tolist()
+        }
+        if df_info is not None and len(df_info) > 0 and 'MofName' in df_info.columns and cif_ids[i] in df_info['MofName'].values:
+            sample_info["topology"] = df_info.loc[df_info['MofName'] == cif_ids[i], 'topology'].values[0]
+            sample_info["linkers"] = df_info.loc[df_info['MofName'] == cif_ids[i], 'linkers'].values[0]
+            sample_info["node_fomula"] = df_info.loc[df_info['MofName'] == cif_ids[i], 'node_fomula'].values[0]
+        
+        # Add reduced vector if available
+        if reduced_vectors is not None:
+            sample_info['reduced_vector'] = reduced_vectors[i].tolist()
+            
+        # Add neighbors information
+        sample_info['neighbors'] = neighbors
+        
+        # Add to dictionary with CIF ID as key
+        nearest_neighbors_dict[cif_ids[i]] = sample_info
+    
+    return nearest_neighbors_dict
+
 def run_analysis(model_dir, uncertainty_trees_file, output_dir, dim_reduction_methods=["tsne"], use_data_module=None):
     """
     Run the full analysis pipeline.
@@ -1032,19 +1132,36 @@ def run_analysis(model_dir, uncertainty_trees_file, output_dir, dim_reduction_me
     
     # Collect and process data
     results = collect_and_process_data(model, data_module, device, uncertainty_trees, output_dir)
-    
+
+    # Load additional information (nodes, linkers, and topologys) from Excel file
+    info_file = Path(ROOT_DIR)/"data/raw_data/CoREMOF2019_mofs_addtion_processed.xlsx"
+    if info_file.exists():
+        print(f"Loading additional information from {info_file}")
+        df_info_ = pd.read_excel(info_file)
+        df_info_.rename(columns={"name": "MofName"}, inplace=True)
+    else:
+        df_info_ = pd.DataFrame([], columns=["MofName", "linkers", "node_fomula", "topology"])
+
     # Create task-specific visualizations
     print("\nCreating visualizations by task...")
     for task in model.hparams.tasks:
         if task not in results or not results[task]:
             print(f"No data for task {task}. Skipping visualization.")
             continue
-        
+        df_info = df_info_.copy()
+
+        # for tasks that are not TSD or SSD, remove "_clean" from MofName
+        if task not in ["TSD", "SSD"]:
+            df_info["MofName"] = df_info["MofName"].apply(lambda x: x.replace("_clean", ""))
+
         # Combine data from all splits
         all_features = []
         all_preds = []
         all_targets = []
         all_uncertainties = []
+        all_splits = []
+        all_cif_ids = []
+        all_extra_features = []
         
         for split in ['train', 'val', 'test']:
             if split in results[task]:
@@ -1052,7 +1169,10 @@ def run_analysis(model_dir, uncertainty_trees_file, output_dir, dim_reduction_me
                 all_preds.append(results[task][split]['preds'])
                 all_targets.append(results[task][split]['targets'])
                 all_uncertainties.append(results[task][split]['uncertainties'])
-        
+                all_splits.extend([split ]*len(results[task][split]['targets']))
+                all_cif_ids.extend(results[task][split]['cif_ids'])
+                all_extra_features.append(results[task][split]['extra_features'])
+
         if not all_features:
             continue
             
@@ -1065,13 +1185,60 @@ def run_analysis(model_dir, uncertainty_trees_file, output_dir, dim_reduction_me
         preds = np.concatenate(all_preds, axis=0)
         targets = np.concatenate(all_targets, axis=0)
         uncertainties = np.concatenate(all_uncertainties, axis=0)
-        
+        extra_features = np.concatenate(all_extra_features, axis=0)
+
         # Create visualization
-        create_visualization_figure(
+        _, reduced_vectors_cache = create_visualization_figure(
             task, features, preds, targets, uncertainties, 
             task_type, dim_reduction_methods, output_dir
         )
-    
+        
+        # Find nearest neighbors in feature space
+        print(f"Finding nearest neighbors for task {task} in feature space...")
+
+        nearest_neighbors_dict = find_nearest_neighbors(
+            features=features,
+            cif_ids=all_cif_ids,
+            preds=preds,
+            targets=targets,
+            uncertainties=uncertainties,
+            extra_features=extra_features,
+            reduced_vectors=reduced_vectors_cache.get(dim_reduction_methods[0]) if dim_reduction_methods else None,
+            k=10,
+            df_info=df_info
+        )
+
+        # Save nearest neighbors information
+        with open(output_dir / f"{task}_nearest_neighbors.json", 'w') as f:
+            json.dump(nearest_neighbors_dict, f, indent=2)
+        print(f"Saved nearest neighbors information for task {task} to {output_dir / f'{task}_nearest_neighbors.json'}")
+
+        # save reduced vectors cache and results to csv
+        df_results = pd.DataFrame({
+            'MofName': all_cif_ids,
+            'Partition': all_splits,
+            'Predicted': preds.flatten(),
+            'GroudTruth': targets.flatten(),
+            'Uncertainty': uncertainties.flatten()
+        })
+        if task_type == 'regression':
+            df_results['RelativeError'] = np.abs(preds.flatten() - targets.flatten())/(targets.flatten()+1e-6)
+        else:
+            df_results['IsError'] = preds.flatten() != targets.flatten()
+
+        for method, reduced_vectors in reduced_vectors_cache.items():
+            df_results[f'{method.upper()}1'] = reduced_vectors[:, 0]
+            df_results[f'{method.upper()}2'] = reduced_vectors[:, 1]
+
+        if df_info is not None:
+            try:
+                df_results = df_results.merge(df_info[["MofName", "linkers", "node_fomula", "topology"]], on='MofName', how='left')
+            except KeyError as e:
+                print(f"Error merging additional information: {e}")
+        df_results.to_csv(output_dir / f"{task}_reduced_vectors.csv", index=False)
+        print(f"Saved reduced vectors for task {task} to {output_dir / f'{task}_reduced_vectors.csv'}")
+
+
     # Create combined visualizations
     print("\nCreating combined visualizations for each dimensionality reduction method...")
     for method in dim_reduction_methods:
@@ -1094,13 +1261,13 @@ if __name__ == "__main__":
                         default=os.path.join(ROOT_DIR, "results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43"),
                         help="Path to the model directory")
     parser.add_argument("--uncertainty_trees_file", type=str, 
-                        default=os.path.join(ROOT_DIR, "results/evaluation/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn@version_43/uncertainty_trees.pkl"),
+                        default=os.path.join(ROOT_DIR, "results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43/uncertainty_trees.pkl"),
                         help="Path to the uncertainty trees file")
     parser.add_argument("--output_dir", type=str, 
                         default=os.path.join(ROOT_DIR, "results/uncertainty_visualization"),
                         help="Directory where visualization outputs will be saved")
     parser.add_argument("--dim_reduction", type=str, nargs='+',
-                        default=["tsne", "pca", "umap"],
+                        default=["tsne"],
                         choices=["tsne", "pca", "umap"],
                         help="Dimensionality reduction method(s) to use. Can specify multiple methods.")
     

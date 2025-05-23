@@ -132,14 +132,15 @@ class AtomImportanceVisualizer:
             - 'grad_cam': Standard Grad-CAM with ReLU activation (positive contributions only)
             - 'grad_cam_no_relu': Grad-CAM without ReLU (preserves positive and negative contributions)
             - 'guided_grad_cam': Guided Grad-CAM (combines Grad-CAM with Guided Backpropagation)
+            - 'guided_grad_cam_no_relu': Guided Grad-CAM without ReLU (preserves both positive and negative contributions)
             
         Returns
         -------
         dict
             Contains atom importance scores and optionally raw gradients
         """
-        if method not in ['grad_cam', 'grad_cam_no_relu', 'guided_grad_cam']:
-            raise ValueError(f"Unsupported method: {method}. Choose from 'grad_cam', 'grad_cam_no_relu', or 'guided_grad_cam'")
+        if method not in ['grad_cam', 'grad_cam_no_relu', 'guided_grad_cam', 'guided_grad_cam_no_relu']:
+            raise ValueError(f"Unsupported method: {method}. Choose from 'grad_cam', 'grad_cam_no_relu', 'guided_grad_cam', or 'guided_grad_cam_no_relu'")
         
         # Store original atom features for guided backpropagation
         original_atom_fea = atom_fea.clone().detach().requires_grad_(True) if method == 'guided_grad_cam' else None
@@ -167,7 +168,11 @@ class AtomImportanceVisualizer:
             # For classification, we compute gradient of the specific class prediction
             if hasattr(self.model, 'task_types') and 'classification' in self.model.task_types[task_idx]:
                 if target.shape[1] > 1:  # Multi-class
-                    target = torch.max(target, dim=1)[0]
+                    # target = torch.max(target, dim=1)[0]
+                    # Use the positive class index for the gradient
+                    target = target[:, 1]  # Assuming binary classification
+                elif hasattr(self.model, 'task_types') and self.model.task_types[task_idx] == 'classification_4':
+                    target = target[:, 2:]
             
             # Compute gradients w.r.t the target layer's activations
             target.mean().backward()
@@ -193,11 +198,18 @@ class AtomImportanceVisualizer:
         # Apply ReLU for standard Grad-CAM (positive contributions only)
         if method in ['grad_cam', 'guided_grad_cam']:
             atom_importance_scores = torch.relu(atom_importance_scores)
+            print(f"Atom importance scores (ReLU applied): {atom_importance_scores.min()}, {atom_importance_scores.max()}")
         
         # For Guided Grad-CAM, we need to get the guided gradients
         guided_gradients = None
         if method == 'guided_grad_cam' and self.input_gradients is not None:
+            # Apply ReLU to guided gradients
+            guided_gradients = torch.relu(self.input_gradients)
+            print(f"Guided gradients: {guided_gradients.min()}, {guided_gradients.max()}")
+        elif method == 'guided_grad_cam_no_relu' and self.input_gradients is not None:
             guided_gradients = self.input_gradients
+            # No ReLU applied to guided gradients
+            print(f"Guided gradients (no ReLU): {guided_gradients.min()}, {guided_gradients.max()}")
         
         # Process importance scores for each crystal
         for idx_map in crystal_atom_idx:
@@ -210,7 +222,7 @@ class AtomImportanceVisualizer:
                 gradients_per_crystal.append(crystal_gradients)
             
             # For Guided Grad-CAM, we need to multiply Grad-CAM heatmap with guided gradients
-            if method == 'guided_grad_cam' and guided_gradients is not None:
+            if method in ['guided_grad_cam', 'guided_grad_cam_no_relu'] and guided_gradients is not None:
                 # Get guided gradients for this crystal
                 crystal_guided_grads = guided_gradients[idx_map].detach().cpu().numpy()
                 guided_gradients_per_crystal.append(crystal_guided_grads)
