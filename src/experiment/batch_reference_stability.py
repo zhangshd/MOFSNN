@@ -98,7 +98,7 @@ def run_predict_stability(cif_file: str, working_dir: str, python_executable_ts:
     
     print(f"Processing {mof_name}...")
     print(f"Command (Thermal and solvent stability): {' '.join(cmd_ts)}")
-    print(f"Command (Water and acid stability): {' '.join(cmd_ws)}")
+    # print(f"Command (Water and acid/base/boiling stability): {' '.join(cmd_ws)}")
 
     start_time = time.time()
     results = {
