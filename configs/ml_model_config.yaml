@@ -12,7 +12,6 @@ model_dirs_map:
       results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
       results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
       results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
-      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
       ]
     DisplayName: Baseline-RF
     Model: RandomForestRegressor
@@ -24,7 +23,6 @@ model_dirs_map:
       results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
       results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
       results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
-      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
       ]
     DisplayName: Baseline-GP
     Model: GaussianProcessRegressor
@@ -36,7 +34,6 @@ model_dirs_map:
       results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
       results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
       results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
-      results/ml_models/TSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
       ]
     DisplayName: Baseline-SVM
     Model: SVR
@@ -49,7 +46,6 @@ model_dirs_map:
       results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
       results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
       results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
-      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
     ]
     DisplayName: Baseline-RF
     Model: RandomForestRegressor
@@ -61,7 +57,6 @@ model_dirs_map:
       results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
       results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
       results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
-      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
     ]
     DisplayName: Baseline-GP
     Model: GaussianProcessRegressor
@@ -73,7 +68,6 @@ model_dirs_map:
       results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand1/Label,
       results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand2/Label,
       results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand3/Label,
-      results/ml_models/SSD/RAC_and_zeo_features_with_id_prop_rand4/Label,
     ]
     DisplayName: Baseline-SVM
     Model: SVC
@@ -86,7 +80,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water_label,
     ]
     DisplayName: Baseline-RF
     Model: RandomForestClassifier
@@ -98,7 +91,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water_label,
     ]
     DisplayName: Baseline-GP
     Model: GaussianProcessClassifier
@@ -110,7 +102,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water_label,
     ]
     DisplayName: Baseline-SVM
     Model: SVC
@@ -123,7 +114,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water4_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water4_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water4_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water4_label,
     ]
     DisplayName: Baseline-RF
     Model: RandomForestClassifier
@@ -135,7 +125,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water4_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water4_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water4_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water4_label,
     ]
     DisplayName: Baseline-GP
     Model: GaussianProcessClassifier
@@ -147,7 +136,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/water4_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/water4_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/water4_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/water4_label,
     ]
     DisplayName: Baseline-SVM
     Model: SVC
@@ -160,7 +148,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/acid_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/acid_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/acid_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/acid_label,
     ]
     DisplayName: Baseline-RF
     Model: RandomForestClassifier
@@ -172,7 +159,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/acid_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/acid_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/acid_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/acid_label,
     ]
     DisplayName: Baseline-GP
     Model: GaussianProcessClassifier
@@ -184,7 +170,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/acid_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/acid_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/acid_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/acid_label,
     ]
     DisplayName: Baseline-SVM
     Model: SVC
@@ -197,7 +182,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/base_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/base_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/base_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/base_label,
     ]
     DisplayName: Baseline-RF
     Model: RandomForestClassifier
@@ -209,7 +193,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/base_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/base_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/base_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/base_label,
     ]
     DisplayName: Baseline-GP
     Model: GaussianProcessClassifier
@@ -221,7 +204,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/base_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/base_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/base_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/base_label,
     ]
     DisplayName: Baseline-SVM
     Model: SVC
@@ -234,7 +216,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/boiling_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/boiling_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/boiling_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/boiling_label,
     ]
     DisplayName: Baseline-RF
     Model: RandomForestClassifier
@@ -246,7 +227,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/boiling_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/boiling_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/boiling_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/boiling_label,
     ]
     DisplayName: Baseline-GP
     Model: GaussianProcessClassifier
@@ -258,7 +238,6 @@ model_dirs_map:
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand1/boiling_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand2/boiling_label,
       results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand3/boiling_label,
-      results/ml_models/WS24/RAC_and_zeo_features_with_id_prop_rand4/boiling_label,
     ]
     DisplayName: Baseline-SVM
     Model: SVC

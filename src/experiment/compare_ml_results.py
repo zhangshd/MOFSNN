@@ -403,7 +403,7 @@ def process_ml_results(
             # Create a column with formatted values like "0.75 ± 0.02"
             formatted_col = f"{col}_formatted"
             df_results[formatted_col] = df_results.apply(
-                lambda row: f"{row[col]:.4f} ± {row[std_col]:.4f}" if pd.notnull(row[col]) and pd.notnull(row[std_col]) else row[col],
+                lambda row: f"{row[col]:.2f}±{row[std_col]:.2f}" if pd.notnull(row[col]) and pd.notnull(row[std_col]) else row[col],
                 axis=1
             )
             
