@@ -247,7 +247,7 @@ def main():
     args = parser.parse_args()
 
     # Get CSV file names based on pattern
-    csv_file_names = [args.csv_pattern.replace("*", str(i)) for i in range(5)]
+    csv_file_names = [args.csv_pattern.replace("*", str(i)) for i in range(4)]
     for name in csv_file_names:
         print(f"  - {name}")
     

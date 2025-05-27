@@ -404,6 +404,7 @@ def sample_data(id_prop_file, split, prop_cols,
         prop_cols = [prop_cols]
     
     # For classification tasks, perform class balancing if needed
+    print(id_prop_df.columns)
     if len(id_prop_df[prop_cols[0]].unique()) <= 5:  # detect if the task is classification
         if not prop_cols or prop_cols[0] not in ["acid_label", "base_label", "boiling_label"]:
             return id_prop_df
