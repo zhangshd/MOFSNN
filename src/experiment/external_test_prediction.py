@@ -38,6 +38,8 @@ from ml.module import plot_roc_curve, plot_scatter, plot_confusion_matrix
 from cgcnn.utils import load_model_from_dir, MODEL_NAME_TO_DATASET_CLS
 from torch.utils.data import DataLoader
 import torch
+import pickle
+from cgcnn.module.module_utils import calculate_lse_from_tree, calculate_lsv_from_tree
 
 # Default paths
 DEFAULT_CONFIG_PATH = os.path.join(ROOT_DIR, "configs/model_comparison_config.yaml")
@@ -375,161 +377,201 @@ def cgcnn_predict_external_test(model_dirs_map: Dict[str, Dict[str, Any]],
         
         for path_index, model_specific_path in enumerate(model_specific_paths):
             # Load the model
-            try:
-                model_dir = Path(model_specific_path)
-                model, trainer = load_model_from_dir(model_dir)
-                hparams = model.hparams
-                print(f"Successfully loaded model ({path_index+1}/{len(model_specific_paths)}) from {model_dir}")
-                print("Model hyperparameters:")
-                for k, v in hparams.items():
-                    if isinstance(v, (str, int, float, bool)):
-                        print(f"{k}: {v}")
+            model_dir = Path(model_specific_path)
+            model, trainer = load_model_from_dir(model_dir)
+            hparams = model.hparams
+            print(f"Successfully loaded model ({path_index+1}/{len(model_specific_paths)}) from {model_dir}")
+            print("Model hyperparameters:")
+            for k, v in hparams.items():
+                if isinstance(v, (str, int, float, bool)):
+                    print(f"{k}: {v}")
+                    
+            # Process each external test set
+            for col2task, data_dir in zip(col2tasks, data_dirs):
+                for col, task in col2task.items():
+                    # Skip if this is a task-specific model and task doesn't match
+                    if is_specific_task_model and model_key != task:
+                        continue
                         
-                # Process each external test set
-                for col2task, data_dir in zip(col2tasks, data_dirs):
-                    for col, task in col2task.items():
-                        # Skip if this is a task-specific model and task doesn't match
-                        if is_specific_task_model and model_key != task:
-                            continue
-                            
-                        # Skip if task is not in model's task list
-                        if "tasks" in hparams and task not in hparams["tasks"]:
-                            print(f"Task {task} not found in model tasks: {hparams['tasks']}. Skipping.")
-                            continue
-                            
-                        print(f"Predicting {task} using {model_key} model (path {path_index+1}/{len(model_specific_paths)})...")
+                    # Skip if task is not in model's task list
+                    if "tasks" in hparams and task not in hparams["tasks"]:
+                        print(f"Task {task} not found in model tasks: {hparams['tasks']}. Skipping.")
+                        continue
                         
+                    print(f"Predicting {task} using {model_key} model (path {path_index+1}/{len(model_specific_paths)})...")
+                    
+                    
+                    # Get task information
+                    task_id = hparams["tasks"].index(task)
+                    task_tp = hparams["task_types"][task_id]
+                    dataset_cls = MODEL_NAME_TO_DATASET_CLS[hparams["model_name"]]
+                    
+                    # Create a copy of hparams to modify safely
+                    hparams_copy = dict(hparams)
+                    for k in ["data_dir", "split", "task_id", "prop_cols", "csv_file_name"]:
+                        if k in hparams_copy:
+                            del hparams_copy[k]
+                    
+                    # Create dataset and dataloader
+                    dataset = dataset_cls(
+                        data_dir, 
+                        split=split, 
+                        task_id=task_id,
+                        prop_cols=[col], 
+                        csv_file_name="RAC_and_zeo_features_with_id_prop.csv",
+                        **hparams_copy
+                    )
+                    
+                    dataloader = DataLoader(
+                        dataset, 
+                        batch_size=min(len(dataset), hparams["batch_size"]), 
+                        num_workers=hparams.get("num_workers", 2), 
+                        shuffle=False,
+                        collate_fn=dataset_cls.collate
+                    )
+                    
+                    # Make predictions
+                    outputs = trainer.predict(model, dataloader)
+                    
+                    # Gather predictions and targets
+                    targets = torch.stack([d["targets"] for d in dataset]).cpu().numpy()
+                    cif_ids = [d["cif_id"] for d in dataset]
+                    predictions = torch.cat([d[f"{task}_pred"] for d in outputs], dim=0).cpu().numpy()
+                    last_layer_fea = torch.cat([d[f"{task}_last_layer_fea"] for d in outputs], dim=0).cpu().numpy()
+                    
+                    # Calculate uncertainty if trees are available
+                    uncertainties = None
+                    if "UncertaintyTreesPath" in model_config:
+                        uncertainty_trees_path = model_config["UncertaintyTreesPath"]
                         try:
-                            # Get task information
-                            task_id = hparams["tasks"].index(task)
-                            task_tp = hparams["task_types"][task_id]
-                            dataset_cls = MODEL_NAME_TO_DATASET_CLS[hparams["model_name"]]
+                            print(f"Loading uncertainty trees from {uncertainty_trees_path}")
+                            with open(uncertainty_trees_path, 'rb') as f:
+                                uncertainty_trees = pickle.load(f)
                             
-                            # Create a copy of hparams to modify safely
-                            hparams_copy = dict(hparams)
-                            for k in ["data_dir", "split", "task_id", "prop_cols", "csv_file_name"]:
-                                if k in hparams_copy:
-                                    del hparams_copy[k]
-                            
-                            # Create dataset and dataloader
-                            dataset = dataset_cls(
-                                data_dir, 
-                                split=split, 
-                                task_id=task_id,
-                                prop_cols=[col], 
-                                csv_file_name="RAC_and_zeo_features_with_id_prop.csv",
-                                **hparams_copy
-                            )
-                            
-                            dataloader = DataLoader(
-                                dataset, 
-                                batch_size=min(len(dataset), hparams["batch_size"]), 
-                                num_workers=hparams.get("num_workers", 2), 
-                                shuffle=False,
-                                collate_fn=dataset_cls.collate
-                            )
-                            
-                            # Make predictions
-                            outputs = trainer.predict(model, dataloader)
-                            
-                            # Gather predictions and targets
-                            targets = torch.stack([d["targets"] for d in dataset]).cpu().numpy()
-                            cif_ids = [d["cif_id"] for d in dataset]
-                            predictions = torch.cat([d[f"{task}_pred"] for d in outputs], dim=0).cpu().numpy()
-                            last_layer_fea = torch.cat([d[f"{task}_last_layer_fea"] for d in outputs], dim=0).cpu().numpy()
-                        
-                            if "classification" in task_tp:
-                                # Process classification outputs
-                                probabilities = torch.cat([d[f"{task}_prob"] for d in outputs], dim=0).cpu().numpy()
-                                
-                                # Save predictions
-                                df_results = pd.DataFrame({
-                                    "CifId": cif_ids,
-                                    "GroundTruth": np.concatenate(targets),
-                                    "Predicted": np.concatenate(predictions),
-                                    "Prob": probabilities[:, 1].tolist() if probabilities.shape[1] == 2 else probabilities.tolist()
-                                })
-                                
-                                # Calculate metrics
-                                metrics = calculate_metrics(
-                                    np.concatenate(targets), 
-                                    np.concatenate(predictions),
-                                    probabilities,
-                                    task_type="classification"
-                                )
-                                
-                            
-                                img_file = model_dir / f"{split}_confusion_matrix_{task}.png"
-                                plot_confusion_matrix(
-                                    np.concatenate(targets), 
-                                    np.concatenate(predictions),
-                                    title=f"{split}/{task}",
-                                    outfile=str(img_file)
-                                )
-                                
-                                if probabilities.shape[1] == 2:
-                                    from sklearn.metrics import roc_curve
-                                    fpr, tpr, thresholds = roc_curve(
-                                        np.concatenate(targets),
-                                        probabilities[:, 1],
-                                        drop_intermediate=False
+                            if task in uncertainty_trees:
+                                print(f"Calculating uncertainty for {task}...")
+                                # Calculate uncertainty based on task type
+                                if "classification" in task_tp:
+                                    uncertainties = calculate_lse_from_tree(
+                                        uncertainty_trees[task],
+                                        last_layer_fea,
+                                        k=uncertainty_trees[task].get("k", 5)
                                     )
-                                    img_file = model_dir / f"{split}_roc_curve_{task}.png"
-                                    plot_roc_curve(
-                                        fpr, tpr, metrics["AUROC"], 
-                                        title=f"{split}/{task}",
-                                        outfile=str(img_file)
+                                else:
+                                    uncertainties = calculate_lsv_from_tree(
+                                        uncertainty_trees[task],
+                                        last_layer_fea,
+                                        k=uncertainty_trees[task].get("k", 5)
                                     )
+                                print(f"Uncertainty shape: {uncertainties.shape if hasattr(uncertainties, 'shape') else 'unknown'}")
                             else:
-                                # Process regression outputs
-                                df_results = pd.DataFrame({
-                                    "CifId": cif_ids,
-                                    "GroundTruth": np.concatenate(targets),
-                                    "Predicted": np.concatenate(predictions),
-                                })
-                                df_results["Error"] = (df_results["GroundTruth"] - df_results["Predicted"]).abs()
-                                
-                                # Calculate metrics
-                                metrics = calculate_metrics(
-                                    np.concatenate(targets), 
-                                    np.concatenate(predictions),
-                                    task_type="regression"
-                                )
-                                
-                                # Create scatter plot only for the first path to avoid clutter
-                                if path_index == 0:
-                                    img_file = model_dir / f"{split}_scatter_{task}.png"
-                                    plot_scatter(
-                                        np.concatenate(targets),
-                                        np.concatenate(predictions),
-                                        title=f"{split}/{task}",
-                                        metrics=metrics,
-                                        outfile=str(img_file)
-                                    )
-                            
-                            # Save predictions to model directory
-                            model_csv_file = model_dir / f"{split}_results_{task}.csv"
-                            df_results.to_csv(model_csv_file, index=False)
-                            print(f"Saved predictions to model directory: {model_csv_file}")
-
-                            # Save last layer features in model directory
-                            np.savez(
-                                model_dir / f"{split}_last_layer_fea_{task}.npz", 
-                                last_layer_fea
-                            )
-                            
-                            # Store metrics for this task and path
-                            task_key = f"{task}_{model_display_name}"
-                            if task_key not in all_task_metrics:
-                                all_task_metrics[task_key] = []
-                            all_task_metrics[task_key].append(metrics)
-                            
-                            print(f"Successfully processed {task} with metrics: {metrics}")
-                            
+                                print(f"No uncertainty trees found for task {task}")
                         except Exception as e:
-                            print(f"Error processing {task} with model {model_key} (path {path_index+1}): {e}")
-            except Exception as e:
-                print(f"Error loading model from {model_specific_path}: {e}")
+                            print(f"Error loading or using uncertainty trees: {e}")
+                    
+                    if "classification" in task_tp:
+                        # Process classification outputs
+                        probabilities = torch.cat([d[f"{task}_prob"] for d in outputs], dim=0).cpu().numpy()
+                        
+                        # Save predictions
+                        results_dict = {
+                            "CifId": cif_ids,
+                            "GroundTruth": np.concatenate(targets).astype(np.int8).tolist(),
+                            "Predicted": np.concatenate(predictions).astype(np.int8).tolist(),
+                        }
+                        
+                        # Add probability values
+                        if probabilities.shape[1] == 2:
+                            results_dict["Prob"] = probabilities[:, 1].tolist()
+                        else:
+                            results_dict["Prob"] = probabilities.tolist()
+                        
+                        # Add uncertainty if available
+                        if uncertainties is not None:
+                            results_dict["Uncertainty"] = uncertainties.tolist()
+                            
+                        df_results = pd.DataFrame(results_dict)
+                        
+                        # Calculate metrics
+                        metrics = calculate_metrics(
+                            np.concatenate(targets), 
+                            np.concatenate(predictions),
+                            probabilities,
+                            task_type="classification"
+                        )
+                        
+                        img_file = model_dir / f"{split}_confusion_matrix_{task}.png"
+                        plot_confusion_matrix(
+                            np.concatenate(targets), 
+                            np.concatenate(predictions),
+                            title=f"{split}/{task}",
+                            outfile=str(img_file)
+                        )
+                        
+                        if probabilities.shape[1] == 2:
+                            from sklearn.metrics import roc_curve
+                            fpr, tpr, thresholds = roc_curve(
+                                np.concatenate(targets),
+                                probabilities[:, 1],
+                                drop_intermediate=False
+                            )
+                            img_file = model_dir / f"{split}_roc_curve_{task}.png"
+                            plot_roc_curve(
+                                fpr, tpr, metrics["AUROC"], 
+                                title=f"{split}/{task}",
+                                outfile=str(img_file)
+                            )
+                    else:
+                        # Process regression outputs
+                        results_dict = {
+                            "CifId": cif_ids,
+                            "GroundTruth": np.concatenate(targets),
+                            "Predicted": np.concatenate(predictions),
+                        }
+                        
+                        # Add uncertainty if available
+                        if uncertainties is not None:
+                            results_dict["Uncertainty"] = uncertainties
+                        
+                        df_results = pd.DataFrame(results_dict)
+                        df_results["Error"] = (df_results["GroundTruth"] - df_results["Predicted"]).abs()
+                        
+                        # Calculate metrics
+                        metrics = calculate_metrics(
+                            np.concatenate(targets), 
+                            np.concatenate(predictions),
+                            task_type="regression"
+                        )
+                        
+                        # Create scatter plot only for the first path to avoid clutter
+                        if path_index == 0:
+                            img_file = model_dir / f"{split}_scatter_{task}.png"
+                            plot_scatter(
+                                np.concatenate(targets),
+                                np.concatenate(predictions),
+                                title=f"{split}/{task}",
+                                metrics=metrics,
+                                outfile=str(img_file)
+                            )
+                    
+                    # Save predictions to model directory
+                    model_csv_file = model_dir / f"{split}_results_{task}.csv"
+                    df_results.to_csv(model_csv_file, index=False)
+                    print(f"Saved predictions to model directory: {model_csv_file}")
+
+                    # Save last layer features in model directory
+                    np.savez(
+                        model_dir / f"{split}_last_layer_fea_{task}.npz", 
+                        last_layer_fea
+                    )
+                    
+                    # Store metrics for this task and path
+                    task_key = f"{task}_{model_display_name}"
+                    if task_key not in all_task_metrics:
+                        all_task_metrics[task_key] = []
+                    all_task_metrics[task_key].append(metrics)
+                    
+                    print(f"Successfully processed {task} with metrics: {metrics}")
         
         # Aggregate metrics across paths for each task
         for task_key, metrics_list in all_task_metrics.items():

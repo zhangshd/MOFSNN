@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-17 19:01:41
 LastEditors: zhangshd
-LastEditTime: 2025-05-02 14:58:12
+LastEditTime: 2025-05-27 15:14:43
 '''
 import os
 import sys
@@ -219,7 +219,7 @@ if __name__ == '__main__':
     
     model_dirs = [
 
-        ROOT_DIR/"results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_cgcnn_raw/version_24"
+        ROOT_DIR/"results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43"
 
         
     ]

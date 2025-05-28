@@ -87,6 +87,7 @@ model_dirs_map:
     Path: results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43
     DisplayName: MOFSNN
     Model: att_cgcnn
+    UncertaintyTreesPath: results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43/epoch_108/uncertainty_trees.pkl
   
   # MOFSNN variants
   MOFSNN_no_lattice:
