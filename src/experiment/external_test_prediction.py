@@ -262,16 +262,12 @@ def ml_predict_external_test(model_dirs_map: Dict[str, Dict[str, Any]],
                 path_metrics.append(metrics)
                 
                 # Save predictions
-                if y_prob.shape[1] == 2:
-                    y_prob_final = y_prob[:, 1]
-                else:
-                    y_prob_final = y_prob
                     
                 df_pred = pd.DataFrame({
                     "MofName": df["MofName"].values, 
                     "GroundTruth": y_true, 
                     "Predicted": y_pred, 
-                    "Prob": y_prob_final.tolist()
+                    "Prob": y_prob.tolist()
                 })
                 
                 # Create visualizations only for the first path to avoid clutter
@@ -481,10 +477,7 @@ def cgcnn_predict_external_test(model_dirs_map: Dict[str, Dict[str, Any]],
                         }
                         
                         # Add probability values
-                        if probabilities.shape[1] == 2:
-                            results_dict["Prob"] = probabilities[:, 1].tolist()
-                        else:
-                            results_dict["Prob"] = probabilities.tolist()
+                        results_dict["Prob"] = probabilities.tolist()
                         
                         # Add uncertainty if available
                         if uncertainties is not None:

@@ -119,6 +119,7 @@ The project includes advanced tools for visualizing and explaining CGCNN model p
 
 1. **Atom Importance Visualization** - Understand which atoms influence predictions
 2. **Feature Importance Visualization** - Analyze the importance of crystal and extra features
+3. **Model Uncertainty Analysis** - Analyze prediction uncertainty using LSE and LSV metrics
 
 ### Atom Importance Visualization
 
@@ -187,6 +188,91 @@ python examples/feature_importance_visualization.py --model_path /path/to/model/
 - Print detailed statistics about the most important features
 - Generate high-quality visualizations suitable for publications
 
+### Model Uncertainty Analysis
+
+This tool provides comprehensive uncertainty analysis for CGCNN models using Local Similarity Entropy (LSE) for classification tasks and Local Similarity Variance (LSV) for regression tasks.
+
+#### Using the Uncertainty Analysis Tool
+
+You can perform uncertainty analysis using the command line interface:
+
+```bash
+# Run uncertainty analysis on model evaluation results
+python src/experiment/model_uncertainty_analysis.py \
+    --log_dir /path/to/model/evaluation/results \
+    --uncertainty_trees_file /path/to/uncertainty_trees.pkl \
+    --output_dir results/uncertainty_analysis \
+    --k 5
+
+# Use custom figure size
+python src/experiment/model_uncertainty_analysis.py \
+    --log_dir /path/to/evaluation/results \
+    --uncertainty_trees_file /path/to/uncertainty_trees.pkl \
+    --output_dir results/uncertainty_analysis \
+    --figsize 24 12
+```
+
+Or use the Python API for more flexibility:
+
+```python
+from experiment.model_uncertainty_analysis import UncertaintyAnalyzer
+
+# Initialize analyzer
+analyzer = UncertaintyAnalyzer(
+    log_dir="/path/to/evaluation/results",
+    uncertainty_trees_file="/path/to/uncertainty_trees.pkl",
+    output_dir="results/uncertainty_analysis"
+)
+
+# Run combined analysis for all tasks
+analyzer.run_combined_analysis(k=5, figsize=(20, 10))
+
+# Analyze individual tasks
+ax, df_summary = analyzer.lse_analysis('SSD', k=5)  # Classification task
+ax, df_summary = analyzer.lsv_analysis('TSD', k=5)  # Regression task
+```
+
+#### Uncertainty Analysis Features
+
+- **LSE Analysis**: Local Similarity Entropy for classification tasks
+  - Measures prediction uncertainty based on neighbor label diversity
+  - Analyzes accuracy vs uncertainty cutoff relationships
+  - Computes AUROC scores for different uncertainty thresholds
+- **LSV Analysis**: Local Similarity Variance for regression tasks  
+  - Measures prediction uncertainty based on neighbor label variance
+  - Analyzes MAE and R² scores vs uncertainty cutoff relationships
+  - Identifies optimal uncertainty thresholds for data filtering
+- **Cutoff Analysis**: Performance evaluation at different uncertainty levels
+  - Shows how model performance changes when filtering by uncertainty
+  - Identifies trade-offs between data retention and prediction accuracy
+  - Provides insights for deployment with uncertainty-based filtering
+- **Comprehensive Reporting**: 
+  - Combined visualization plots for all tasks
+  - Numerical results exported to Excel format
+  - Summary reports with analysis statistics
+  - Individual task analysis with customizable parameters
+
+#### Prerequisites for Uncertainty Analysis
+
+Before running uncertainty analysis, you need:
+
+1. **Model evaluation results**: CSV files with predictions, targets, and probabilities
+2. **Latent features**: NPZ files containing last-layer features from the model  
+3. **Uncertainty trees**: Pickle file with pre-built ball trees for uncertainty calculation
+
+These can be generated using existing scripts:
+
+```bash
+# Build uncertainty trees from model checkpoints
+python src/experiment/build_latent_vec_tree.py \
+    --model_dir /path/to/model/directory \
+    --output_dir /path/to/uncertainty_trees \
+    --k 5
+
+# Run model evaluation to get results and features
+# (Use existing evaluation scripts in the project)
+```
+
 ### Interactive 3D Visualization Requirements
 
 For interactive 3D visualization, additional packages are required:
@@ -226,3 +312,14 @@ conda install -c conda-forge ovito
 - Created easy-to-use example script in `examples/feature_importance_visualization.py`
 - Added optional ReLU activation for focusing on positive feature contributions
 - Supported per-sample analysis for detailed examination of individual samples
+
+#### 2025-05-30: Model Uncertainty Analysis
+- Implemented comprehensive uncertainty analysis using LSE (Local Similarity Entropy) and LSV (Local Similarity Variance)
+- Created `model_uncertainty_analysis.py` script for automated uncertainty analysis of CGCNN models
+- Added support for cutoff analysis to evaluate performance vs uncertainty trade-offs
+- Integrated with existing uncertainty tree infrastructure for efficient neighbor searches
+- Generated combined visualization plots and numerical results in Excel format
+- Added command-line interface and Python API for flexible usage
+- Created example script in `examples/uncertainty_analysis_example.py`
+- Supports both classification tasks (LSE) and regression tasks (LSV)
+- Provides insights for uncertainty-based data filtering and model deployment

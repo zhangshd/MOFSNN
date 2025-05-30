@@ -233,6 +233,37 @@ def compare_model_performance_repeat(
         print("DataFrame is empty after processing results. Exiting.")
         return None
 
+    # Process standard deviations and means aggregation (inspired by process_ml_results)
+    numeric_cols = ["R2", "MAE", "ACC", "BACC", "AUROC"]
+    std_cols = []
+    
+    # Round all numeric columns (both metrics and their standard deviations)
+    for col in df_results.columns:
+        # Process standard metric columns
+        if (col in numeric_cols) and (col in df_results.columns):
+            df_results[col] = df_results[col].apply(lambda x: round(float(x), 4) if pd.notnull(x) else x)
+            
+        # Process standard deviation columns
+        elif col.endswith('_std') and col.replace('_std', '') in numeric_cols:
+            std_cols.append(col)
+            df_results[col] = df_results[col].apply(lambda x: round(float(x), 4) if pd.notnull(x) else x)
+    
+    # Create new columns that combine mean ± std for better readability
+    for col in numeric_cols:
+        std_col = f"{col}_std"
+        if std_col in df_results.columns:
+            # Create a column with formatted values like "0.75 ± 0.02"
+            formatted_col = f"{col}_formatted"
+            df_results[formatted_col] = df_results.apply(
+                lambda row: f"{row[col]:.2f}±{row[std_col]:.2f}" if pd.notnull(row[col]) and pd.notnull(row[std_col]) else row[col],
+                axis=1
+            )
+            
+            # If include_std is False, remove the std columns but keep formatted columns
+            if not include_std:
+                std_cols_to_drop = [c for c in df_results.columns if c.endswith('_std')]
+                df_results = df_results.drop(columns=std_cols_to_drop)
+
     # Prepare Task column for ordered sorting
     df_results["Task"] = df_results["Task"].astype(str).str.strip()
     task_order_categories = tasks
@@ -274,6 +305,7 @@ def compare_model_performance_repeat(
 
     # Sort by Task and Model
     df_results = df_results.sort_values(["Task", "Model"])
+    df_results.set_index(["Task", "Model"], inplace=True)
 
     # Save results to Excel
     if output_dir:
@@ -284,7 +316,7 @@ def compare_model_performance_repeat(
         else:
             results_file = os.path.join(output_dir, f"model_performance_results_{split}.xlsx")
         
-        df_results.to_excel(results_file, index=False)
+        df_results.to_excel(results_file)
         print(f"Results saved to {results_file}")
 
     return df_results

@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-17 19:01:41
 LastEditors: zhangshd
-LastEditTime: 2025-05-27 15:14:43
+LastEditTime: 2025-05-31 00:22:07
 '''
 import os
 import sys
@@ -88,7 +88,7 @@ def main(model_dir, data_dir, col2task, split="external_test", result_dir=None):
                                                    all_outputs[f"{task}_pred"], 
                                                    all_outputs[f"{task}_cif_ids"], 
                                                    task, split, log_dir=log_dir))
-        np.savez(os.path.join(log_dir, f"{split}_last_layer_fea_{task}.npz"), all_outputs[f'{task}_last_layer_fea'])
+        np.savez(os.path.join(log_dir, f"{task}_{split}_latent_vectors.npz"), all_outputs[f'{task}_last_layer_fea'])
     df_metrics = pd.DataFrame(all_metrics, index=[model_name])
     df_metrics.index.name = "Model"
     metrics_file = os.path.join(log_dir, f"{split}_metrics.csv")
@@ -172,7 +172,7 @@ def process_clf_outputs(targets, preds, logits, cifids, task, split, **kwargs):
                     "CifId": cifids,
                     "GroundTruth": targets,
                     "Predicted": preds,
-                    "Prob": logits[:, 1] if len(logits[0]) == 2 else logits.tolist(),
+                    "Prob": logits.tolist(),
                 })
     df_results.to_csv(csv_file, index=False)
 

@@ -5,6 +5,7 @@ Date: 2025-06-05 (Updated: 2025-06-12)
 Description: Process ML model results across tasks and save summarized results to Excel,
 compatible with compare_model_performance.py for comparing with CGCNN results.
 Supports multiple result directories per task for computing means and standard deviations.
+Enhanced with visualization functionality from compare_model_performance_repeat.py.
 '''
 
 import os
@@ -13,8 +14,11 @@ import json
 import yaml
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from argparse import ArgumentParser
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Any, Union, Tuple
+from matplotlib.figure import Figure
 
 # Get the directory of the script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -25,7 +29,12 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 # Import reusable functions from compare_model_performance.py
 from experiment.compare_model_performance import (
-    read_results_file, calculate_metrics, load_config
+    read_results_file, calculate_metrics, load_config, generate_visualization
+)
+
+# Import visualization functions from compare_model_performance_repeat.py
+from experiment.compare_model_performance_repeat import (
+    plot_bars_with_error, generate_visualization_with_error
 )
 
 # Default paths
@@ -507,6 +516,29 @@ def main():
                       help="Base directory for ML model results (overrides config)")
     parser.add_argument("--no_std", action="store_true",
                       help="Do not include standard deviation columns in output")
+    parser.add_argument("--visualize", action="store_true",
+                      help="Generate visualization of model performance")
+    parser.add_argument("--fig_dir", type=str, default=None,
+                      help="Directory to save visualization figures")
+    parser.add_argument("--fig_format", type=str, default="both",
+                      choices=["tif", "svg", "both", "png"],
+                      help="Format to save visualization figures (default: both tif and svg)")
+    parser.add_argument("--fig_dpi", type=int, default=300,
+                      help="DPI for saved figures (default: 300)")
+    parser.add_argument("--mae_min", type=float, default=10,
+                      help="Minimum value for MAE y-axis")
+    parser.add_argument("--mae_max", type=float, default=60,
+                      help="Maximum value for MAE y-axis")
+    parser.add_argument("--acc_min", type=float, default=0.0,
+                      help="Minimum value for ACC y-axis")
+    parser.add_argument("--acc_max", type=float, default=1.0,
+                      help="Maximum value for ACC y-axis")
+    parser.add_argument("--annotate", action="store_true", 
+                      help="Whether to annotate bars with their values")
+    parser.add_argument("--annotate_size", type=int, default=8,
+                      help="Font size for annotations in the plot")
+    parser.add_argument("--bar_width", type=float, default=0.8,
+                      help="Width of bars in the plot")
 
     args = parser.parse_args()
 
@@ -578,6 +610,43 @@ def main():
     if results_df is not None:
         print("\nResults Summary:")
         print(results_df)
+
+        # Generate visualization if requested
+        if args.visualize:
+            # Set figure directory if not specified
+            fig_dir = args.fig_dir if args.fig_dir else os.path.join(args.output_dir, "figures")
+
+            # Set visualization parameters
+            viz_params = {
+                'mae_lim': (args.mae_min, args.mae_max),
+                'acc_lim': (args.acc_min, args.acc_max),
+                'bar_width': args.bar_width,
+                'annotate_size': args.annotate_size,
+                'annotate': args.annotate
+            }
+
+            # Generate and save visualization with error bars if std data is available
+            if not args.no_std and any(col.endswith('_std') for col in results_df.columns):
+                generate_visualization_with_error(
+                    results_df,
+                    fig_dir=fig_dir,
+                    split=args.split,
+                    fig_format=args.fig_format,
+                    fig_dpi=args.fig_dpi,
+                    **viz_params
+                )
+                print(f"Visualization with error bars saved to {fig_dir}")
+            else:
+                # Generate standard visualization without error bars
+                generate_visualization(
+                    results_df,
+                    fig_dir=fig_dir,
+                    split=args.split,
+                    fig_format=args.fig_format,
+                    fig_dpi=args.fig_dpi,
+                    **viz_params
+                )
+                print(f"Visualization saved to {fig_dir}")
 
 if __name__ == "__main__":
     main()
