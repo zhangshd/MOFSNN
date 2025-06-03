@@ -1,11 +1,8 @@
 """
 Dataset Analysis Script
-
-This script reproduces the data analysis and visualization from notebook 03_dataset_analysis.ipynb.
 It analyzes MOF stability datasets including TSD, SSD, and WS24 tasks, creating visualizations
 for data distributions, correlations, and dataset intersections.
-
-Author: Converted from notebook 03_dataset_analysis.ipynb
+Author: zhangshd
 """
 
 import sys
