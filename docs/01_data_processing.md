@@ -220,3 +220,99 @@ For each random seed (0-4), the script creates the following files:
 - Identical files are also saved in the corresponding `data/cgcnn_data/` directories
 
 When training models that use multiple datasets, always use datasets with the same random seed to ensure proper separation of training, validation, and test data.
+
+## Dataset Analysis
+
+After processing the data, you can perform comprehensive analysis using the dataset analysis script located at `src/experiment/dataset_analysis.py`. This script reproduces the analysis and visualizations from notebook `03_dataset_analysis.ipynb`.
+
+### Features
+
+The dataset analysis script provides:
+- **Dataset Distribution Analysis**: Visualizes data distributions across different splits and stability labels
+- **Correlation Analysis**: Calculates correlations between different datasets using Cramér's V and Eta squared
+- **Intersection Analysis**: Creates UpSet plots to show dataset overlaps and intersections
+- **Automated Report Generation**: Saves numerical data and visualizations in Excel and image formats
+
+### Usage
+
+To run the analysis with default settings:
+
+```bash
+python src/experiment/dataset_analysis.py
+```
+
+Available command line options:
+- `--log-level`: Set logging level (DEBUG, INFO, WARNING, ERROR)
+
+### Configuration
+
+The script uses built-in configuration parameters. All paths are automatically configured relative to the project root directory. The default configuration includes:
+
+- **Data Paths**: 
+  - CGCNN data: `data/cgcnn_data`
+  - Raw SSD data: `data/raw_data/Nandy_2022_SciData/separate_files/solvent_removal_stability/full_SSD_data.csv`
+  - Raw TSD data: `data/raw_data/Nandy_2022_SciData/separate_files/thermal_stability/full_TSD_data.csv`
+
+- **Output Paths**:
+  - Figures: `results/data_analysis/figures`
+  - Numerical data: `results/data_analysis/numerical_data`
+  - Logs: `logs/data_processing`
+
+- **Tasks**: TSD, SSD, WS24_water, WS24_water4, WS24_acid, WS24_base, WS24_boiling
+- **Task Types**: TSD (regression), all others (classification)
+
+- **Plot Settings**: DPI=300, formats=[tif, svg, png], color palette="Blues"
+
+To modify these settings, edit the `load_config()` function in the script.
+
+### Output Files
+
+The analysis generates several types of output:
+
+#### Figures
+- `dataset_distribution.{tif,svg}`: Distribution of samples across tasks and splits
+- `dataset_correlation_heatmap.png`: Correlation matrix heatmap  
+- `dataset_intersections.{tif,svg}`: UpSet plot showing dataset intersections
+
+#### Numerical Data
+- `Figure2.xlsx`: Dataset distribution data with sheets for each task
+- `Figure3.xlsx`: UpSet plot data and correlation matrix
+
+#### Logs
+- `logs/data_processing/dataset_analysis.log`: Detailed execution log
+
+### Analysis Methods
+
+The script employs two statistical methods for correlation analysis:
+
+1. **Cramér's V**: For categorical-categorical variable pairs
+   - Measures association strength between categorical variables
+   - Values range from 0 (no association) to 1 (perfect association)
+
+2. **Eta Squared**: For continuous-categorical variable pairs
+   - Measures the proportion of variance in the continuous variable explained by the categorical variable
+   - Values range from 0 (no association) to 1 (perfect association)
+
+### Dataset Intersection Analysis
+
+The UpSet plot visualization shows:
+- Single dataset memberships (MOFs that appear in only one dataset)
+- Pairwise dataset intersections (MOFs that appear in exactly two datasets)
+- Higher-order intersections (MOFs that appear in multiple datasets)
+
+This analysis is crucial for understanding data overlap when training multi-task models.
+
+### Troubleshooting
+
+Common issues and solutions:
+
+1. **Missing Data Files**: Ensure all processed data files exist in the specified directories
+2. **Import Errors**: Check that all required packages are installed (pandas, numpy, matplotlib, seaborn, upsetplot, scipy, scikit-learn, PyYAML)
+3. **Permission Errors**: Ensure write permissions for output directories
+4. **Memory Issues**: Large datasets may require more RAM; consider running on a machine with more memory
+
+For detailed debugging information, run with debug logging:
+
+```bash
+python src/experiment/dataset_analysis.py --log-level DEBUG
+```
