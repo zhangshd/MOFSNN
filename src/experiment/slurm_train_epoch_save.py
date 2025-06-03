@@ -135,7 +135,7 @@ def main():
         'reconstruct': False,
         'log_dir': os.path.join(ROOT_DIR, "results/cgcnn_models"),
         'optim': 'adam',
-        'decay_power': 'constant_with_warmup',
+        # 'decay_power': 1.0,
     }
     
     # Create job name

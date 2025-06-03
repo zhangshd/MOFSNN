@@ -2,7 +2,7 @@
  * @Author: zhangshd
  * @Date: 2025-06-03 10:17:33
  * @LastEditors: zhangshd
- * @LastEditTime: 2025-06-03 10:17:33
+ * @LastEditTime: 2025-06-04 01:48:38
 -->
 # MOFSNN: Metal-Organic Framework Stability Neural Network
 
@@ -100,4 +100,5 @@ The documentation is organized into the following sections:
 1. [Data Processing](docs/01_data_processing.md)
 2. [Machine Learning Models](docs/02_machine_learning_models.md)
 3. [CGCNN Models](docs/03_cgcnn_models.md)
-4. [CGCNN Feature Importance Visualization Guide](docs/cgcnn_visualization_guide.md)
+4. [Experimentation and Results](docs/04_experiments.md)
+5. [CGCNN Feature Importance Visualization Guide](docs/cgcnn_visualization_guide.md)
