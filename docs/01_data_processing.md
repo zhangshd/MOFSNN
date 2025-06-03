@@ -19,19 +19,6 @@ The data processing includes the following steps:
 5. Creating train/validation/test splits
 6. Merging features with property data
 
-## Setup and Requirements
-
-The data processing script requires the following dependencies:
-- Python 3.8+
-- pandas
-- numpy
-- scikit-learn
-- ASE (Atomic Simulation Environment)
-- PyMatGen (Python Materials Genomics)
-- tqdm
-
-Make sure your project environment has all required dependencies installed.
-
 ## Using the Data Processor
 
 The project includes a dedicated data processor script located at `src/data/data_processor.py`. This script replaces the previously used Jupyter notebooks for data processing.
@@ -43,8 +30,8 @@ The data processor supports the following command line arguments:
 | Argument | Description | Default |
 |----------|-------------|---------|
 | `--raw_data_dir` | Directory containing raw data files | `data/raw_data` |
-| `--output_dir` | Directory to save processed data for CGCNN models | `data/cgcnn_data_` |
-| `--ml_output_dir` | Directory to save processed data for ML models | `data/ml_data_` |
+| `--output_dir` | Directory to save processed data for CGCNN models | `data/cgcnn_data` |
+| `--ml_output_dir` | Directory to save processed data for ML models | `data/ml_data` |
 | `--log_dir` | Directory to save logs | `logs/data_processing` |
 | `--dataset` | Dataset to process: `all`, `tsd_ssd`, or `ws24` | `all` |
 | `--n_cpus` | Number of CPU cores to use for parallel processing | `4` |
@@ -99,7 +86,7 @@ The processing workflow for TSD and SSD datasets follows these steps:
    - Handles errors in CIF files that might prevent further processing
 
 4. **Feature Generation**:
-   - Generates RAC (Revised Autocorrelation) and zeolite-inspired features
+   - Generates RAC (Revised Autocorrelation) and zeo++ features
    - Creates feature files in the specified output directory
 
 5. **Graph Data Preparation**:
@@ -109,10 +96,6 @@ The processing workflow for TSD and SSD datasets follows these steps:
 6. **Data Analysis**:
    - Computes statistics about atom counts and structure properties
    - Records these statistics in the log files
-
-7. **Data Merging**:
-   - Combines features with property data
-   - Creates a final CSV file with all necessary information for ML models
 
 The script automatically checks if any step has already been completed to avoid redundant processing, making it efficient for repeated runs.
 
