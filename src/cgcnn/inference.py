@@ -2,7 +2,7 @@
 Author: zhangshd
 Date: 2024-08-19 15:59:37
 LastEditors: zhangshd
-LastEditTime: 2025-06-03 13:50:51
+LastEditTime: 2025-06-10 16:00:09
 '''
 import os
 import sys
@@ -410,7 +410,7 @@ def main():
     parser.add_argument('--model_dir', default=str(ROOT_DIR/"results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43"), 
                         help='Path to the model directory')
     parser.add_argument('--uncertainty_trees_file', 
-                        default=str(ROOT_DIR/"results/evaluation/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn@version_43/uncertainty_trees.pkl"), 
+                        default=str(ROOT_DIR/"results/cgcnn_models/TSD_SSD_WS24_water_WS24_water4_WS24_acid_WS24_base_WS24_boiling_seed42_att_cgcnn/version_43/epoch_108/uncertainty_trees.pkl"), 
                         help='Path to uncertainty trees file')
     parser.add_argument('--uncertainty', action='store_true', default=False, help='Whether to enable uncertainty estimation')
     parser.add_argument('--temp_dir', type=str, default=None, help='Directory for saving temporary files')

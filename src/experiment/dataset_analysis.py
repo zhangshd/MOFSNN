@@ -232,8 +232,8 @@ def plot_dataset_distribution(dfs: Dict[str, Dict[str, pd.DataFrame]],
     
     plt.subplots_adjust(wspace=0.4, hspace=0.4)
     plt.tight_layout()
-    plt.savefig(fig_dir / 'dataset_distribution.tif', dpi=96)
-    plt.savefig(fig_dir / f"dataset_distribution.svg", dpi=200, transparent=True)
+    plt.savefig(fig_dir / 'dataset_distribution.tif', dpi=300)
+    plt.savefig(fig_dir / f"dataset_distribution.svg", dpi=300, transparent=True)
     plt.show()
     
     excel_writer.close()

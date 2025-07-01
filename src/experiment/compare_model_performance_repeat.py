@@ -512,7 +512,7 @@ def generate_visualization_with_error(df_results: pd.DataFrame,
                               fig_dir: Optional[str] = None,
                               split: str = "test",
                               fig_format: str = "both",
-                              fig_dpi: int = 200,
+                              fig_dpi: int = 300,
                               **kwargs) -> Optional[Figure]:
     """
     Generate and save visualization for model performance comparison with error bars.
@@ -601,7 +601,7 @@ def generate_visualization_with_error(df_results: pd.DataFrame,
         # Save in specified format(s)
         if fig_format in ["tif", "both"]:
             tif_path = os.path.join(fig_dir, f"{base_filename}.tif")
-            fig.savefig(tif_path, dpi=96)
+            fig.savefig(tif_path, dpi=fig_dpi)
             print(f"Figure saved as {tif_path}")
 
         if fig_format in ["svg", "both"]:

@@ -670,8 +670,8 @@ def create_combined_visualization(results, tasks, model_hparams, output_dir, dim
     fig_target.tight_layout(rect=[0, 0, 1, 1])
     
     # Save figures
-    uncertainty_path = output_dir / f"all_tasks_{dim_reduction_method.lower()}_uncertainty_visualization.png"
-    target_path = output_dir / f"all_tasks_{dim_reduction_method.lower()}_target_visualization.png"
+    uncertainty_path = output_dir / f"all_tasks_{dim_reduction_method.lower()}_uncertainty_visualization.tif"
+    target_path = output_dir / f"all_tasks_{dim_reduction_method.lower()}_target_visualization.tif"
     
     fig_uncertainty.savefig(uncertainty_path, dpi=300, bbox_inches='tight')
     fig_target.savefig(target_path, dpi=300, bbox_inches='tight')

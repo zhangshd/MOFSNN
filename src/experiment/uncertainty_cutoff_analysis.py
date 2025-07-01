@@ -480,7 +480,7 @@ class UncertaintyAnalyzer:
         
         # Save the combined plot
         plt.tight_layout()
-        fig_file = self.output_dir / "figures" / "uncertainty_cutoff_analysis.png"
+        fig_file = self.output_dir / "figures" / "uncertainty_cutoff_analysis.tif"
         plt.savefig(fig_file, dpi=300, bbox_inches='tight')
         
         svg_file = self.output_dir / "figures" / "uncertainty_cutoff_analysis.svg"

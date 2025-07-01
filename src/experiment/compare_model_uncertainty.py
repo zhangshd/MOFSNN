@@ -313,11 +313,14 @@ def compare_uncertainty_evolution(
         # Save figure
         if output_filename:
             output_file = output_dir / output_filename
+            
         else:
             output_file = output_dir / f"model_comparison_{task_name}_{uncertainty_type}_{split}.png"
         
         plt.tight_layout()
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        tif_output = output_file.with_suffix('.tif')
+        plt.savefig(tif_output, dpi=300, bbox_inches='tight')
         print(f"Saved comparison plot to {output_file}")
         plt.close()
         

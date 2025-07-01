@@ -602,6 +602,7 @@ def plot_bars(df: pd.DataFrame, figsize: Tuple[int, int]=(14, 8),
 
     if "TSD" in df['Task'].unique():
         # Plot MAE bar chart for TSD
+        print("Plotting TSD (MAE) performance")
         tsd_plot = sns.barplot(
             data=df[df['Task'] == 'TSD'],
             x='Task',
@@ -634,6 +635,7 @@ def plot_bars(df: pd.DataFrame, figsize: Tuple[int, int]=(14, 8),
         # Create second y-axis
         ax2 = ax1.twinx()
     else:
+        print("No TSD task found, plotting only ACC performance")
         ax2 = ax1
 
     # Plot ACC bar chart for other tasks
@@ -677,7 +679,7 @@ def generate_visualization(df_results: pd.DataFrame,
                         fig_dir: Optional[str] = None,
                         split: str = "test",
                         fig_format: str = "both",
-                        fig_dpi: int = 200,
+                        fig_dpi: int = 300,
                         **kwargs) -> Optional[Figure]:
     """
     Generate and save visualization for model performance comparison.
@@ -725,6 +727,10 @@ def generate_visualization(df_results: pd.DataFrame,
         print("Error: No valid data for visualization")
         return None
 
+    # Remove categorical information to avoid showing empty categories on x-axis
+    combined_data['Task'] = combined_data['Task'].astype(str)
+    combined_data['Model'] = combined_data['Model'].astype(str)
+
     # Default visualization parameters
     viz_params = {
         'figsize': (14, 8),
@@ -739,6 +745,7 @@ def generate_visualization(df_results: pd.DataFrame,
     # Update with any provided kwargs
     viz_params.update(kwargs)
 
+    print("-" * 40)
     # Generate visualization
     fig = plot_bars(combined_data, **viz_params)
 
@@ -751,7 +758,7 @@ def generate_visualization(df_results: pd.DataFrame,
         # Save in specified format(s)
         if fig_format in ["tif", "both"]:
             tif_path = os.path.join(fig_dir, f"{base_filename}.tif")
-            fig.savefig(tif_path, dpi=96)
+            fig.savefig(tif_path, dpi=fig_dpi)
             print(f"Figure saved as {tif_path}")
 
         if fig_format in ["svg", "both"]:
