@@ -371,10 +371,13 @@ def track_uncertainty_evolution(
     
     # Save the combined figure
     combined_output_file = output_dir / "all_splits_combined_uncertainty_evolution.png"
+    combined_output_file_tif = combined_output_file.with_suffix('.tif')
     plt.savefig(combined_output_file, dpi=300)
+    plt.savefig(combined_output_file_tif, dpi=300)
     plt.close(fig)
     
     print(f"Saved combined plot with all splits to {combined_output_file}")
+    print(f"Saved combined plot with all splits to {combined_output_file_tif}")
     
     return results
 

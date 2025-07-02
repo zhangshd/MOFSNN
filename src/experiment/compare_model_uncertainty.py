@@ -322,6 +322,7 @@ def compare_uncertainty_evolution(
         tif_output = output_file.with_suffix('.tif')
         plt.savefig(tif_output, dpi=300, bbox_inches='tight')
         print(f"Saved comparison plot to {output_file}")
+        print(f"Saved comparison plot to {tif_output}")
         plt.close()
         
         # Save combined data to CSV
@@ -436,6 +437,9 @@ if __name__ == "__main__":
         for j in range(len(tasks), len(axs_flat)):
             axs_flat[j].set_visible(False)
         output_file = Path(output_dir) / f"all_tasks_val_combined.png"
+        output_tif = output_file.with_suffix('.tif')
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        plt.savefig(output_tif, dpi=300, bbox_inches='tight')
         print(f"Saved combined plot to {output_file}")
+        print(f"Saved combined plot to {output_tif}")
         plt.close(fig)
