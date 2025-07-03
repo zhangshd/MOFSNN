@@ -233,6 +233,7 @@ def plot_dataset_distribution(dfs: Dict[str, Dict[str, pd.DataFrame]],
     plt.subplots_adjust(wspace=0.4, hspace=0.4)
     plt.tight_layout()
     plt.savefig(fig_dir / 'dataset_distribution.tif', dpi=300)
+    plt.savefig(fig_dir / 'dataset_distribution.png', dpi=300)
     plt.savefig(fig_dir / f"dataset_distribution.svg", dpi=300, transparent=True)
     plt.show()
     
@@ -438,7 +439,8 @@ def create_upset_plot(dfs: Dict[str, Dict[str, pd.DataFrame]],
     fig = intersections_ax.figure
     fig.set_size_inches(16, 10)
     fig.figure.set_dpi(300)
-    fig.savefig(fig_dir / 'dataset_intersections.tif', dpi=300, bbox_inches='tight')
+    # fig.savefig(fig_dir / 'dataset_intersections.tif', dpi=300, bbox_inches='tight')
+    fig.savefig(fig_dir / 'dataset_intersections.png', dpi=300, bbox_inches='tight')
     fig.savefig(fig_dir / 'dataset_intersections.svg', dpi=300, transparent=True)
     plt.show()
     
