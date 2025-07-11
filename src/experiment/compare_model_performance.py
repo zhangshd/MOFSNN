@@ -761,12 +761,12 @@ def generate_visualization(df_results: pd.DataFrame,
             fig.savefig(tif_path, dpi=fig_dpi)
             print(f"Figure saved as {tif_path}")
 
-        if fig_format in ["svg", "both"]:
+        if fig_format in ["svg"]:
             svg_path = os.path.join(fig_dir, f"{base_filename}.svg")
             fig.savefig(svg_path, dpi=fig_dpi, transparent=True)
             print(f"Figure saved as {svg_path}")
 
-        if fig_format == "png":
+        if fig_format in ["png", "both"]:
             png_path = os.path.join(fig_dir, f"{base_filename}.png")
             fig.savefig(png_path, dpi=fig_dpi)
             print(f"Figure saved as {png_path}")

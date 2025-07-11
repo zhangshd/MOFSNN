@@ -97,6 +97,6 @@ for i, task in enumerate(tasks):
             
         ax.set_title(f"{task}(ACC={accuracy:.2f})", weight='bold')
 plt.savefig(fig_dir / "test_preds.tif", dpi=300, bbox_inches='tight')
-fig.savefig(fig_dir/'test_preds.svg', bbox_inches='tight', dpi=300, transparent=True)
+fig.savefig(fig_dir/'test_preds.png', bbox_inches='tight', dpi=300)
 plt.show()
 excel_writer.close()

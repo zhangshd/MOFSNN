@@ -675,7 +675,11 @@ def create_combined_visualization(results, tasks, model_hparams, output_dir, dim
     
     fig_uncertainty.savefig(uncertainty_path, dpi=300, bbox_inches='tight')
     fig_target.savefig(target_path, dpi=300, bbox_inches='tight')
-    
+
+    ## save png files
+    fig_uncertainty.savefig(uncertainty_path.with_suffix('.png'), dpi=300, bbox_inches='tight')
+    fig_target.savefig(target_path.with_suffix('.png'), dpi=300, bbox_inches='tight')
+
     plt.close(fig_uncertainty)
     plt.close(fig_target)
     

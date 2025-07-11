@@ -604,12 +604,12 @@ def generate_visualization_with_error(df_results: pd.DataFrame,
             fig.savefig(tif_path, dpi=fig_dpi)
             print(f"Figure saved as {tif_path}")
 
-        if fig_format in ["svg", "both"]:
+        if fig_format in ["svg"]:
             svg_path = os.path.join(fig_dir, f"{base_filename}.svg")
             fig.savefig(svg_path, dpi=fig_dpi, transparent=True)
             print(f"Figure saved as {svg_path}")
 
-        if fig_format == "png":
+        if fig_format in ["png", "both"]:
             png_path = os.path.join(fig_dir, f"{base_filename}.png")
             fig.savefig(png_path, dpi=fig_dpi)
             print(f"Figure saved as {png_path}")
@@ -637,7 +637,7 @@ def main():
                       help="Directory to save visualization figures")
     parser.add_argument("--fig_format", type=str, default="both",
                       choices=["tif", "svg", "both", "png"],
-                      help="Format to save visualization figures (default: both tif and svg)")
+                      help="Format to save visualization figures (default: both tif and png)")
     parser.add_argument("--fig_dpi", type=int, default=300,
                       help="DPI for saved figures (default: 300)")
     parser.add_argument("--mae_min", type=float, default=10,

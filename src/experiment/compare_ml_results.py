@@ -522,7 +522,7 @@ def main():
                       help="Directory to save visualization figures")
     parser.add_argument("--fig_format", type=str, default="both",
                       choices=["tif", "svg", "both", "png"],
-                      help="Format to save visualization figures (default: both tif and svg)")
+                      help="Format to save visualization figures (default: both tif and png)")
     parser.add_argument("--fig_dpi", type=int, default=300,
                       help="DPI for saved figures (default: 300)")
     parser.add_argument("--mae_min", type=float, default=10,
