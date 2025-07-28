@@ -101,4 +101,3 @@ The documentation is organized into the following sections:
 2. [Machine Learning Models](docs/02_machine_learning_models.md)
 3. [CGCNN Models](docs/03_cgcnn_models.md)
 4. [Experimentation and Results](docs/04_experiments.md)
-5. [CGCNN Feature Importance Visualization Guide](docs/cgcnn_visualization_guide.md)

@@ -44,6 +44,8 @@ data/*
 logs*
 **/raw_data
 **/CoREMOF2019
+**/*visualization*/
+**/*visualization*.*
 results/*
 !results/cgcnn_models/
 results/cgcnn_models/*
