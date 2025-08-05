@@ -324,6 +324,8 @@ def inference(cif_list, model_dir, saved_dir, uncertainty_trees_file=None, logge
         all_outputs[f"{task}_uncertainty"] = []
         for d in tqdm(outputs, desc=f"Calculating uncertainty for {task}"):
             task_fea = d[f'{task}_last_layer_fea'].cpu().numpy().squeeze()
+            if task_fea.ndim == 1:
+                task_fea = task_fea.reshape(1, -1)
             if "classification" in task_tp:
                 all_outputs[f"{task}_uncertainty"].append(calculate_lse_from_tree(uncertainty_trees[task], task_fea, k=uncertainty_trees[task]["k"]))
             else:
